@@ -1,0 +1,278 @@
+\doxysection{I2C Class Reference}
+\hypertarget{class_i2_c}{}\label{class_i2_c}\index{I2C@{I2C}}
+
+
+{\ttfamily \#include $<$Arduboy\+I2\+C.\+h$>$}
+
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{class_i2_c_a0d0843fa16f5444c019bc9542a8e80e5}{init}} ()
+\begin{DoxyCompactList}\small\item\em Initalizes \doxylink{class_i2_c}{I2C} hardware. \end{DoxyCompactList}\item 
+static void \mbox{\hyperlink{class_i2_c_ab565cec84a8fc6e626efd29c1b737907}{set\+Address}} (uint8\+\_\+t address, bool general\+Call=false)
+\begin{DoxyCompactList}\small\item\em Set the address of the device and enable/disable general calls on the \doxylink{class_i2_c}{I2C} bus. \end{DoxyCompactList}\item 
+static void \mbox{\hyperlink{class_i2_c_aed92501cef760847b58ba8a22d5fefe2}{write\+To}} (uint8\+\_\+t address, const void \texorpdfstring{$\ast$}{*}buffer, uint8\+\_\+t size, bool wait)
+\begin{DoxyCompactList}\small\item\em Attempts to become the bus controller (master) and sends data over \doxylink{class_i2_c}{I2C} to the specified address. \end{DoxyCompactList}\item 
+\Hypertarget{class_i2_c_a8e6e0f71d918e8eb26f00fc5ffb39223}\label{class_i2_c_a8e6e0f71d918e8eb26f00fc5ffb39223} 
+{\footnotesize template$<$typename T $>$ }\\static void {\bfseries write\+To} (uint8\+\_\+t address, T \texorpdfstring{$\ast$}{*}buffer, bool wait)
+\item 
+static void \mbox{\hyperlink{class_i2_c_aaccde5c977fbdeb269fad658e4a223cf}{read\+From}} (uint8\+\_\+t address, void \texorpdfstring{$\ast$}{*}buffer, uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Attempts to become the bus controller (master) and reads data over \doxylink{class_i2_c}{I2C} from the specified address. \end{DoxyCompactList}\item 
+\Hypertarget{class_i2_c_a0030c199bb212033954ca0f6a5697dc9}\label{class_i2_c_a0030c199bb212033954ca0f6a5697dc9} 
+{\footnotesize template$<$typename T $>$ }\\static void {\bfseries read\+From} (uint8\+\_\+t address, T \texorpdfstring{$\ast$}{*}buffer)
+\item 
+static void \mbox{\hyperlink{class_i2_c_aca6b5562fe21e387b6800103195a214b}{transmit}} (void \texorpdfstring{$\ast$}{*}buffer, uint8\+\_\+t size)
+\begin{DoxyCompactList}\small\item\em Transmits data back to the controller (master). \end{DoxyCompactList}\item 
+static void \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{on\+Request}} (void(\texorpdfstring{$\ast$}{*}function)())
+\begin{DoxyCompactList}\small\item\em Sets up the callback to be called when data is requested from the device\textquotesingle{}s address (a read\+From). \end{DoxyCompactList}\item 
+static void \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{on\+Receive}} (void(\texorpdfstring{$\ast$}{*}function)())
+\begin{DoxyCompactList}\small\item\em Sets up the callback to be called when data is sent to the device\textquotesingle{}s address (a write\+To) \end{DoxyCompactList}\item 
+static uint8\+\_\+t \mbox{\hyperlink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{get\+TWError}} ()
+\begin{DoxyCompactList}\small\item\em Gets the hardware error which happened in a previous read or write. \end{DoxyCompactList}\item 
+static uint8\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb}{get\+Buffer}} ()
+\begin{DoxyCompactList}\small\item\em Gets a pointer to the \doxylink{class_i2_c}{I2C} buffer holding received data. \end{DoxyCompactList}\item 
+static uint8\+\_\+t \mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{get\+Address\+From\+Id}} (uint8\+\_\+t id)
+\begin{DoxyCompactList}\small\item\em Gets the address from a provided id. \end{DoxyCompactList}\item 
+static uint8\+\_\+t \mbox{\hyperlink{class_i2_c_a931972954dc9844762a94d2f7de56f04}{handshake}} ()
+\begin{DoxyCompactList}\small\item\em Handshakes with other devices and returns a unique id once complete. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides all \doxylink{class_i2_c}{I2C} functionality. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}\index{I2C@{I2C}!getAddressFromId@{getAddressFromId}}
+\index{getAddressFromId@{getAddressFromId}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{getAddressFromId()}{getAddressFromId()}}
+{\footnotesize\ttfamily \label{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb} 
+static uint8\+\_\+t I2\+C\+::get\+Address\+From\+Id (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{id}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Gets the address from a provided id. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & An id between 0 and I2\+C\+\_\+\+MAX\+\_\+\+ADDRESSES \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The address corresponding to that id.
+\end{DoxyReturn}
+This function is provided to standardize addresses for each id. It is used by \doxylink{class_i2_c_a931972954dc9844762a94d2f7de56f04}{I2\+C\+::handshake}. \Hypertarget{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb}\index{I2C@{I2C}!getBuffer@{getBuffer}}
+\index{getBuffer@{getBuffer}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{getBuffer()}{getBuffer()}}
+{\footnotesize\ttfamily \label{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb} 
+static uint8\+\_\+t \texorpdfstring{$\ast$}{*} I2\+C\+::get\+Buffer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Gets a pointer to the \doxylink{class_i2_c}{I2C} buffer holding received data. 
+
+Intended to be used inside the on\+Receive callback. \begin{DoxySeeAlso}{See also}
+\doxylink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{on\+Receive()} 
+\end{DoxySeeAlso}
+\Hypertarget{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}\index{I2C@{I2C}!getTWError@{getTWError}}
+\index{getTWError@{getTWError}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{getTWError()}{getTWError()}}
+{\footnotesize\ttfamily \label{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171} 
+static uint8\+\_\+t I2\+C\+::get\+TWError (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Gets the hardware error which happened in a previous read or write. 
+
+\begin{DoxyReturn}{Returns}
+A byte indicating the error. TW\+\_\+\+SUCCESS means no error has occurred. The full list of error codes are available in the avr utils\textbackslash{}twi.\+h. 
+\end{DoxyReturn}
+\Hypertarget{class_i2_c_a931972954dc9844762a94d2f7de56f04}\index{I2C@{I2C}!handshake@{handshake}}
+\index{handshake@{handshake}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{handshake()}{handshake()}}
+{\footnotesize\ttfamily \label{class_i2_c_a931972954dc9844762a94d2f7de56f04} 
+static uint8\+\_\+t I2\+C\+::handshake (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Handshakes with other devices and returns a unique id once complete. 
+
+\begin{DoxyReturn}{Returns}
+A unique id for this device.
+\end{DoxyReturn}
+I2\+C\+\_\+\+MAX\+\_\+\+PLAYERS must be defined to 1 or more before including the header file to the number of players in the handshake. This function will wait until every single player has joined. \Hypertarget{class_i2_c_a0d0843fa16f5444c019bc9542a8e80e5}\index{I2C@{I2C}!init@{init}}
+\index{init@{init}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}}
+{\footnotesize\ttfamily \label{class_i2_c_a0d0843fa16f5444c019bc9542a8e80e5} 
+static void I2\+C\+::init (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Initalizes \doxylink{class_i2_c}{I2C} hardware. 
+
+This functions powers on, initializes, and sets up the clock on the TWI hardware. Must be called after the arduboy hardware is initialized as {\ttfamily arduboy.\+boot()} disables the \doxylink{class_i2_c}{I2\+C(\+TWI)} hardware. \Hypertarget{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}\index{I2C@{I2C}!onReceive@{onReceive}}
+\index{onReceive@{onReceive}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{onReceive()}{onReceive()}}
+{\footnotesize\ttfamily \label{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d} 
+static void I2\+C\+::on\+Receive (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*}}]{function~}{)()}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Sets up the callback to be called when data is sent to the device\textquotesingle{}s address (a write\+To) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em function} & The function to be called when data is received.\\
+\hline
+\end{DoxyParams}
+Example Callback and Usage\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ dataReceive()\ \{}
+\DoxyCodeLine{\ \ uint8\_t\ *buffer\ =\ \mbox{\hyperlink{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb}{I2C::getBuffer}}();}
+\DoxyCodeLine{\ \ players[buffer[0]]\ =\ *(player\_t\ *)buffer;}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{...}
+\DoxyCodeLine{void\ setup()\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{I2C::onReceive}}(dataReceive);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ \begin{DoxySeeAlso}{See also}
+\doxylink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{on\+Request()} \doxylink{class_i2_c_aed92501cef760847b58ba8a22d5fefe2}{write\+To()} 
+\end{DoxySeeAlso}
+\Hypertarget{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}\index{I2C@{I2C}!onRequest@{onRequest}}
+\index{onRequest@{onRequest}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{onRequest()}{onRequest()}}
+{\footnotesize\ttfamily \label{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d} 
+static void I2\+C\+::on\+Request (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*}}]{function~}{)()}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Sets up the callback to be called when data is requested from the device\textquotesingle{}s address (a read\+From). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em function} & The function to be called when data is requested.\\
+\hline
+\end{DoxyParams}
+Example Callback and Usage\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{void}\ dataRequest()\ \{}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{class_i2_c_aca6b5562fe21e387b6800103195a214b}{I2C::transmit}}(\&players[\textcolor{keywordtype}{id}],\ 2);}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{...}
+\DoxyCodeLine{void\ setup()\ \{}
+\DoxyCodeLine{\ \ ...}
+\DoxyCodeLine{\ \ \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{I2C::onRequest}}(dataRequest);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ \begin{DoxyNote}{Note}
+To respond to the controller (master), use {\ttfamily transmit} instead of {\ttfamily write\+To}. 
+
+If no bytes are send in the callback, the result of the transmission is undefined. 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\doxylink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{on\+Receive()} \doxylink{class_i2_c_aca6b5562fe21e387b6800103195a214b}{transmit()} \doxylink{class_i2_c_aaccde5c977fbdeb269fad658e4a223cf}{read\+From()} 
+\end{DoxySeeAlso}
+\Hypertarget{class_i2_c_aaccde5c977fbdeb269fad658e4a223cf}\index{I2C@{I2C}!readFrom@{readFrom}}
+\index{readFrom@{readFrom}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{readFrom()}{readFrom()}}
+{\footnotesize\ttfamily \label{class_i2_c_aaccde5c977fbdeb269fad658e4a223cf} 
+static void I2\+C\+::read\+From (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{address}{, }\item[{void \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{uint8\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Attempts to become the bus controller (master) and reads data over \doxylink{class_i2_c}{I2C} from the specified address. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The 7-\/bit address which to receive the data from. Addresses 0-\/7 and 120-\/127 are reserved by the standard and should not be used. \\
+\hline
+{\em buffer} & A pointer to the buffer in which to store the data. \\
+\hline
+{\em size} & The maximum amount of bytes to receive. This cannot be zero. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Unlike the {\ttfamily write\+To} function, this function is bufferless and is not limited to 32 bytes. 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\doxylink{class_i2_c_aed92501cef760847b58ba8a22d5fefe2}{write\+To()} 
+\end{DoxySeeAlso}
+\Hypertarget{class_i2_c_ab565cec84a8fc6e626efd29c1b737907}\index{I2C@{I2C}!setAddress@{setAddress}}
+\index{setAddress@{setAddress}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{setAddress()}{setAddress()}}
+{\footnotesize\ttfamily \label{class_i2_c_ab565cec84a8fc6e626efd29c1b737907} 
+static void I2\+C\+::set\+Address (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{address}{, }\item[{bool}]{general\+Call}{ = {\ttfamily false}}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Set the address of the device and enable/disable general calls on the \doxylink{class_i2_c}{I2C} bus. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The 7-\/bit address which to respond to. Addresses 0-\/7 and 120-\/127 are reserved by the standard and should not be used. \\
+\hline
+{\em general\+Call} & Whether to enable or disable general calls. Defaults to false. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+General calls are a way for a device to broadcast data to every other device without addressing them individually. They are sent by sending a write to address 0. If they are disabled, the device will not respond to them. 
+\end{DoxyNote}
+\Hypertarget{class_i2_c_aca6b5562fe21e387b6800103195a214b}\index{I2C@{I2C}!transmit@{transmit}}
+\index{transmit@{transmit}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{transmit()}{transmit()}}
+{\footnotesize\ttfamily \label{class_i2_c_aca6b5562fe21e387b6800103195a214b} 
+static void I2\+C\+::transmit (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{uint8\+\_\+t}]{size}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Transmits data back to the controller (master). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & A pointer to the data to send. \\
+\hline
+{\em size} & The amount of the data in bytes to send.\\
+\hline
+\end{DoxyParams}
+This function is intended to be called once inside the on\+Request callback. It fills the transmitting buffer with data to then be send one byte at a time. If it is called multiple times, only the last call will be sent. \begin{DoxyNote}{Note}
+Internally, this function uses a buffer. The buffer size is controlled by the macro {\ttfamily I2\+C\+\_\+\+BUFFER\+\_\+\+SIZE} and defaults to 32. If the program needs to send more than 32 bytes at a time, {\ttfamily I2\+C\+\_\+\+BUFFER\+\_\+\+SIZE} must be defined before including to be larger. 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\doxylink{class_i2_c_aed92501cef760847b58ba8a22d5fefe2}{write\+To()} \doxylink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{on\+Request()} 
+\end{DoxySeeAlso}
+\Hypertarget{class_i2_c_aed92501cef760847b58ba8a22d5fefe2}\index{I2C@{I2C}!writeTo@{writeTo}}
+\index{writeTo@{writeTo}!I2C@{I2C}}
+\doxysubsubsection{\texorpdfstring{writeTo()}{writeTo()}}
+{\footnotesize\ttfamily \label{class_i2_c_aed92501cef760847b58ba8a22d5fefe2} 
+static void I2\+C\+::write\+To (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{address}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{uint8\+\_\+t}]{size}{, }\item[{bool}]{wait}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Attempts to become the bus controller (master) and sends data over \doxylink{class_i2_c}{I2C} to the specified address. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em address} & The 7-\/bit address which to send the data. To send a general call, use address 0. Addresses 1-\/7 and 120-\/127 are reserved by the standard and should not be used. \\
+\hline
+{\em buffer} & A pointer to the data to send. \\
+\hline
+{\em size} & The amount of data in bytes to send. This cannot be zero. \\
+\hline
+{\em wait} & Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Sending general calls will only function if the {\ttfamily general\+Call} argument of {\ttfamily set\+Address} is true on every other device. 
+
+Interally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro {\ttfamily I2\+C\+\_\+\+BUFFER\+\_\+\+SIZE} and defaults to 32. If the program needs to send more than 32 bytes at a time, {\ttfamily I2\+C\+\_\+\+BUFFER\+\_\+\+SIZE} must be defined before including to be larger. 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\doxylink{class_i2_c_aca6b5562fe21e387b6800103195a214b}{transmit()} \doxylink{class_i2_c_aaccde5c977fbdeb269fad658e4a223cf}{read\+From()} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_arduboy_i2_c_8h}{Arduboy\+I2\+C.\+h}}\end{DoxyCompactItemize}

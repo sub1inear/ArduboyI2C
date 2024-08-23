@@ -1,0 +1,159 @@
+\doxysection{Arduboy\+I2\+C.\+h File Reference}
+\hypertarget{_arduboy_i2_c_8h}{}\label{_arduboy_i2_c_8h}\index{ArduboyI2C.h@{ArduboyI2C.h}}
+
+
+An \doxylink{class_i2_c}{I2C} library for Arduboy multiplayer games.  
+
+
+{\ttfamily \#include $<$avr/interrupt.\+h$>$}\newline
+{\ttfamily \#include $<$avr/power.\+h$>$}\newline
+{\ttfamily \#include $<$util/twi.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_i2_c}{I2C}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_afd74d0ddc5d78f0d7957c5bbe90eb222}{I2\+C\+\_\+\+FREQUENCY}}~100000
+\begin{DoxyCompactList}\small\item\em The initial \doxylink{class_i2_c}{I2C} frequency. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}{I2\+C\+\_\+\+BUFFER\+\_\+\+SIZE}}~32
+\begin{DoxyCompactList}\small\item\em The size of the buffer used for writes/target (slave) operations. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2\+C\+\_\+\+BUS\+\_\+\+BUSY\+\_\+\+CHECKS}}~16
+\begin{DoxyCompactList}\small\item\em The amount of times the bus is checked before continuing with a read/write operation. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a0e4e08bab2fb484136d18b067bef372c}{I2\+C\+\_\+\+SCL\+\_\+\+PIN}}~PIND
+\begin{DoxyCompactList}\small\item\em The pin on which the SCL line is connected. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a5e7834d040f89e2e7fc864785e80f981}{I2\+C\+\_\+\+SCL\+\_\+\+BIT}}~PIND0
+\begin{DoxyCompactList}\small\item\em The bit of the pin on which the SCL line is connected. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a2cade698267beb86ccaa38c14d35ab0f}{I2\+C\+\_\+\+SDA\+\_\+\+PIN}}~PIND
+\begin{DoxyCompactList}\small\item\em The pin on which the SDA line is connected. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_ab37c7049d3f4f3dc7d89b5c02e88f7c7}{I2\+C\+\_\+\+SDA\+\_\+\+BIT}}~PIND1
+\begin{DoxyCompactList}\small\item\em The bit of the pin on which the sda line is connected. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a7b1d0a049421f122f95c1e80542a532b}{I2\+C\+\_\+\+MAX\+\_\+\+PLAYERS}}
+\begin{DoxyCompactList}\small\item\em The maxmimum number of players in the handshake/lobby. \end{DoxyCompactList}\item 
+\Hypertarget{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a}\label{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a} 
+\#define {\bfseries TW\+\_\+\+SUCCESS}~0x\+FF
+\begin{DoxyCompactList}\small\item\em Error code used to mean success, returned by \doxylink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{I2\+C\+::get\+TWError()}. \end{DoxyCompactList}\item 
+\Hypertarget{_arduboy_i2_c_8h_a71cebcb14a4ae8c7baf93e10aac0d498}\label{_arduboy_i2_c_8h_a71cebcb14a4ae8c7baf93e10aac0d498} 
+\#define {\bfseries I2\+C\+\_\+\+HANDSHAKE\+\_\+\+COMPLETED}~0x\+FE
+\begin{DoxyCompactList}\small\item\em Error code RETURNED by \doxylink{class_i2_c_a931972954dc9844762a94d2f7de56f04}{I2\+C\+::handshake}, meaning the handshake has already been completed. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a79cc8450ce152950948306f7590c3919}{I2\+C\+\_\+\+MAX\+\_\+\+ADDRESSES}}~112
+\begin{DoxyCompactList}\small\item\em The maximum amount of addresses available to a device. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{_arduboy_i2_c_8h_a89cb379c38e2b4b8e1a1c00df7d6ab45}{I2\+C\+\_\+\+LIB\+\_\+\+VER}}~1\`{}00\`{}00
+\begin{DoxyCompactList}\small\item\em \doxylink{class_i2_c}{I2C} library version. ~\newline
+ \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+An \doxylink{class_i2_c}{I2C} library for Arduboy multiplayer games. 
+
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_BUFFER\_SIZE@{I2C\_BUFFER\_SIZE}}
+\index{I2C\_BUFFER\_SIZE@{I2C\_BUFFER\_SIZE}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_BUFFER\_SIZE}{I2C\_BUFFER\_SIZE}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd} 
+\#define I2\+C\+\_\+\+BUFFER\+\_\+\+SIZE~32}
+
+
+
+The size of the buffer used for writes/target (slave) operations. 
+
+Defaults to 32. If more than 32 bytes are needed for writes/target (slave) operations, increase. If more RAM is needed, decrease. \Hypertarget{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_BUS\_BUSY\_CHECKS@{I2C\_BUS\_BUSY\_CHECKS}}
+\index{I2C\_BUS\_BUSY\_CHECKS@{I2C\_BUS\_BUSY\_CHECKS}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_BUS\_BUSY\_CHECKS}{I2C\_BUS\_BUSY\_CHECKS}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f} 
+\#define I2\+C\+\_\+\+BUS\+\_\+\+BUSY\+\_\+\+CHECKS~16}
+
+
+
+The amount of times the bus is checked before continuing with a read/write operation. 
+
+Defaults to 16. Fixes design flaw where TWI hardware does not check if the bus has become busy during a stop interrupt, so if multiple targets (slaves) receive the stop interrupt right before they become the controller (master) and send a start, they all will think the bus is free and clobber each other. Can be set to 0 when there is only one controller (master). Increase if the game ever freezes. More information\+: \href{https://www.robotroom.com/Atmel-AVR-TWI-I2C-Multi-Master-Problem.html}{\texttt{ https\+://www.\+robotroom.\+com/\+Atmel-\/\+AVR-\/\+TWI-\/\+I2\+C-\/\+Multi-\/\+Master-\/\+Problem.\+html}} \Hypertarget{_arduboy_i2_c_8h_afd74d0ddc5d78f0d7957c5bbe90eb222}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_FREQUENCY@{I2C\_FREQUENCY}}
+\index{I2C\_FREQUENCY@{I2C\_FREQUENCY}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_FREQUENCY}{I2C\_FREQUENCY}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_afd74d0ddc5d78f0d7957c5bbe90eb222} 
+\#define I2\+C\+\_\+\+FREQUENCY~100000}
+
+
+
+The initial \doxylink{class_i2_c}{I2C} frequency. 
+
+Defaults to 100000 Hz. ~\newline
+Standard frequencies\+: ~\newline
+100000 Hz -\/ Standard Mode ~\newline
+400000 Hz -\/ Fast Mode \Hypertarget{_arduboy_i2_c_8h_a89cb379c38e2b4b8e1a1c00df7d6ab45}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_LIB\_VER@{I2C\_LIB\_VER}}
+\index{I2C\_LIB\_VER@{I2C\_LIB\_VER}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_LIB\_VER}{I2C\_LIB\_VER}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a89cb379c38e2b4b8e1a1c00df7d6ab45} 
+\#define I2\+C\+\_\+\+LIB\+\_\+\+VER~1\`{}00\`{}00}
+
+
+
+\doxylink{class_i2_c}{I2C} library version. ~\newline
+ 
+
+For a given version x.\+y.\+z, the library version will be in the form xxxyyzz with no leading zeros on x. \Hypertarget{_arduboy_i2_c_8h_a79cc8450ce152950948306f7590c3919}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_MAX\_ADDRESSES@{I2C\_MAX\_ADDRESSES}}
+\index{I2C\_MAX\_ADDRESSES@{I2C\_MAX\_ADDRESSES}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_MAX\_ADDRESSES}{I2C\_MAX\_ADDRESSES}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a79cc8450ce152950948306f7590c3919} 
+\#define I2\+C\+\_\+\+MAX\+\_\+\+ADDRESSES~112}
+
+
+
+The maximum amount of addresses available to a device. 
+
+\doxylink{class_i2_c}{I2C} uses a 7-\/bit addressing scheme with 127 available unique addresses. However, addresses 0-\/7 and 120-\/127 are reserved by the standard and should not be used. This leaves 112 addresses for devices to use. \Hypertarget{_arduboy_i2_c_8h_a7b1d0a049421f122f95c1e80542a532b}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_MAX\_PLAYERS@{I2C\_MAX\_PLAYERS}}
+\index{I2C\_MAX\_PLAYERS@{I2C\_MAX\_PLAYERS}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_MAX\_PLAYERS}{I2C\_MAX\_PLAYERS}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a7b1d0a049421f122f95c1e80542a532b} 
+\#define I2\+C\+\_\+\+MAX\+\_\+\+PLAYERS}
+
+
+
+The maxmimum number of players in the handshake/lobby. 
+
+Cannot be more than I2\+C\+\_\+\+MAX\+\_\+\+ADDRESSES. \Hypertarget{_arduboy_i2_c_8h_a5e7834d040f89e2e7fc864785e80f981}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_SCL\_BIT@{I2C\_SCL\_BIT}}
+\index{I2C\_SCL\_BIT@{I2C\_SCL\_BIT}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SCL\_BIT}{I2C\_SCL\_BIT}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a5e7834d040f89e2e7fc864785e80f981} 
+\#define I2\+C\+\_\+\+SCL\+\_\+\+BIT~PIND0}
+
+
+
+The bit of the pin on which the SCL line is connected. 
+
+Defaults to PIND0. \Hypertarget{_arduboy_i2_c_8h_a0e4e08bab2fb484136d18b067bef372c}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_SCL\_PIN@{I2C\_SCL\_PIN}}
+\index{I2C\_SCL\_PIN@{I2C\_SCL\_PIN}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SCL\_PIN}{I2C\_SCL\_PIN}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a0e4e08bab2fb484136d18b067bef372c} 
+\#define I2\+C\+\_\+\+SCL\+\_\+\+PIN~PIND}
+
+
+
+The pin on which the SCL line is connected. 
+
+Defaults to PIND. \Hypertarget{_arduboy_i2_c_8h_ab37c7049d3f4f3dc7d89b5c02e88f7c7}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_SDA\_BIT@{I2C\_SDA\_BIT}}
+\index{I2C\_SDA\_BIT@{I2C\_SDA\_BIT}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SDA\_BIT}{I2C\_SDA\_BIT}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_ab37c7049d3f4f3dc7d89b5c02e88f7c7} 
+\#define I2\+C\+\_\+\+SDA\+\_\+\+BIT~PIND1}
+
+
+
+The bit of the pin on which the sda line is connected. 
+
+Defaults to PIND1. \Hypertarget{_arduboy_i2_c_8h_a2cade698267beb86ccaa38c14d35ab0f}\index{ArduboyI2C.h@{ArduboyI2C.h}!I2C\_SDA\_PIN@{I2C\_SDA\_PIN}}
+\index{I2C\_SDA\_PIN@{I2C\_SDA\_PIN}!ArduboyI2C.h@{ArduboyI2C.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SDA\_PIN}{I2C\_SDA\_PIN}}
+{\footnotesize\ttfamily \label{_arduboy_i2_c_8h_a2cade698267beb86ccaa38c14d35ab0f} 
+\#define I2\+C\+\_\+\+SDA\+\_\+\+PIN~PIND}
+
+
+
+The pin on which the SDA line is connected. 
+
+Defaults to PIND. 
