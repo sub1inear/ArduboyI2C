@@ -7,8 +7,8 @@ var class_i2_c =
     [ "init", "class_i2_c.html#a0d0843fa16f5444c019bc9542a8e80e5", null ],
     [ "onReceive", "class_i2_c.html#aba82f80b86f08e2caf0f6cab4860728d", null ],
     [ "onRequest", "class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d", null ],
-    [ "readFrom", "class_i2_c.html#aaccde5c977fbdeb269fad658e4a223cf", null ],
+    [ "read", "class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0", null ],
     [ "setAddress", "class_i2_c.html#ab565cec84a8fc6e626efd29c1b737907", null ],
-    [ "transmit", "class_i2_c.html#aca6b5562fe21e387b6800103195a214b", null ],
-    [ "writeTo", "class_i2_c.html#aed92501cef760847b58ba8a22d5fefe2", null ]
+    [ "transmit", "class_i2_c.html#a6d2695878ede6f9ded985230afeaad99", null ],
+    [ "write", "class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03", null ]
 ];
