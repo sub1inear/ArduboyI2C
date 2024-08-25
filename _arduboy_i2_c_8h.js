@@ -4,7 +4,7 @@ var _arduboy_i2_c_8h =
     [ "I2C_BUFFER_SIZE", "_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd", null ],
     [ "I2C_BUS_BUSY_CHECKS", "_arduboy_i2_c_8h.html#a419daf161333923dae12b87e7a942d6f", null ],
     [ "I2C_FREQUENCY", "_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222", null ],
-    [ "I2C_HANDSHAKE_COMPLETED", "_arduboy_i2_c_8h.html#a71cebcb14a4ae8c7baf93e10aac0d498", null ],
+    [ "I2C_HANDSHAKE_FAILED", "_arduboy_i2_c_8h.html#a439f3615789ffec435412484d25e584d", null ],
     [ "I2C_LIB_VER", "_arduboy_i2_c_8h.html#a89cb379c38e2b4b8e1a1c00df7d6ab45", null ],
     [ "I2C_MAX_ADDRESSES", "_arduboy_i2_c_8h.html#a79cc8450ce152950948306f7590c3919", null ],
     [ "I2C_MAX_PLAYERS", "_arduboy_i2_c_8h.html#a7b1d0a049421f122f95c1e80542a532b", null ],

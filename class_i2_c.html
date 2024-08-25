@@ -114,28 +114,32 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ab565cec84a8fc6e626efd29c1b737907" id="r_ab565cec84a8fc6e626efd29c1b737907"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab565cec84a8fc6e626efd29c1b737907">setAddress</a> (uint8_t address, bool generalCall=false)</td></tr>
 <tr class="memdesc:ab565cec84a8fc6e626efd29c1b737907"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the address of the device and enable/disable general calls on the <a class="el" href="class_i2_c.html">I2C</a> bus.  <br /></td></tr>
 <tr class="separator:ab565cec84a8fc6e626efd29c1b737907"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed92501cef760847b58ba8a22d5fefe2" id="r_aed92501cef760847b58ba8a22d5fefe2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed92501cef760847b58ba8a22d5fefe2">writeTo</a> (uint8_t address, const void *buffer, uint8_t size, bool wait)</td></tr>
-<tr class="memdesc:aed92501cef760847b58ba8a22d5fefe2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to become the bus controller (master) and sends data over <a class="el" href="class_i2_c.html">I2C</a> to the specified address.  <br /></td></tr>
-<tr class="separator:aed92501cef760847b58ba8a22d5fefe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e6e0f71d918e8eb26f00fc5ffb39223" id="r_a8e6e0f71d918e8eb26f00fc5ffb39223"><td class="memTemplParams" colspan="2"><a id="a8e6e0f71d918e8eb26f00fc5ffb39223" name="a8e6e0f71d918e8eb26f00fc5ffb39223"></a>
+<tr class="memitem:afb38ec006200442dbdca3fecc9af0d03" id="r_afb38ec006200442dbdca3fecc9af0d03"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb38ec006200442dbdca3fecc9af0d03">write</a> (uint8_t address, const void *buffer, uint8_t size, bool wait)</td></tr>
+<tr class="memdesc:afb38ec006200442dbdca3fecc9af0d03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to become the bus controller (master) and sends data over <a class="el" href="class_i2_c.html">I2C</a> to the specified address.  <br /></td></tr>
+<tr class="separator:afb38ec006200442dbdca3fecc9af0d03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a336a90c642de205a367f8823412f94eb" id="r_a336a90c642de205a367f8823412f94eb"><td class="memTemplParams" colspan="2"><a id="a336a90c642de205a367f8823412f94eb" name="a336a90c642de205a367f8823412f94eb"></a>
 template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a8e6e0f71d918e8eb26f00fc5ffb39223"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>writeTo</b> (uint8_t address, T *buffer, bool wait)</td></tr>
-<tr class="separator:a8e6e0f71d918e8eb26f00fc5ffb39223"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaccde5c977fbdeb269fad658e4a223cf" id="r_aaccde5c977fbdeb269fad658e4a223cf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaccde5c977fbdeb269fad658e4a223cf">readFrom</a> (uint8_t address, void *buffer, uint8_t size)</td></tr>
-<tr class="memdesc:aaccde5c977fbdeb269fad658e4a223cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to become the bus controller (master) and reads data over <a class="el" href="class_i2_c.html">I2C</a> from the specified address.  <br /></td></tr>
-<tr class="separator:aaccde5c977fbdeb269fad658e4a223cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0030c199bb212033954ca0f6a5697dc9" id="r_a0030c199bb212033954ca0f6a5697dc9"><td class="memTemplParams" colspan="2"><a id="a0030c199bb212033954ca0f6a5697dc9" name="a0030c199bb212033954ca0f6a5697dc9"></a>
+<tr class="memitem:a336a90c642de205a367f8823412f94eb"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>write</b> (uint8_t address, const T *buffer, bool wait)</td></tr>
+<tr class="separator:a336a90c642de205a367f8823412f94eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fa12af5a3f24c3db496672a4d5c3fe0" id="r_a7fa12af5a3f24c3db496672a4d5c3fe0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0">read</a> (uint8_t address, void *buffer, uint8_t size)</td></tr>
+<tr class="memdesc:a7fa12af5a3f24c3db496672a4d5c3fe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to become the bus controller (master) and reads data over <a class="el" href="class_i2_c.html">I2C</a> from the specified address.  <br /></td></tr>
+<tr class="separator:a7fa12af5a3f24c3db496672a4d5c3fe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dccd94715faf9449431c9294b707647" id="r_a7dccd94715faf9449431c9294b707647"><td class="memTemplParams" colspan="2"><a id="a7dccd94715faf9449431c9294b707647" name="a7dccd94715faf9449431c9294b707647"></a>
 template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a0030c199bb212033954ca0f6a5697dc9"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>readFrom</b> (uint8_t address, T *buffer)</td></tr>
-<tr class="separator:a0030c199bb212033954ca0f6a5697dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca6b5562fe21e387b6800103195a214b" id="r_aca6b5562fe21e387b6800103195a214b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca6b5562fe21e387b6800103195a214b">transmit</a> (void *buffer, uint8_t size)</td></tr>
-<tr class="memdesc:aca6b5562fe21e387b6800103195a214b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmits data back to the controller (master).  <br /></td></tr>
-<tr class="separator:aca6b5562fe21e387b6800103195a214b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dccd94715faf9449431c9294b707647"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>read</b> (uint8_t address, T *buffer)</td></tr>
+<tr class="separator:a7dccd94715faf9449431c9294b707647"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d2695878ede6f9ded985230afeaad99" id="r_a6d2695878ede6f9ded985230afeaad99"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d2695878ede6f9ded985230afeaad99">transmit</a> (const void *buffer, uint8_t size)</td></tr>
+<tr class="memdesc:a6d2695878ede6f9ded985230afeaad99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmits data back to the controller (master).  <br /></td></tr>
+<tr class="separator:a6d2695878ede6f9ded985230afeaad99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c340ab5b950b9f35fdd6f9c3498e08b" id="r_a5c340ab5b950b9f35fdd6f9c3498e08b"><td class="memTemplParams" colspan="2"><a id="a5c340ab5b950b9f35fdd6f9c3498e08b" name="a5c340ab5b950b9f35fdd6f9c3498e08b"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a5c340ab5b950b9f35fdd6f9c3498e08b"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>transmit</b> (const T *object)</td></tr>
+<tr class="separator:a5c340ab5b950b9f35fdd6f9c3498e08b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a026eaad0ba8bb6a698d3eaca9dd9887d" id="r_a026eaad0ba8bb6a698d3eaca9dd9887d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d">onRequest</a> (void(*function)())</td></tr>
-<tr class="memdesc:a026eaad0ba8bb6a698d3eaca9dd9887d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the callback to be called when data is requested from the device's address (a readFrom).  <br /></td></tr>
+<tr class="memdesc:a026eaad0ba8bb6a698d3eaca9dd9887d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the callback to be called when data is requested from the device's address (a read).  <br /></td></tr>
 <tr class="separator:a026eaad0ba8bb6a698d3eaca9dd9887d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba82f80b86f08e2caf0f6cab4860728d" id="r_aba82f80b86f08e2caf0f6cab4860728d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d">onReceive</a> (void(*function)())</td></tr>
-<tr class="memdesc:aba82f80b86f08e2caf0f6cab4860728d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the callback to be called when data is sent to the device's address (a writeTo)  <br /></td></tr>
+<tr class="memdesc:aba82f80b86f08e2caf0f6cab4860728d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the callback to be called when data is sent to the device's address (a write)  <br /></td></tr>
 <tr class="separator:aba82f80b86f08e2caf0f6cab4860728d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03dfacb57e2a02b10b61cf093b2f6171" id="r_a03dfacb57e2a02b10b61cf093b2f6171"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03dfacb57e2a02b10b61cf093b2f6171">getTWError</a> ()</td></tr>
 <tr class="memdesc:a03dfacb57e2a02b10b61cf093b2f6171"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the hardware error which happened in a previous read or write.  <br /></td></tr>
@@ -179,7 +183,7 @@ template&lt;typename T &gt; </td></tr>
 <p>Gets the address from a provided id. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">id</td><td>An id between 0 and I2C_MAX_ADDRESSES </td></tr>
+    <tr><td class="paramname">id</td><td>An id between 0 and I2C_MAX_ADDRESSES - 1 </td></tr>
   </table>
   </dd>
 </dl>
@@ -212,7 +216,7 @@ template&lt;typename T &gt; </td></tr>
 </div><div class="memdoc">
 
 <p>Gets a pointer to the <a class="el" href="class_i2_c.html">I2C</a> buffer holding received data. </p>
-<p>Intended to be used inside the onReceive callback. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up the callback to be called when data is sent to the device&#39;s address (a writeTo)">onReceive()</a> </dd></dl>
+<p>Intended to be used inside the onReceive callback. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up the callback to be called when data is sent to the device&#39;s address (a write)">onReceive()</a> </dd></dl>
 
 </div>
 </div>
@@ -324,7 +328,7 @@ template&lt;typename T &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Sets up the callback to be called when data is sent to the device's address (a writeTo) </p>
+<p>Sets up the callback to be called when data is sent to the device's address (a write) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">function</td><td>The function to be called when data is received.</td></tr>
@@ -341,8 +345,8 @@ template&lt;typename T &gt; </td></tr>
 <div class="line">  <a class="code hl_function" href="#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a>(dataReceive);</div>
 <div class="line">}</div>
 <div class="ttc" id="aclass_i2_c_html_a5ca82bd463cf11cad3b544d3c8fc75cb"><div class="ttname"><a href="#a5ca82bd463cf11cad3b544d3c8fc75cb">I2C::getBuffer</a></div><div class="ttdeci">static uint8_t * getBuffer()</div><div class="ttdoc">Gets a pointer to the I2C buffer holding received data.</div></div>
-<div class="ttc" id="aclass_i2_c_html_aba82f80b86f08e2caf0f6cab4860728d"><div class="ttname"><a href="#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a></div><div class="ttdeci">static void onReceive(void(*function)())</div><div class="ttdoc">Sets up the callback to be called when data is sent to the device's address (a writeTo)</div></div>
-</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up the callback to be called when data is requested from the device&#39;s address (a readFrom).">onRequest()</a> <a class="el" href="#aed92501cef760847b58ba8a22d5fefe2" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">writeTo()</a> </dd></dl>
+<div class="ttc" id="aclass_i2_c_html_aba82f80b86f08e2caf0f6cab4860728d"><div class="ttname"><a href="#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a></div><div class="ttdeci">static void onReceive(void(*function)())</div><div class="ttdoc">Sets up the callback to be called when data is sent to the device's address (a write)</div></div>
+</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up the callback to be called when data is requested from the device&#39;s address (a read).">onRequest()</a> <a class="el" href="#afb38ec006200442dbdca3fecc9af0d03" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">write()</a> </dd></dl>
 
 </div>
 </div>
@@ -369,7 +373,7 @@ template&lt;typename T &gt; </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Sets up the callback to be called when data is requested from the device's address (a readFrom). </p>
+<p>Sets up the callback to be called when data is requested from the device's address (a read). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">function</td><td>The function to be called when data is requested.</td></tr>
@@ -377,24 +381,24 @@ template&lt;typename T &gt; </td></tr>
   </dd>
 </dl>
 <p>Example Callback and Usage: </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> dataRequest() {</div>
-<div class="line">  <a class="code hl_function" href="#aca6b5562fe21e387b6800103195a214b">I2C::transmit</a>(&amp;players[<span class="keywordtype">id</span>], 2);</div>
+<div class="line">  <a class="code hl_function" href="#a6d2695878ede6f9ded985230afeaad99">I2C::transmit</a>(&amp;players[<span class="keywordtype">id</span>], 2);</div>
 <div class="line">}</div>
 <div class="line">...</div>
 <div class="line">void setup() {</div>
 <div class="line">  ...</div>
 <div class="line">  <a class="code hl_function" href="#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a>(dataRequest);</div>
 <div class="line">}</div>
-<div class="ttc" id="aclass_i2_c_html_a026eaad0ba8bb6a698d3eaca9dd9887d"><div class="ttname"><a href="#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a></div><div class="ttdeci">static void onRequest(void(*function)())</div><div class="ttdoc">Sets up the callback to be called when data is requested from the device's address (a readFrom).</div></div>
-<div class="ttc" id="aclass_i2_c_html_aca6b5562fe21e387b6800103195a214b"><div class="ttname"><a href="#aca6b5562fe21e387b6800103195a214b">I2C::transmit</a></div><div class="ttdeci">static void transmit(void *buffer, uint8_t size)</div><div class="ttdoc">Transmits data back to the controller (master).</div></div>
-</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>To respond to the controller (master), use <code>transmit</code> instead of <code>writeTo</code>. </dd>
+<div class="ttc" id="aclass_i2_c_html_a026eaad0ba8bb6a698d3eaca9dd9887d"><div class="ttname"><a href="#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a></div><div class="ttdeci">static void onRequest(void(*function)())</div><div class="ttdoc">Sets up the callback to be called when data is requested from the device's address (a read).</div></div>
+<div class="ttc" id="aclass_i2_c_html_a6d2695878ede6f9ded985230afeaad99"><div class="ttname"><a href="#a6d2695878ede6f9ded985230afeaad99">I2C::transmit</a></div><div class="ttdeci">static void transmit(const void *buffer, uint8_t size)</div><div class="ttdoc">Transmits data back to the controller (master).</div></div>
+</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>To respond to the controller (master), use <code>transmit</code> instead of <code>write</code>. </dd>
 <dd>
 If no bytes are send in the callback, the result of the transmission is undefined. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up the callback to be called when data is sent to the device&#39;s address (a writeTo)">onReceive()</a> <a class="el" href="#aca6b5562fe21e387b6800103195a214b" title="Transmits data back to the controller (master).">transmit()</a> <a class="el" href="#aaccde5c977fbdeb269fad658e4a223cf" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">readFrom()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up the callback to be called when data is sent to the device&#39;s address (a write)">onReceive()</a> <a class="el" href="#a6d2695878ede6f9ded985230afeaad99" title="Transmits data back to the controller (master).">transmit()</a> <a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">read()</a> </dd></dl>
 
 </div>
 </div>
-<a id="aaccde5c977fbdeb269fad658e4a223cf" name="aaccde5c977fbdeb269fad658e4a223cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaccde5c977fbdeb269fad658e4a223cf">&#9670;&#160;</a></span>readFrom()</h2>
+<a id="a7fa12af5a3f24c3db496672a4d5c3fe0" name="a7fa12af5a3f24c3db496672a4d5c3fe0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fa12af5a3f24c3db496672a4d5c3fe0">&#9670;&#160;</a></span>read()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -403,7 +407,7 @@ If no bytes are send in the callback, the result of the transmission is undefine
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void I2C::readFrom </td>
+          <td class="memname">static void I2C::read </td>
           <td>(</td>
           <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>address</em></span>, </td>
         </tr>
@@ -434,8 +438,8 @@ If no bytes are send in the callback, the result of the transmission is undefine
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Unlike the <code>writeTo</code> function, this function is bufferless and is not limited to 32 bytes. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aed92501cef760847b58ba8a22d5fefe2" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">writeTo()</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Unlike the <code>write</code> function, this function is bufferless and is not limited to 32 bytes. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#afb38ec006200442dbdca3fecc9af0d03" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">write()</a> </dd></dl>
 
 </div>
 </div>
@@ -478,8 +482,8 @@ If no bytes are send in the callback, the result of the transmission is undefine
 
 </div>
 </div>
-<a id="aca6b5562fe21e387b6800103195a214b" name="aca6b5562fe21e387b6800103195a214b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca6b5562fe21e387b6800103195a214b">&#9670;&#160;</a></span>transmit()</h2>
+<a id="a6d2695878ede6f9ded985230afeaad99" name="a6d2695878ede6f9ded985230afeaad99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d2695878ede6f9ded985230afeaad99">&#9670;&#160;</a></span>transmit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -490,7 +494,7 @@ If no bytes are send in the callback, the result of the transmission is undefine
         <tr>
           <td class="memname">static void I2C::transmit </td>
           <td>(</td>
-          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>, </td>
+          <td class="paramtype">const void *</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -514,12 +518,12 @@ If no bytes are send in the callback, the result of the transmission is undefine
   </dd>
 </dl>
 <p>This function is intended to be called once inside the onRequest callback. It fills the transmitting buffer with data to then be send one byte at a time. If it is called multiple times, only the last call will be sent. </p><dl class="section note"><dt>Note</dt><dd>Internally, this function uses a buffer. The buffer size is controlled by the macro <code>I2C_BUFFER_SIZE</code> and defaults to 32. If the program needs to send more than 32 bytes at a time, <code>I2C_BUFFER_SIZE</code> must be defined before including to be larger. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aed92501cef760847b58ba8a22d5fefe2" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">writeTo()</a> <a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up the callback to be called when data is requested from the device&#39;s address (a readFrom).">onRequest()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#afb38ec006200442dbdca3fecc9af0d03" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">write()</a> <a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up the callback to be called when data is requested from the device&#39;s address (a read).">onRequest()</a> </dd></dl>
 
 </div>
 </div>
-<a id="aed92501cef760847b58ba8a22d5fefe2" name="aed92501cef760847b58ba8a22d5fefe2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed92501cef760847b58ba8a22d5fefe2">&#9670;&#160;</a></span>writeTo()</h2>
+<a id="afb38ec006200442dbdca3fecc9af0d03" name="afb38ec006200442dbdca3fecc9af0d03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb38ec006200442dbdca3fecc9af0d03">&#9670;&#160;</a></span>write()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -528,7 +532,7 @@ If no bytes are send in the callback, the result of the transmission is undefine
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void I2C::writeTo </td>
+          <td class="memname">static void I2C::write </td>
           <td>(</td>
           <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>address</em></span>, </td>
         </tr>
@@ -568,7 +572,7 @@ If no bytes are send in the callback, the result of the transmission is undefine
 <dl class="section note"><dt>Note</dt><dd>Sending general calls will only function if the <code>generalCall</code> argument of <code>setAddress</code> is true on every other device. </dd>
 <dd>
 Interally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro <code>I2C_BUFFER_SIZE</code> and defaults to 32. If the program needs to send more than 32 bytes at a time, <code>I2C_BUFFER_SIZE</code> must be defined before including to be larger. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aca6b5562fe21e387b6800103195a214b" title="Transmits data back to the controller (master).">transmit()</a> <a class="el" href="#aaccde5c977fbdeb269fad658e4a223cf" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">readFrom()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a6d2695878ede6f9ded985230afeaad99" title="Transmits data back to the controller (master).">transmit()</a> <a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">read()</a> </dd></dl>
 
 </div>
 </div>
