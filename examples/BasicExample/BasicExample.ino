@@ -34,18 +34,18 @@ void setup() {
     // initialize I2C(twi) hardware
     I2C::init();
 
-    // arduboy.clear();
-    // arduboy.print("Waiting for other\nplayers...");
-    // arduboy.display();
+    arduboy.clear();
+    arduboy.print("Waiting for other\nplayers...");
+    arduboy.display();
     // get unique id and wait for other players to join
     // Note: I2C::handshake enables general calls by default
     id = I2C::handshake();
 
     // if the handshake has been completed (I2C_MAX_PLAYERS has been reached), exit
-    if (id == I2C_HANDSHAKE_COMPLETED) {
+    if (id == I2C_HANDSHAKE_FAILED) {
         arduboy.exitToBootloader();
     }
-    // setup our rx event to be called when we receive a writeTo
+    // setup our rx event to be called when we receive a write
     I2C::onReceive(onReceive);
     // identify our player data packets
     players[id].id = id;
@@ -63,7 +63,7 @@ void loop() {
     players[id].y += arduboy.pressed(DOWN_BUTTON) - arduboy.pressed(UP_BUTTON);
     
     // send out a general call to give every other device our data
-    I2C::writeTo(0x00, &players[id], false);
+    I2C::write(0x00, &players[id], false);
     // draw all of the players
     for (uint8_t i = 0; i < I2C_MAX_PLAYERS; i++) {
         arduboy.fillRect(players[i].x, players[i].y, 8, 8);

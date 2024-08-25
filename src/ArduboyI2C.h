@@ -1,24 +1,25 @@
 /*
-The MIT License (MIT)
-Copyright © 2024 Sublinear
+MIT License
 
-Permission is hereby granted, free of charge,
-to any person obtaining a copy of this software and associated documentation files (the “Software”),
-to deal in the Software without restriction,
-including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software,
-and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Copyright (c) 2024 sub1inear
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 */
 /** @file
  * \brief
@@ -49,6 +50,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
  * Defaults to 32. If more than 32 bytes are needed for writes/target (slave) operations, increase. If more RAM is needed, decrease.
  */
 #define I2C_BUFFER_SIZE 32
+#elif I2C_BUFFER_SIZE >= 256
+#error "I2C_BUFFER_SIZE is too big."
 #endif
 
 #ifndef I2C_BUS_BUSY_CHECKS
@@ -126,7 +129,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
  * \details
  *  
  */
-#define I2C_HANDSHAKE_COMPLETED 0xFE
+#define I2C_HANDSHAKE_FAILED 0xFE
 
 /** \brief
  * The maximum amount of addresses available to a device.
@@ -142,7 +145,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 1`00`00
+#define I2C_LIB_VER 10100
 
 /** 
  * Provides all I2C functionality.
@@ -182,12 +185,12 @@ public:
      * Interally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
      * must be defined before including to be larger.
-     * \see transmit() readFrom()
+     * \see transmit() read()
      */
-    static void writeTo(uint8_t address, const void *buffer, uint8_t size, bool wait);
+    static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
     
     template<typename T>
-    static void writeTo(uint8_t address, T *buffer, bool wait);
+    static void write(uint8_t address, const T *buffer, bool wait);
     
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
@@ -196,13 +199,13 @@ public:
      * \param buffer A pointer to the buffer in which to store the data.
      * \param size The maximum amount of bytes to receive. This cannot be zero.
      * \note
-     * Unlike the `writeTo` function, this function is bufferless and is not limited to 32 bytes.
-     * \see writeTo()
+     * Unlike the `write` function, this function is bufferless and is not limited to 32 bytes.
+     * \see write()
      */
-    static void readFrom(uint8_t address, void *buffer, uint8_t size);
+    static void read(uint8_t address, void *buffer, uint8_t size);
     
     template<typename T>
-    static void readFrom(uint8_t address, T *buffer);
+    static void read(uint8_t address, T *buffer);
 
     /** \brief
      * Transmits data back to the controller (master).
@@ -216,12 +219,15 @@ public:
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
      * must be defined before including to be larger.
-     * \see writeTo() onRequest()
+     * \see write() onRequest()
      */
-    static void transmit(void *buffer, uint8_t size);
+    static void transmit(const void *buffer, uint8_t size);
 
+    template <typename T>
+    static void transmit(const T *object);
+    
     /** \brief
-     * Sets up the callback to be called when data is requested from the device's address (a readFrom).
+     * Sets up the callback to be called when data is requested from the device's address (a read).
      * \param function The function to be called when data is requested.
      * \details
      * Example Callback and Usage:
@@ -236,15 +242,15 @@ public:
      * }
      * \endcode
      * \note
-     * To respond to the controller (master), use `transmit` instead of `writeTo`.
+     * To respond to the controller (master), use `transmit` instead of `write`.
      * \note
      * If no bytes are send in the callback, the result of the transmission is undefined.
-     * \see onReceive() transmit() readFrom()
+     * \see onReceive() transmit() read()
      */
     static void onRequest(void (*function)());
 
     /** \brief
-     * Sets up the callback to be called when data is sent to the device's address (a writeTo)
+     * Sets up the callback to be called when data is sent to the device's address (a write)
      * \param function The function to be called when data is received.
      * \details
      * Example Callback and Usage:
@@ -259,7 +265,7 @@ public:
      *   I2C::onReceive(dataReceive);
      * }
      * \endcode
-     * \see onRequest() writeTo()
+     * \see onRequest() write()
      */
     static void onReceive(void (*function)());
 
@@ -280,7 +286,7 @@ public:
 
     /** \brief
      * Gets the address from a provided id.
-     * \param id An id between 0 and I2C_MAX_ADDRESSES
+     * \param id An id between 0 and I2C_MAX_ADDRESSES - 1
      * \return The address corresponding to that id.
      * \details
      * This function is provided to standardize addresses for each id. It is used by I2C::handshake.
@@ -326,7 +332,7 @@ void stop() {
 
 #if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
 #error "Too many players. Max is I2C_MAX_ADDRESSES."
-#endif
+#endif // #if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
 
 volatile uint8_t handshakeState;
 
@@ -336,10 +342,9 @@ void handshakeOnReceive() {
 
 void handshakeOnRequest() {
     handshakeState++;
-    I2C::transmit((uint8_t *)&handshakeState, 1);
+    I2C::transmit(&handshakeState);
 }
-#endif
-
+#endif // #ifdef I2C_MAX_PLAYERS
 
 }
 
@@ -354,11 +359,11 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
     TWAR = address << 1 | generalCall;
 }
 
-void I2C::writeTo(uint8_t address, const void *buffer, uint8_t size, bool wait) {
+void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     while (i2c_detail::active) {}
     
     for (uint8_t i = 0; i < size; i++) {
-        i2c_detail::twiBuffer[i] = ((uint8_t *)buffer)[i];
+        i2c_detail::twiBuffer[i] = ((const uint8_t *)buffer)[i];
     }
     i2c_detail::bufferIdx = 0;
     i2c_detail::bufferSize = size;
@@ -367,7 +372,6 @@ void I2C::writeTo(uint8_t address, const void *buffer, uint8_t size, bool wait) 
     
     i2c_detail::active = true;
     i2c_detail::slaRW = address << 1 | TW_WRITE;
-
 
     uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
     while (busyChecks) {
@@ -379,15 +383,18 @@ void I2C::writeTo(uint8_t address, const void *buffer, uint8_t size, bool wait) 
     }
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
-    while (wait && i2c_detail::active) {}
+    if (wait) {
+        while (i2c_detail::active) {}
+    }
 }
 
 template<typename T>
-void I2C::writeTo(uint8_t address, T *buffer, bool wait) {
-    I2C::writeTo(address, (void *)buffer, sizeof(T), wait);
+void I2C::write(uint8_t address, const T *buffer, bool wait) {
+    static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
+    I2C::write(address, (const void *)buffer, sizeof(T), wait);
 }
 
-void I2C::readFrom(uint8_t address, void *buffer, uint8_t size) {
+void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     while (i2c_detail::active) {}
     
     i2c_detail::rxBuffer = (uint8_t *)buffer;
@@ -414,18 +421,26 @@ void I2C::readFrom(uint8_t address, void *buffer, uint8_t size) {
 }
 
 template<typename T>
-void I2C::readFrom(uint8_t address, T *object) {
-    I2C::readFrom(address, (void *)object, sizeof(T));
+void I2C::read(uint8_t address, T *object) {
+    static_assert(sizeof(T) < 256, "Size of T must be less than 256.");
+    I2C::read(address, (void *)object, sizeof(T));
 }
 
 
-void I2C::transmit(void *buffer, uint8_t size) {
+void I2C::transmit(const void *buffer, uint8_t size) {
     for (uint8_t i = 0; i < size; i++) {
         i2c_detail::twiBuffer[i] = ((uint8_t *)buffer)[i];
     }
     i2c_detail::bufferIdx = 0;
     i2c_detail::bufferSize = size;
 }
+
+template <typename T>
+void I2C::transmit(const T *object) {
+    static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
+    I2C::transmit((const void *)object, sizeof(T));
+}
+
 void I2C::onRequest(void (*function)()) {
     i2c_detail::onRequestFunction = function;
 }
@@ -448,27 +463,30 @@ inline uint8_t I2C::getAddressFromId(uint8_t id) {
 }
 
 uint8_t I2C::handshake() {
-    uint8_t id;
-    int8_t i;
-    for (i = I2C_MAX_PLAYERS - 1; i >= 0; i--) {
-        I2C::readFrom(I2C::getAddressFromId(i), &id, 1);
-        if (I2C::getTWError() == TW_MR_SLA_NACK) {
-            id = i;
+    for (int8_t i = I2C_MAX_PLAYERS - 1; i >= 0; ) {
+        uint8_t dummy;
+
+        I2C::read(I2C::getAddressFromId(i), &dummy, 1);
+
+        switch (I2C::getTWError()) {
+        case TW_MR_SLA_NACK:
             I2C::setAddress(I2C::getAddressFromId(i), true);
             I2C::onReceive(i2c_detail::handshakeOnReceive);
             I2C::onRequest(i2c_detail::handshakeOnRequest);
+
+            // handshakeState is the number of times the callback has been called.
+            // When the callback has been called i times, the final Arduboy has joined.
+            while (i2c_detail::handshakeState < i) { }
+
+            return i;
+        case TW_SUCCESS:
+            i--;
             break;
         }
     }
-    if (i == -1) {
-        return I2C_HANDSHAKE_COMPLETED;
-    }
-    // handshakeState is the number of times our callback has been called.
-    // When our callback has been called id times, we know the final Arduboy has joined.
-    while (i2c_detail::handshakeState < id) { }
-
-    return id;
+    return I2C_HANDSHAKE_FAILED;
 }
+
 #endif
 
 ISR(TWI_vect, ISR_NAKED) {
@@ -504,7 +522,7 @@ push r18
 push r30
 push r31
 ; save and restore call-clobbered registers
-; slave could call function pointer 
+; target (slave) could call function pointer 
 push r19
 push r20
 push r21
