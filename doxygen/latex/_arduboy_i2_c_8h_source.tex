@@ -84,634 +84,634 @@
 \DoxyCodeLine{00172\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_ab565cec84a8fc6e626efd29c1b737907}{setAddress}}(uint8\_t\ address,\ \textcolor{keywordtype}{bool}\ generalCall\ =\ \textcolor{keyword}{false});}
 \DoxyCodeLine{00173\ }
 \DoxyCodeLine{00190\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{write}}(uint8\_t\ address,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size,\ \textcolor{keywordtype}{bool}\ wait);}
-\DoxyCodeLine{00191\ \ \ \ \ }
-\DoxyCodeLine{00192\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{00193\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{write}}(uint8\_t\ address,\ \textcolor{keyword}{const}\ T\ *buffer,\ \textcolor{keywordtype}{bool}\ wait);}
-\DoxyCodeLine{00194\ \ \ \ \ }
-\DoxyCodeLine{00205\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{read}}(uint8\_t\ address,\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size);}
-\DoxyCodeLine{00206\ \ \ \ \ }
+\DoxyCodeLine{00191\ }
 \DoxyCodeLine{00207\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{read}}(uint8\_t\ address,\ T\ *buffer);}
-\DoxyCodeLine{00209\ }
-\DoxyCodeLine{00224\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{transmit}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size);}
-\DoxyCodeLine{00225\ }
-\DoxyCodeLine{00226\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{00227\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{transmit}}(\textcolor{keyword}{const}\ T\ *\textcolor{keywordtype}{object});}
-\DoxyCodeLine{00228\ \ \ \ \ }
-\DoxyCodeLine{00250\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{onRequest}}(\textcolor{keywordtype}{void}\ (*function)());}
-\DoxyCodeLine{00251\ }
-\DoxyCodeLine{00270\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{onReceive}}(\textcolor{keywordtype}{void}\ (*function)());}
-\DoxyCodeLine{00271\ }
-\DoxyCodeLine{00277\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{getTWError}}();}
-\DoxyCodeLine{00278\ }
-\DoxyCodeLine{00285\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ *\mbox{\hyperlink{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb}{getBuffer}}();}
-\DoxyCodeLine{00286\ }
-\DoxyCodeLine{00294\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{getAddressFromId}}(uint8\_t\ \textcolor{keywordtype}{id});}
-\DoxyCodeLine{00303\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a931972954dc9844762a94d2f7de56f04}{handshake}}();}
-\DoxyCodeLine{00304\ }
-\DoxyCodeLine{00305\ \};}
-\DoxyCodeLine{00306\ }
-\DoxyCodeLine{00307\ \textcolor{preprocessor}{\#ifdef\ I2C\_IMPLEMENTATION}}
-\DoxyCodeLine{00311\ \textcolor{keyword}{namespace\ }i2c\_detail\ \{}
-\DoxyCodeLine{00312\ }
-\DoxyCodeLine{00313\ uint8\_t\ \ \ \ \ \ \ \ \ \ \ twiBuffer[\mbox{\hyperlink{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}{I2C\_BUFFER\_SIZE}}];}
-\DoxyCodeLine{00314\ \textcolor{keyword}{volatile}\ uint8\_t\ *rxBuffer;}
-\DoxyCodeLine{00315\ \textcolor{keyword}{volatile}\ uint8\_t\ \ bufferIdx;}
-\DoxyCodeLine{00316\ \textcolor{keyword}{volatile}\ uint8\_t\ \ bufferSize;}
-\DoxyCodeLine{00317\ }
-\DoxyCodeLine{00318\ \textcolor{keyword}{volatile}\ \textcolor{keywordtype}{bool}\ \ \ \ \ active;}
-\DoxyCodeLine{00319\ \textcolor{keyword}{volatile}\ uint8\_t\ \ slaRW;}
-\DoxyCodeLine{00320\ \textcolor{keyword}{volatile}\ uint8\_t\ \ error;}
-\DoxyCodeLine{00321\ }
-\DoxyCodeLine{00322\ void\ \ \ \ \ \ \ \ \ \ \ \ (*onRequestFunction)();}
-\DoxyCodeLine{00323\ void\ \ \ \ \ \ \ \ \ \ \ \ (*onReceiveFunction)();}
-\DoxyCodeLine{00324\ }
-\DoxyCodeLine{00325\ \textcolor{keywordtype}{void}\ stop()\ \{}
-\DoxyCodeLine{00326\ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWSTO)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00327\ \ \ \ \ \textcolor{keywordflow}{while}\ (TWCR\ \&\ \_BV(TWSTO))\ \{\ \ \}}
-\DoxyCodeLine{00328\ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
-\DoxyCodeLine{00329\ \}}
-\DoxyCodeLine{00330\ }
-\DoxyCodeLine{00331\ \textcolor{preprocessor}{\#ifdef\ I2C\_MAX\_PLAYERS}}
-\DoxyCodeLine{00332\ }
-\DoxyCodeLine{00333\ \textcolor{preprocessor}{\#if\ I2C\_MAX\_PLAYERS\ >\ I2C\_MAX\_ADDRESSES}}
-\DoxyCodeLine{00334\ \textcolor{preprocessor}{\#error\ "{}Too\ many\ players.\ Max\ is\ I2C\_MAX\_ADDRESSES."{}}}
-\DoxyCodeLine{00335\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ I2C\_MAX\_PLAYERS\ >\ I2C\_MAX\_ADDRESSES}}
-\DoxyCodeLine{00336\ }
-\DoxyCodeLine{00337\ \textcolor{keyword}{volatile}\ uint8\_t\ handshakeState;}
-\DoxyCodeLine{00338\ }
-\DoxyCodeLine{00339\ \textcolor{keywordtype}{void}\ handshakeOnReceive()\ \{}
-\DoxyCodeLine{00340\ \ \ \ \ \textcolor{keywordflow}{return};}
-\DoxyCodeLine{00341\ \}}
-\DoxyCodeLine{00342\ }
-\DoxyCodeLine{00343\ \textcolor{keywordtype}{void}\ handshakeOnRequest()\ \{}
-\DoxyCodeLine{00344\ \ \ \ \ handshakeState++;}
-\DoxyCodeLine{00345\ \ \ \ \ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}(\&handshakeState);}
-\DoxyCodeLine{00346\ \}}
-\DoxyCodeLine{00347\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#ifdef\ I2C\_MAX\_PLAYERS}}
+\DoxyCodeLine{00208\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_ac23f4a0728d98898318dbf56e9b5232d}{write}}(uint8\_t\ address,\ \textcolor{keyword}{const}\ T\ *\textcolor{keywordtype}{object},\ \textcolor{keywordtype}{bool}\ wait);}
+\DoxyCodeLine{00209\ \ \ \ \ }
+\DoxyCodeLine{00221\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{read}}(uint8\_t\ address,\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size);}
+\DoxyCodeLine{00222\ }
+\DoxyCodeLine{00235\ \ \ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00236\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_ae2599143656ddbbaa877e4809ff2f1cf}{read}}(uint8\_t\ address,\ T\ *\textcolor{keywordtype}{object});}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{transmit}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size);}
+\DoxyCodeLine{00253\ \ \ \ \ }
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a5c340ab5b950b9f35fdd6f9c3498e08b}{transmit}}(\textcolor{keyword}{const}\ T\ *\textcolor{keywordtype}{object});}
+\DoxyCodeLine{00270\ \ \ \ \ }
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{onRequest}}(\textcolor{keywordtype}{void}\ (*function)());}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00312\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{onReceive}}(\textcolor{keywordtype}{void}\ (*function)());}
+\DoxyCodeLine{00313\ }
+\DoxyCodeLine{00319\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{getTWError}}();}
+\DoxyCodeLine{00320\ }
+\DoxyCodeLine{00327\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ *\mbox{\hyperlink{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb}{getBuffer}}();}
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00336\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{getAddressFromId}}(uint8\_t\ \textcolor{keywordtype}{id});}
+\DoxyCodeLine{00345\ \ \ \ \ \textcolor{keyword}{static}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a931972954dc9844762a94d2f7de56f04}{handshake}}();}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \};}
 \DoxyCodeLine{00348\ }
-\DoxyCodeLine{00349\ \}}
-\DoxyCodeLine{00350\ }
-\DoxyCodeLine{00351\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a0d0843fa16f5444c019bc9542a8e80e5}{I2C::init}}()\ \{}
-\DoxyCodeLine{00352\ \ \ \ \ power\_twi\_enable();}
-\DoxyCodeLine{00353\ \ \ \ \ TWCR\ =\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00354\ \ \ \ \ TWSR\ =\ 0;\ \textcolor{comment}{//\ clear\ prescaler\ bits}}
-\DoxyCodeLine{00355\ \ \ \ \ TWBR\ =\ (F\_CPU\ /\ \mbox{\hyperlink{_arduboy_i2_c_8h_afd74d0ddc5d78f0d7957c5bbe90eb222}{I2C\_FREQUENCY}}\ -\/\ 16)\ /\ 2;}
-\DoxyCodeLine{00356\ \}}
-\DoxyCodeLine{00357\ }
-\DoxyCodeLine{00358\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_ab565cec84a8fc6e626efd29c1b737907}{I2C::setAddress}}(uint8\_t\ address,\ \textcolor{keywordtype}{bool}\ generalCall)\ \{}
-\DoxyCodeLine{00359\ \ \ \ \ TWAR\ =\ address\ <<\ 1\ |\ generalCall;}
-\DoxyCodeLine{00360\ \}}
-\DoxyCodeLine{00361\ }
-\DoxyCodeLine{00362\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{I2C::write}}(uint8\_t\ address,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size,\ \textcolor{keywordtype}{bool}\ wait)\ \{}
-\DoxyCodeLine{00363\ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
-\DoxyCodeLine{00364\ \ \ \ \ }
-\DoxyCodeLine{00365\ \ \ \ \ \textcolor{keywordflow}{for}\ (uint8\_t\ i\ =\ 0;\ i\ <\ size;\ i++)\ \{}
-\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ i2c\_detail::twiBuffer[i]\ =\ ((\textcolor{keyword}{const}\ uint8\_t\ *)buffer)[i];}
-\DoxyCodeLine{00367\ \ \ \ \ \}}
-\DoxyCodeLine{00368\ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
-\DoxyCodeLine{00369\ \ \ \ \ i2c\_detail::bufferSize\ =\ size;}
-\DoxyCodeLine{00370\ }
-\DoxyCodeLine{00371\ \ \ \ \ i2c\_detail::error\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a}{TW\_SUCCESS}};}
-\DoxyCodeLine{00372\ \ \ \ \ }
-\DoxyCodeLine{00373\ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
-\DoxyCodeLine{00374\ \ \ \ \ i2c\_detail::slaRW\ =\ address\ <<\ 1\ |\ TW\_WRITE;}
-\DoxyCodeLine{00375\ }
-\DoxyCodeLine{00376\ \ \ \ \ uint8\_t\ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
-\DoxyCodeLine{00377\ \ \ \ \ \textcolor{keywordflow}{while}\ (busyChecks)\ \{}
-\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{_arduboy_i2_c_8h_a0e4e08bab2fb484136d18b067bef372c}{I2C\_SCL\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_a5e7834d040f89e2e7fc864785e80f981}{I2C\_SCL\_BIT}}))\ \&\&\ (\mbox{\hyperlink{_arduboy_i2_c_8h_a2cade698267beb86ccaa38c14d35ab0f}{I2C\_SDA\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_ab37c7049d3f4f3dc7d89b5c02e88f7c7}{I2C\_SDA\_BIT}})))\ \{}
-\DoxyCodeLine{00379\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks-\/-\/;}
-\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
-\DoxyCodeLine{00382\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00383\ \ \ \ \ \}}
+\DoxyCodeLine{00349\ \textcolor{preprocessor}{\#ifdef\ I2C\_IMPLEMENTATION}}
+\DoxyCodeLine{00353\ \textcolor{keyword}{namespace\ }i2c\_detail\ \{}
+\DoxyCodeLine{00354\ }
+\DoxyCodeLine{00355\ uint8\_t\ \ \ \ \ \ \ \ \ \ \ twiBuffer[\mbox{\hyperlink{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}{I2C\_BUFFER\_SIZE}}];}
+\DoxyCodeLine{00356\ \textcolor{keyword}{volatile}\ uint8\_t\ *rxBuffer;}
+\DoxyCodeLine{00357\ \textcolor{keyword}{volatile}\ uint8\_t\ \ bufferIdx;}
+\DoxyCodeLine{00358\ \textcolor{keyword}{volatile}\ uint8\_t\ \ bufferSize;}
+\DoxyCodeLine{00359\ }
+\DoxyCodeLine{00360\ \textcolor{keyword}{volatile}\ \textcolor{keywordtype}{bool}\ \ \ \ \ active;}
+\DoxyCodeLine{00361\ \textcolor{keyword}{volatile}\ uint8\_t\ \ slaRW;}
+\DoxyCodeLine{00362\ \textcolor{keyword}{volatile}\ uint8\_t\ \ error;}
+\DoxyCodeLine{00363\ }
+\DoxyCodeLine{00364\ void\ \ \ \ \ \ \ \ \ \ \ \ (*onRequestFunction)();}
+\DoxyCodeLine{00365\ void\ \ \ \ \ \ \ \ \ \ \ \ (*onReceiveFunction)();}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \textcolor{keywordtype}{void}\ stop()\ \{}
+\DoxyCodeLine{00368\ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWSTO)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00369\ \ \ \ \ \textcolor{keywordflow}{while}\ (TWCR\ \&\ \_BV(TWSTO))\ \{\ \ \}}
+\DoxyCodeLine{00370\ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00371\ \}}
+\DoxyCodeLine{00372\ }
+\DoxyCodeLine{00373\ \textcolor{preprocessor}{\#ifdef\ I2C\_MAX\_PLAYERS}}
+\DoxyCodeLine{00374\ }
+\DoxyCodeLine{00375\ \textcolor{preprocessor}{\#if\ I2C\_MAX\_PLAYERS\ >\ I2C\_MAX\_ADDRESSES}}
+\DoxyCodeLine{00376\ \textcolor{preprocessor}{\#error\ "{}Too\ many\ players.\ Max\ is\ I2C\_MAX\_ADDRESSES."{}}}
+\DoxyCodeLine{00377\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ I2C\_MAX\_PLAYERS\ >\ I2C\_MAX\_ADDRESSES}}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \textcolor{keyword}{volatile}\ uint8\_t\ handshakeState;}
+\DoxyCodeLine{00380\ }
+\DoxyCodeLine{00381\ \textcolor{keywordtype}{void}\ handshakeOnReceive()\ \{}
+\DoxyCodeLine{00382\ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00383\ \}}
 \DoxyCodeLine{00384\ }
-\DoxyCodeLine{00385\ \ \ \ \ TWCR\ =\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWSTA);}
-\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keywordflow}{if}\ (wait)\ \{}
-\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
-\DoxyCodeLine{00388\ \ \ \ \ \}}
-\DoxyCodeLine{00389\ \}}
+\DoxyCodeLine{00385\ \textcolor{keywordtype}{void}\ handshakeOnRequest()\ \{}
+\DoxyCodeLine{00386\ \ \ \ \ handshakeState++;}
+\DoxyCodeLine{00387\ \ \ \ \ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}(\&handshakeState);}
+\DoxyCodeLine{00388\ \}}
+\DoxyCodeLine{00389\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#ifdef\ I2C\_MAX\_PLAYERS}}
 \DoxyCodeLine{00390\ }
-\DoxyCodeLine{00391\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{00392\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{I2C::write}}(uint8\_t\ address,\ \textcolor{keyword}{const}\ T\ *buffer,\ \textcolor{keywordtype}{bool}\ wait)\ \{}
-\DoxyCodeLine{00393\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(T)\ <=\ \mbox{\hyperlink{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}{I2C\_BUFFER\_SIZE}},\ \textcolor{stringliteral}{"{}Size\ of\ T\ must\ be\ less\ than\ or\ equal\ to\ I2C\_BUFFER\_SIZE."{}});}
-\DoxyCodeLine{00394\ \ \ \ \ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{I2C::write}}(address,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *)buffer,\ \textcolor{keyword}{sizeof}(T),\ wait);}
-\DoxyCodeLine{00395\ \}}
-\DoxyCodeLine{00396\ }
-\DoxyCodeLine{00397\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(uint8\_t\ address,\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size)\ \{}
-\DoxyCodeLine{00398\ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
-\DoxyCodeLine{00399\ \ \ \ \ }
-\DoxyCodeLine{00400\ \ \ \ \ i2c\_detail::rxBuffer\ =\ (uint8\_t\ *)buffer;}
-\DoxyCodeLine{00401\ }
-\DoxyCodeLine{00402\ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
-\DoxyCodeLine{00403\ \ \ \ \ i2c\_detail::bufferSize\ =\ size\ -\/\ 1;}
-\DoxyCodeLine{00404\ }
-\DoxyCodeLine{00405\ \ \ \ \ i2c\_detail::error\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a}{TW\_SUCCESS}};}
-\DoxyCodeLine{00406\ }
-\DoxyCodeLine{00407\ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
-\DoxyCodeLine{00408\ \ \ \ \ i2c\_detail::slaRW\ =\ address\ <<\ 1\ |\ TW\_READ;}
-\DoxyCodeLine{00409\ }
-\DoxyCodeLine{00410\ \ \ \ \ uint8\_t\ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
-\DoxyCodeLine{00411\ \ \ \ \ \textcolor{keywordflow}{while}\ (busyChecks)\ \{}
-\DoxyCodeLine{00412\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{_arduboy_i2_c_8h_a0e4e08bab2fb484136d18b067bef372c}{I2C\_SCL\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_a5e7834d040f89e2e7fc864785e80f981}{I2C\_SCL\_BIT}}))\ \&\&\ (\mbox{\hyperlink{_arduboy_i2_c_8h_a2cade698267beb86ccaa38c14d35ab0f}{I2C\_SDA\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_ab37c7049d3f4f3dc7d89b5c02e88f7c7}{I2C\_SDA\_BIT}})))\ \{}
-\DoxyCodeLine{00413\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks-\/-\/;}
-\DoxyCodeLine{00414\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00415\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
-\DoxyCodeLine{00416\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00417\ \ \ \ \ \}}
-\DoxyCodeLine{00418\ }
-\DoxyCodeLine{00419\ \ \ \ \ TWCR\ =\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWSTA);}
-\DoxyCodeLine{00420\ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
-\DoxyCodeLine{00421\ \}}
-\DoxyCodeLine{00422\ }
-\DoxyCodeLine{00423\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{00424\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(uint8\_t\ address,\ T\ *\textcolor{keywordtype}{object})\ \{}
-\DoxyCodeLine{00425\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(T)\ <\ 256,\ \textcolor{stringliteral}{"{}Size\ of\ T\ must\ be\ less\ than\ 256."{}});}
-\DoxyCodeLine{00426\ \ \ \ \ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(address,\ (\textcolor{keywordtype}{void}\ *)\textcolor{keywordtype}{object},\ \textcolor{keyword}{sizeof}(T));}
-\DoxyCodeLine{00427\ \}}
-\DoxyCodeLine{00428\ }
-\DoxyCodeLine{00429\ }
-\DoxyCodeLine{00430\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size)\ \{}
-\DoxyCodeLine{00431\ \ \ \ \ \textcolor{keywordflow}{for}\ (uint8\_t\ i\ =\ 0;\ i\ <\ size;\ i++)\ \{}
-\DoxyCodeLine{00432\ \ \ \ \ \ \ \ \ i2c\_detail::twiBuffer[i]\ =\ ((uint8\_t\ *)buffer)[i];}
-\DoxyCodeLine{00433\ \ \ \ \ \}}
-\DoxyCodeLine{00434\ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
-\DoxyCodeLine{00435\ \ \ \ \ i2c\_detail::bufferSize\ =\ size;}
-\DoxyCodeLine{00436\ \}}
-\DoxyCodeLine{00437\ }
-\DoxyCodeLine{00438\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{00439\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}(\textcolor{keyword}{const}\ T\ *\textcolor{keywordtype}{object})\ \{}
-\DoxyCodeLine{00440\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(T)\ <=\ \mbox{\hyperlink{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}{I2C\_BUFFER\_SIZE}},\ \textcolor{stringliteral}{"{}Size\ of\ T\ must\ be\ less\ than\ or\ equal\ to\ I2C\_BUFFER\_SIZE."{}});}
-\DoxyCodeLine{00441\ \ \ \ \ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}((\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *)\textcolor{keywordtype}{object},\ \textcolor{keyword}{sizeof}(T));}
-\DoxyCodeLine{00442\ \}}
+\DoxyCodeLine{00391\ \}}
+\DoxyCodeLine{00392\ }
+\DoxyCodeLine{00393\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a0d0843fa16f5444c019bc9542a8e80e5}{I2C::init}}()\ \{}
+\DoxyCodeLine{00394\ \ \ \ \ power\_twi\_enable();}
+\DoxyCodeLine{00395\ \ \ \ \ TWCR\ =\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00396\ \ \ \ \ TWSR\ =\ 0;\ \textcolor{comment}{//\ clear\ prescaler\ bits}}
+\DoxyCodeLine{00397\ \ \ \ \ TWBR\ =\ (F\_CPU\ /\ \mbox{\hyperlink{_arduboy_i2_c_8h_afd74d0ddc5d78f0d7957c5bbe90eb222}{I2C\_FREQUENCY}}\ -\/\ 16)\ /\ 2;}
+\DoxyCodeLine{00398\ \}}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_ab565cec84a8fc6e626efd29c1b737907}{I2C::setAddress}}(uint8\_t\ address,\ \textcolor{keywordtype}{bool}\ generalCall)\ \{}
+\DoxyCodeLine{00401\ \ \ \ \ TWAR\ =\ address\ <<\ 1\ |\ generalCall;}
+\DoxyCodeLine{00402\ \}}
+\DoxyCodeLine{00403\ }
+\DoxyCodeLine{00404\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{I2C::write}}(uint8\_t\ address,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size,\ \textcolor{keywordtype}{bool}\ wait)\ \{}
+\DoxyCodeLine{00405\ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
+\DoxyCodeLine{00406\ \ \ \ \ }
+\DoxyCodeLine{00407\ \ \ \ \ \textcolor{keywordflow}{for}\ (uint8\_t\ i\ =\ 0;\ i\ <\ size;\ i++)\ \{}
+\DoxyCodeLine{00408\ \ \ \ \ \ \ \ \ i2c\_detail::twiBuffer[i]\ =\ ((\textcolor{keyword}{const}\ uint8\_t\ *)buffer)[i];}
+\DoxyCodeLine{00409\ \ \ \ \ \}}
+\DoxyCodeLine{00410\ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
+\DoxyCodeLine{00411\ \ \ \ \ i2c\_detail::bufferSize\ =\ size;}
+\DoxyCodeLine{00412\ }
+\DoxyCodeLine{00413\ \ \ \ \ i2c\_detail::error\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a}{TW\_SUCCESS}};}
+\DoxyCodeLine{00414\ \ \ \ \ }
+\DoxyCodeLine{00415\ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00416\ \ \ \ \ i2c\_detail::slaRW\ =\ address\ <<\ 1\ |\ TW\_WRITE;}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00418\ \ \ \ \ uint8\_t\ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
+\DoxyCodeLine{00419\ \ \ \ \ \textcolor{keywordflow}{while}\ (busyChecks)\ \{}
+\DoxyCodeLine{00420\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{_arduboy_i2_c_8h_a0e4e08bab2fb484136d18b067bef372c}{I2C\_SCL\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_a5e7834d040f89e2e7fc864785e80f981}{I2C\_SCL\_BIT}}))\ \&\&\ (\mbox{\hyperlink{_arduboy_i2_c_8h_a2cade698267beb86ccaa38c14d35ab0f}{I2C\_SDA\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_ab37c7049d3f4f3dc7d89b5c02e88f7c7}{I2C\_SDA\_BIT}})))\ \{}
+\DoxyCodeLine{00421\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks-\/-\/;}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00423\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
+\DoxyCodeLine{00424\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00425\ \ \ \ \ \}}
+\DoxyCodeLine{00426\ }
+\DoxyCodeLine{00427\ \ \ \ \ TWCR\ =\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWSTA);}
+\DoxyCodeLine{00428\ \ \ \ \ \textcolor{keywordflow}{if}\ (wait)\ \{}
+\DoxyCodeLine{00429\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
+\DoxyCodeLine{00430\ \ \ \ \ \}}
+\DoxyCodeLine{00431\ \}}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00434\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{I2C::write}}(uint8\_t\ address,\ \textcolor{keyword}{const}\ T\ *buffer,\ \textcolor{keywordtype}{bool}\ wait)\ \{}
+\DoxyCodeLine{00435\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(T)\ <=\ \mbox{\hyperlink{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}{I2C\_BUFFER\_SIZE}},\ \textcolor{stringliteral}{"{}Size\ of\ T\ must\ be\ less\ than\ or\ equal\ to\ I2C\_BUFFER\_SIZE."{}});}
+\DoxyCodeLine{00436\ \ \ \ \ \mbox{\hyperlink{class_i2_c_afb38ec006200442dbdca3fecc9af0d03}{I2C::write}}(address,\ (\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *)buffer,\ \textcolor{keyword}{sizeof}(T),\ wait);}
+\DoxyCodeLine{00437\ \}}
+\DoxyCodeLine{00438\ }
+\DoxyCodeLine{00439\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(uint8\_t\ address,\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size)\ \{}
+\DoxyCodeLine{00440\ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
+\DoxyCodeLine{00441\ \ \ \ \ }
+\DoxyCodeLine{00442\ \ \ \ \ i2c\_detail::rxBuffer\ =\ (uint8\_t\ *)buffer;}
 \DoxyCodeLine{00443\ }
-\DoxyCodeLine{00444\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{I2C::onRequest}}(\textcolor{keywordtype}{void}\ (*function)())\ \{}
-\DoxyCodeLine{00445\ \ \ \ \ i2c\_detail::onRequestFunction\ =\ function;}
-\DoxyCodeLine{00446\ \}}
-\DoxyCodeLine{00447\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{I2C::onReceive}}(\textcolor{keywordtype}{void}\ (*function)())\ \{}
-\DoxyCodeLine{00448\ \ \ \ \ i2c\_detail::onReceiveFunction\ =\ function;}
-\DoxyCodeLine{00449\ \}}
-\DoxyCodeLine{00450\ }
-\DoxyCodeLine{00451\ \textcolor{keyword}{inline}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{I2C::getTWError}}()\ \{}
-\DoxyCodeLine{00452\ \ \ \ \ \textcolor{keywordflow}{return}\ i2c\_detail::error;}
-\DoxyCodeLine{00453\ \}}
-\DoxyCodeLine{00454\ }
-\DoxyCodeLine{00455\ \textcolor{keyword}{inline}\ uint8\_t\ *\mbox{\hyperlink{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb}{I2C::getBuffer}}()\ \{}
-\DoxyCodeLine{00456\ \ \ \ \ \textcolor{keywordflow}{return}\ i2c\_detail::twiBuffer;}
-\DoxyCodeLine{00457\ \}}
-\DoxyCodeLine{00458\ }
-\DoxyCodeLine{00459\ \textcolor{preprocessor}{\#ifdef\ I2C\_MAX\_PLAYERS}}
+\DoxyCodeLine{00444\ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
+\DoxyCodeLine{00445\ \ \ \ \ i2c\_detail::bufferSize\ =\ size\ -\/\ 1;}
+\DoxyCodeLine{00446\ }
+\DoxyCodeLine{00447\ \ \ \ \ i2c\_detail::error\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a}{TW\_SUCCESS}};}
+\DoxyCodeLine{00448\ }
+\DoxyCodeLine{00449\ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00450\ \ \ \ \ i2c\_detail::slaRW\ =\ address\ <<\ 1\ |\ TW\_READ;}
+\DoxyCodeLine{00451\ }
+\DoxyCodeLine{00452\ \ \ \ \ uint8\_t\ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
+\DoxyCodeLine{00453\ \ \ \ \ \textcolor{keywordflow}{while}\ (busyChecks)\ \{}
+\DoxyCodeLine{00454\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((\mbox{\hyperlink{_arduboy_i2_c_8h_a0e4e08bab2fb484136d18b067bef372c}{I2C\_SCL\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_a5e7834d040f89e2e7fc864785e80f981}{I2C\_SCL\_BIT}}))\ \&\&\ (\mbox{\hyperlink{_arduboy_i2_c_8h_a2cade698267beb86ccaa38c14d35ab0f}{I2C\_SDA\_PIN}}\ \&\ \_BV(\mbox{\hyperlink{_arduboy_i2_c_8h_ab37c7049d3f4f3dc7d89b5c02e88f7c7}{I2C\_SDA\_BIT}})))\ \{}
+\DoxyCodeLine{00455\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks-\/-\/;}
+\DoxyCodeLine{00456\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00457\ \ \ \ \ \ \ \ \ \ \ \ \ busyChecks\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a419daf161333923dae12b87e7a942d6f}{I2C\_BUS\_BUSY\_CHECKS}};}
+\DoxyCodeLine{00458\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00459\ \ \ \ \ \}}
 \DoxyCodeLine{00460\ }
-\DoxyCodeLine{00461\ \textcolor{keyword}{inline}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{I2C::getAddressFromId}}(uint8\_t\ \textcolor{keywordtype}{id})\ \{}
-\DoxyCodeLine{00462\ \ \ \ \ \textcolor{keywordflow}{return}\ 0x8\ +\ id;}
+\DoxyCodeLine{00461\ \ \ \ \ TWCR\ =\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWSTA);}
+\DoxyCodeLine{00462\ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::active)\ \{\}}
 \DoxyCodeLine{00463\ \}}
 \DoxyCodeLine{00464\ }
-\DoxyCodeLine{00465\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a931972954dc9844762a94d2f7de56f04}{I2C::handshake}}()\ \{}
-\DoxyCodeLine{00466\ \ \ \ \ \textcolor{keywordflow}{for}\ (int8\_t\ i\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a7b1d0a049421f122f95c1e80542a532b}{I2C\_MAX\_PLAYERS}}\ -\/\ 1;\ i\ >=\ 0;\ )\ \{}
-\DoxyCodeLine{00467\ \ \ \ \ \ \ \ \ uint8\_t\ dummy;}
-\DoxyCodeLine{00468\ }
-\DoxyCodeLine{00469\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(\mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{I2C::getAddressFromId}}(i),\ \&dummy,\ 1);}
+\DoxyCodeLine{00465\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00466\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(uint8\_t\ address,\ T\ *\textcolor{keywordtype}{object})\ \{}
+\DoxyCodeLine{00467\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(T)\ <\ 256,\ \textcolor{stringliteral}{"{}Size\ of\ T\ must\ be\ less\ than\ 256."{}});}
+\DoxyCodeLine{00468\ \ \ \ \ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(address,\ (\textcolor{keywordtype}{void}\ *)\textcolor{keywordtype}{object},\ \textcolor{keyword}{sizeof}(T));}
+\DoxyCodeLine{00469\ \}}
 \DoxyCodeLine{00470\ }
-\DoxyCodeLine{00471\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{I2C::getTWError}}())\ \{}
-\DoxyCodeLine{00472\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_SLA\_NACK:}
-\DoxyCodeLine{00473\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_ab565cec84a8fc6e626efd29c1b737907}{I2C::setAddress}}(\mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{I2C::getAddressFromId}}(i),\ \textcolor{keyword}{true});}
-\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{I2C::onReceive}}(i2c\_detail::handshakeOnReceive);}
-\DoxyCodeLine{00475\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{I2C::onRequest}}(i2c\_detail::handshakeOnRequest);}
-\DoxyCodeLine{00476\ }
-\DoxyCodeLine{00477\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ handshakeState\ is\ the\ number\ of\ times\ the\ callback\ has\ been\ called.}}
-\DoxyCodeLine{00478\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ the\ callback\ has\ been\ called\ i\ times,\ the\ final\ Arduboy\ has\ joined.}}
-\DoxyCodeLine{00479\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::handshakeState\ <\ i)\ \{\ \}}
-\DoxyCodeLine{00480\ }
-\DoxyCodeLine{00481\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i;}
-\DoxyCodeLine{00482\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a}{TW\_SUCCESS}}:}
-\DoxyCodeLine{00483\ \ \ \ \ \ \ \ \ \ \ \ \ i-\/-\/;}
-\DoxyCodeLine{00484\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00485\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00486\ \ \ \ \ \}}
-\DoxyCodeLine{00487\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduboy_i2_c_8h_a439f3615789ffec435412484d25e584d}{I2C\_HANDSHAKE\_FAILED}};}
+\DoxyCodeLine{00471\ }
+\DoxyCodeLine{00472\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *buffer,\ uint8\_t\ size)\ \{}
+\DoxyCodeLine{00473\ \ \ \ \ \textcolor{keywordflow}{for}\ (uint8\_t\ i\ =\ 0;\ i\ <\ size;\ i++)\ \{}
+\DoxyCodeLine{00474\ \ \ \ \ \ \ \ \ i2c\_detail::twiBuffer[i]\ =\ ((uint8\_t\ *)buffer)[i];}
+\DoxyCodeLine{00475\ \ \ \ \ \}}
+\DoxyCodeLine{00476\ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
+\DoxyCodeLine{00477\ \ \ \ \ i2c\_detail::bufferSize\ =\ size;}
+\DoxyCodeLine{00478\ \}}
+\DoxyCodeLine{00479\ }
+\DoxyCodeLine{00480\ \textcolor{keyword}{template}\ <\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00481\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}(\textcolor{keyword}{const}\ T\ *\textcolor{keywordtype}{object})\ \{}
+\DoxyCodeLine{00482\ \ \ \ \ \textcolor{keyword}{static\_assert}(\textcolor{keyword}{sizeof}(T)\ <=\ \mbox{\hyperlink{_arduboy_i2_c_8h_a6458dbf193a0eef0470fc1b08400bfcd}{I2C\_BUFFER\_SIZE}},\ \textcolor{stringliteral}{"{}Size\ of\ T\ must\ be\ less\ than\ or\ equal\ to\ I2C\_BUFFER\_SIZE."{}});}
+\DoxyCodeLine{00483\ \ \ \ \ \mbox{\hyperlink{class_i2_c_a6d2695878ede6f9ded985230afeaad99}{I2C::transmit}}((\textcolor{keyword}{const}\ \textcolor{keywordtype}{void}\ *)\textcolor{keywordtype}{object},\ \textcolor{keyword}{sizeof}(T));}
+\DoxyCodeLine{00484\ \}}
+\DoxyCodeLine{00485\ }
+\DoxyCodeLine{00486\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{I2C::onRequest}}(\textcolor{keywordtype}{void}\ (*function)())\ \{}
+\DoxyCodeLine{00487\ \ \ \ \ i2c\_detail::onRequestFunction\ =\ function;}
 \DoxyCodeLine{00488\ \}}
-\DoxyCodeLine{00489\ }
-\DoxyCodeLine{00490\ \textcolor{preprocessor}{\#endif}}
-\DoxyCodeLine{00491\ }
-\DoxyCodeLine{00492\ ISR(TWI\_vect,\ ISR\_NAKED)\ \{}
-\DoxyCodeLine{00493\ \ \ \ \ \textcolor{keyword}{asm}\ \textcolor{keyword}{volatile}\ (}
-\DoxyCodeLine{00494\ R\textcolor{stringliteral}{"{}(}}
-\DoxyCodeLine{00495\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ defines\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00496\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00497\ \textcolor{stringliteral}{.equ\ TWCR,\ 0xBC}}
-\DoxyCodeLine{00498\ \textcolor{stringliteral}{.equ\ TWSR,\ 0xB9}}
-\DoxyCodeLine{00499\ \textcolor{stringliteral}{.equ\ TWDR,\ 0xBB}}
-\DoxyCodeLine{00500\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00501\ \textcolor{stringliteral}{.equ\ TWIE,\ 0}}
-\DoxyCodeLine{00502\ \textcolor{stringliteral}{.equ\ TWEN,\ 2}}
-\DoxyCodeLine{00503\ \textcolor{stringliteral}{.equ\ TWWC,\ 3}}
-\DoxyCodeLine{00504\ \textcolor{stringliteral}{.equ\ TWSTO,\ 4}}
-\DoxyCodeLine{00505\ \textcolor{stringliteral}{.equ\ TWSTA,\ 5}}
-\DoxyCodeLine{00506\ \textcolor{stringliteral}{.equ\ TWEA,\ 6}}
-\DoxyCodeLine{00507\ \textcolor{stringliteral}{.equ\ TWINT,\ 7}}
-\DoxyCodeLine{00508\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00509\ \textcolor{stringliteral}{.equ\ REPLY\_ACK,\ (1\ <<\ TWINT)\ |\ (1\ <<\ TWEN)\ |\ (1\ <<\ TWIE)\ |\ (1\ <<\ TWEA)}}
-\DoxyCodeLine{00510\ \textcolor{stringliteral}{.equ\ REPLY\_NACK,\ (1\ <<\ TWINT)\ |\ (1\ <<\ TWEN)\ |\ (1\ <<\ TWIE)}}
-\DoxyCodeLine{00511\ \textcolor{stringliteral}{.equ\ STOP,\ (1\ <<\ TWINT)\ |\ (1\ <<\ TWEN)\ |\ (1\ <<\ TWIE)\ |\ (1\ <<\ TWSTO)\ |\ (1\ <<\ TWEA)}}
-\DoxyCodeLine{00512\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00513\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ registers\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00514\ \textcolor{stringliteral}{;\ r18\ -\/\ TWSR\ (never\ used\ after\ function\ call)}}
-\DoxyCodeLine{00515\ \textcolor{stringliteral}{;\ r19\ -\/\ general\ use}}
-\DoxyCodeLine{00516\ \textcolor{stringliteral}{;\ r30\ -\/\ general\ use}}
-\DoxyCodeLine{00517\ \textcolor{stringliteral}{;\ r31\ -\/\ general\ use}}
-\DoxyCodeLine{00518\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ prologue\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00519\ \textcolor{stringliteral}{push\ r18}}
-\DoxyCodeLine{00520\ \textcolor{stringliteral}{in\ r18,\ \_\_SREG\_\_}}
-\DoxyCodeLine{00521\ \textcolor{stringliteral}{push\ r18}}
-\DoxyCodeLine{00522\ \textcolor{stringliteral}{push\ r30}}
-\DoxyCodeLine{00523\ \textcolor{stringliteral}{push\ r31}}
-\DoxyCodeLine{00524\ \textcolor{stringliteral}{;\ save\ and\ restore\ call-\/clobbered\ registers}}
-\DoxyCodeLine{00525\ \textcolor{stringliteral}{;\ target\ (slave)\ could\ call\ function\ pointer\ }}
-\DoxyCodeLine{00526\ \textcolor{stringliteral}{push\ r19}}
-\DoxyCodeLine{00527\ \textcolor{stringliteral}{push\ r20}}
-\DoxyCodeLine{00528\ \textcolor{stringliteral}{push\ r21}}
-\DoxyCodeLine{00529\ \textcolor{stringliteral}{push\ r22}}
-\DoxyCodeLine{00530\ \textcolor{stringliteral}{push\ r23}}
-\DoxyCodeLine{00531\ \textcolor{stringliteral}{push\ r24}}
-\DoxyCodeLine{00532\ \textcolor{stringliteral}{push\ r25}}
-\DoxyCodeLine{00533\ \textcolor{stringliteral}{push\ r26}}
-\DoxyCodeLine{00534\ \textcolor{stringliteral}{push\ r27}}
-\DoxyCodeLine{00535\ \textcolor{stringliteral}{;\ save\ and\ restore\ tmp\ and\ zero\ registers\ (could\ be\ used\ in\ function\ calls)}}
-\DoxyCodeLine{00536\ \textcolor{stringliteral}{push\ \_\_tmp\_reg\_\_}}
-\DoxyCodeLine{00537\ \textcolor{stringliteral}{push\ \_\_zero\_reg\_\_}}
-\DoxyCodeLine{00538\ \textcolor{stringliteral}{clr\ \_\_zero\_reg\_\_}}
-\DoxyCodeLine{00539\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00540\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00541\ \textcolor{stringliteral}{;\ switch\ (TWSR)}}
-\DoxyCodeLine{00542\ \textcolor{stringliteral}{lds\ r18,\ TWSR\ ;\ no\ mask\ needed\ because\ prescaler\ bits\ are\ cleared}}
-\DoxyCodeLine{00543\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00544\ \textcolor{stringliteral}{cpi\ r18,\ 0x08}}
-\DoxyCodeLine{00545\ \textcolor{stringliteral}{breq\ TW\_START}}
-\DoxyCodeLine{00546\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00547\ \textcolor{stringliteral}{;\ MT\_MR}}
-\DoxyCodeLine{00548\ \textcolor{stringliteral}{cpi\ r18,\ 0x18}}
-\DoxyCodeLine{00549\ \textcolor{stringliteral}{breq\ TW\_MT\_SLA\_ACK}}
-\DoxyCodeLine{00550\ \textcolor{stringliteral}{cpi\ r18,\ 0x28\ }}
-\DoxyCodeLine{00551\ \textcolor{stringliteral}{breq\ TW\_MT\_DATA\_ACK}}
-\DoxyCodeLine{00552\ \textcolor{stringliteral}{cpi\ r18,\ 0x38}}
-\DoxyCodeLine{00553\ \textcolor{stringliteral}{breq\ TW\_MT\_ARB\_LOST\ ;\ same\ as\ TW\_MR\_ARB\_LOST}}
-\DoxyCodeLine{00554\ \textcolor{stringliteral}{cpi\ r18,\ 0x40}}
-\DoxyCodeLine{00555\ \textcolor{stringliteral}{breq\ TW\_MR\_SLA\_ACK}}
-\DoxyCodeLine{00556\ \textcolor{stringliteral}{cpi\ r18,\ 0x50}}
-\DoxyCodeLine{00557\ \textcolor{stringliteral}{breq\ TW\_MR\_DATA\_ACK}}
-\DoxyCodeLine{00558\ \textcolor{stringliteral}{cpi\ r18,\ 0x58}}
-\DoxyCodeLine{00559\ \textcolor{stringliteral}{breq\ TW\_MR\_DATA\_NACK}}
-\DoxyCodeLine{00560\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00561\ \textcolor{stringliteral}{;\ 64\ instruction\ limit\ on\ branches}}
-\DoxyCodeLine{00562\ \textcolor{stringliteral}{rjmp\ SR\_ST\ }}
-\DoxyCodeLine{00563\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00564\ \textcolor{stringliteral}{TW\_START:}}
-\DoxyCodeLine{00565\ \textcolor{stringliteral}{\ \ \ \ ;\ TWDR\ =\ i2c\_detail::slaRW;}}
-\DoxyCodeLine{00566\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[slaRW]}}
-\DoxyCodeLine{00567\ \textcolor{stringliteral}{\ \ \ \ sts\ TWDR,\ r30}}
-\DoxyCodeLine{00568\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_NACK;}}
-\DoxyCodeLine{00569\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_NACK}}
-\DoxyCodeLine{00570\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00571\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
-\DoxyCodeLine{00572\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
-\DoxyCodeLine{00573\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00574\ \textcolor{stringliteral}{TW\_MT\_SLA\_ACK:}}
-\DoxyCodeLine{00575\ \textcolor{stringliteral}{TW\_MT\_DATA\_ACK:}}
-\DoxyCodeLine{00576\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (i2c\_detail::bufferIdx\ >=\ bufferSize)\ \{\ stop();\ return;\ \}}}
-\DoxyCodeLine{00577\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
-\DoxyCodeLine{00578\ \textcolor{stringliteral}{\ \ \ \ lds\ r31,\ \%[bufferSize]}}
-\DoxyCodeLine{00579\ \textcolor{stringliteral}{\ \ \ \ cp\ r30,\ r31}}
-\DoxyCodeLine{00580\ \textcolor{stringliteral}{\ \ \ \ }}
-\DoxyCodeLine{00581\ \textcolor{stringliteral}{\ \ \ \ brlt\ 1f\ ;\ 64\ instruction\ limit\ on\ branches}}
-\DoxyCodeLine{00582\ \textcolor{stringliteral}{\ \ \ \ rjmp\ stop\_reti}}
-\DoxyCodeLine{00583\ \textcolor{stringliteral}{\ \ \ \ 1:}}
-\DoxyCodeLine{00584\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00585\ \textcolor{stringliteral}{\ \ \ \ ;\ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}}
-\DoxyCodeLine{00586\ \textcolor{stringliteral}{\ \ \ \ ;\ Increment\ bufferIdx\ but\ preserve\ r30}}
-\DoxyCodeLine{00587\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
-\DoxyCodeLine{00588\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
-\DoxyCodeLine{00589\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
-\DoxyCodeLine{00590\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00591\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
-\DoxyCodeLine{00592\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
-\DoxyCodeLine{00593\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[twiBuffer]))}}
-\DoxyCodeLine{00594\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[twiBuffer]))}}
-\DoxyCodeLine{00595\ \textcolor{stringliteral}{\ \ \ \ ld\ r30,\ Z}}
-\DoxyCodeLine{00596\ \textcolor{stringliteral}{\ \ \ \ sts\ TWDR,\ r30}}
-\DoxyCodeLine{00597\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00598\ \textcolor{stringliteral}{\ \ \ \ ;\ https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48APA88APA168APA328P-\/SiliConErrataClarif-\/DS80000855A.pdf}}
-\DoxyCodeLine{00599\ \textcolor{stringliteral}{\ \ \ \ ;\ Section\ 2.3.1}}
-\DoxyCodeLine{00600\ \textcolor{stringliteral}{\ \ \ \ lpm\ ;\ 3\ cycle\ delay}}
-\DoxyCodeLine{00601\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00602\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_NACK;}}
-\DoxyCodeLine{00603\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_NACK}}
-\DoxyCodeLine{00604\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00605\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
-\DoxyCodeLine{00606\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
-\DoxyCodeLine{00607\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00608\ \textcolor{stringliteral}{TW\_MT\_ARB\_LOST:}}
-\DoxyCodeLine{00609\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
-\DoxyCodeLine{00610\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
-\DoxyCodeLine{00611\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00612\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::error\ =\ TW\_MT\_ARB\_LOST;}}
-\DoxyCodeLine{00613\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ 0x38}}
-\DoxyCodeLine{00614\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[error],\ r30}}
-\DoxyCodeLine{00615\ \textcolor{stringliteral}{\ \ \ \ ;\ active\ =\ false;}}
-\DoxyCodeLine{00616\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
-\DoxyCodeLine{00617\ \textcolor{stringliteral}{\ \ \ \ rjmp\ active\_false\_reti}}
-\DoxyCodeLine{00618\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00619\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00620\ \textcolor{stringliteral}{TW\_MR\_DATA\_NACK:}}
-\DoxyCodeLine{00621\ \textcolor{stringliteral}{TW\_MR\_DATA\_ACK:}}
-\DoxyCodeLine{00622\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::rxBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}}
-\DoxyCodeLine{00623\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
-\DoxyCodeLine{00624\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
-\DoxyCodeLine{00625\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
-\DoxyCodeLine{00626\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
-\DoxyCodeLine{00627\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00628\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
-\DoxyCodeLine{00629\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
-\DoxyCodeLine{00630\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[rxBuffer]))}}
-\DoxyCodeLine{00631\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[rxBuffer]))}}
-\DoxyCodeLine{00632\ \textcolor{stringliteral}{\ \ \ \ lds\ r19,\ TWDR}}
-\DoxyCodeLine{00633\ \textcolor{stringliteral}{\ \ \ \ st\ Z,\ r19}}
-\DoxyCodeLine{00634\ \textcolor{stringliteral}{\ \ \ \ }}
-\DoxyCodeLine{00635\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (TWSR\ ==\ TW\_MR\_DATA\_NACK)\ \{\ stop();\ return;\ \}}}
-\DoxyCodeLine{00636\ \textcolor{stringliteral}{\ \ \ \ ;\ r18\ holds\ TWSR}}
-\DoxyCodeLine{00637\ \textcolor{stringliteral}{\ \ \ \ cpi\ r18,\ 0x58}}
-\DoxyCodeLine{00638\ \textcolor{stringliteral}{\ \ \ \ brne\ 1f\ ;\ 64\ instruction\ limit\ on\ branches}}
-\DoxyCodeLine{00639\ \textcolor{stringliteral}{\ \ \ \ rjmp\ stop\_reti}}
-\DoxyCodeLine{00640\ \textcolor{stringliteral}{\ \ \ \ 1:}}
-\DoxyCodeLine{00641\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ fallthrough\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00642\ \textcolor{stringliteral}{TW\_MR\_SLA\_ACK:}}
-\DoxyCodeLine{00643\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}}
-\DoxyCodeLine{00644\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_ACK;}}
-\DoxyCodeLine{00645\ \textcolor{stringliteral}{\ \ \ \ ;\ \}\ else\ \{}}
-\DoxyCodeLine{00646\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_nACK;}}
-\DoxyCodeLine{00647\ \textcolor{stringliteral}{\ \ \ \ ;\ \}}}
-\DoxyCodeLine{00648\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00489\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{I2C::onReceive}}(\textcolor{keywordtype}{void}\ (*function)())\ \{}
+\DoxyCodeLine{00490\ \ \ \ \ i2c\_detail::onReceiveFunction\ =\ function;}
+\DoxyCodeLine{00491\ \}}
+\DoxyCodeLine{00492\ }
+\DoxyCodeLine{00493\ \textcolor{keyword}{inline}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{I2C::getTWError}}()\ \{}
+\DoxyCodeLine{00494\ \ \ \ \ \textcolor{keywordflow}{return}\ i2c\_detail::error;}
+\DoxyCodeLine{00495\ \}}
+\DoxyCodeLine{00496\ }
+\DoxyCodeLine{00497\ \textcolor{keyword}{inline}\ uint8\_t\ *\mbox{\hyperlink{class_i2_c_a5ca82bd463cf11cad3b544d3c8fc75cb}{I2C::getBuffer}}()\ \{}
+\DoxyCodeLine{00498\ \ \ \ \ \textcolor{keywordflow}{return}\ i2c\_detail::twiBuffer;}
+\DoxyCodeLine{00499\ \}}
+\DoxyCodeLine{00500\ }
+\DoxyCodeLine{00501\ \textcolor{preprocessor}{\#ifdef\ I2C\_MAX\_PLAYERS}}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00503\ \textcolor{keyword}{inline}\ uint8\_t\ \mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{I2C::getAddressFromId}}(uint8\_t\ \textcolor{keywordtype}{id})\ \{}
+\DoxyCodeLine{00504\ \ \ \ \ \textcolor{keywordflow}{return}\ 0x8\ +\ id;}
+\DoxyCodeLine{00505\ \}}
+\DoxyCodeLine{00506\ }
+\DoxyCodeLine{00507\ uint8\_t\ \mbox{\hyperlink{class_i2_c_a931972954dc9844762a94d2f7de56f04}{I2C::handshake}}()\ \{}
+\DoxyCodeLine{00508\ \ \ \ \ \textcolor{keywordflow}{for}\ (int8\_t\ i\ =\ \mbox{\hyperlink{_arduboy_i2_c_8h_a7b1d0a049421f122f95c1e80542a532b}{I2C\_MAX\_PLAYERS}}\ -\/\ 1;\ i\ >=\ 0;\ )\ \{}
+\DoxyCodeLine{00509\ \ \ \ \ \ \ \ \ uint8\_t\ dummy;}
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_a7fa12af5a3f24c3db496672a4d5c3fe0}{I2C::read}}(\mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{I2C::getAddressFromId}}(i),\ \&dummy,\ 1);}
+\DoxyCodeLine{00512\ }
+\DoxyCodeLine{00513\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{switch}\ (\mbox{\hyperlink{class_i2_c_a03dfacb57e2a02b10b61cf093b2f6171}{I2C::getTWError}}())\ \{}
+\DoxyCodeLine{00514\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_SLA\_NACK:}
+\DoxyCodeLine{00515\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_ab565cec84a8fc6e626efd29c1b737907}{I2C::setAddress}}(\mbox{\hyperlink{class_i2_c_ad8fdf502548d5b86968e1a04b60f89cb}{I2C::getAddressFromId}}(i),\ \textcolor{keyword}{true});}
+\DoxyCodeLine{00516\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_aba82f80b86f08e2caf0f6cab4860728d}{I2C::onReceive}}(i2c\_detail::handshakeOnReceive);}
+\DoxyCodeLine{00517\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_i2_c_a026eaad0ba8bb6a698d3eaca9dd9887d}{I2C::onRequest}}(i2c\_detail::handshakeOnRequest);}
+\DoxyCodeLine{00518\ }
+\DoxyCodeLine{00519\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ handshakeState\ is\ the\ number\ of\ times\ the\ callback\ has\ been\ called.}}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ When\ the\ callback\ has\ been\ called\ i\ times,\ the\ final\ Arduboy\ has\ joined.}}
+\DoxyCodeLine{00521\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ (i2c\_detail::handshakeState\ <\ i)\ \{\ \}}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00523\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ i;}
+\DoxyCodeLine{00524\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{case}\ \mbox{\hyperlink{_arduboy_i2_c_8h_aaa8a379ca27da629fb7eb67cacc5d86a}{TW\_SUCCESS}}:}
+\DoxyCodeLine{00525\ \ \ \ \ \ \ \ \ \ \ \ \ i-\/-\/;}
+\DoxyCodeLine{00526\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00527\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00528\ \ \ \ \ \}}
+\DoxyCodeLine{00529\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{_arduboy_i2_c_8h_a439f3615789ffec435412484d25e584d}{I2C\_HANDSHAKE\_FAILED}};}
+\DoxyCodeLine{00530\ \}}
+\DoxyCodeLine{00531\ }
+\DoxyCodeLine{00532\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00533\ }
+\DoxyCodeLine{00534\ ISR(TWI\_vect,\ ISR\_NAKED)\ \{}
+\DoxyCodeLine{00535\ \ \ \ \ \textcolor{keyword}{asm}\ \textcolor{keyword}{volatile}\ (}
+\DoxyCodeLine{00536\ R\textcolor{stringliteral}{"{}(}}
+\DoxyCodeLine{00537\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ defines\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00538\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00539\ \textcolor{stringliteral}{.equ\ TWCR,\ 0xBC}}
+\DoxyCodeLine{00540\ \textcolor{stringliteral}{.equ\ TWSR,\ 0xB9}}
+\DoxyCodeLine{00541\ \textcolor{stringliteral}{.equ\ TWDR,\ 0xBB}}
+\DoxyCodeLine{00542\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00543\ \textcolor{stringliteral}{.equ\ TWIE,\ 0}}
+\DoxyCodeLine{00544\ \textcolor{stringliteral}{.equ\ TWEN,\ 2}}
+\DoxyCodeLine{00545\ \textcolor{stringliteral}{.equ\ TWWC,\ 3}}
+\DoxyCodeLine{00546\ \textcolor{stringliteral}{.equ\ TWSTO,\ 4}}
+\DoxyCodeLine{00547\ \textcolor{stringliteral}{.equ\ TWSTA,\ 5}}
+\DoxyCodeLine{00548\ \textcolor{stringliteral}{.equ\ TWEA,\ 6}}
+\DoxyCodeLine{00549\ \textcolor{stringliteral}{.equ\ TWINT,\ 7}}
+\DoxyCodeLine{00550\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00551\ \textcolor{stringliteral}{.equ\ REPLY\_ACK,\ (1\ <<\ TWINT)\ |\ (1\ <<\ TWEN)\ |\ (1\ <<\ TWIE)\ |\ (1\ <<\ TWEA)}}
+\DoxyCodeLine{00552\ \textcolor{stringliteral}{.equ\ REPLY\_NACK,\ (1\ <<\ TWINT)\ |\ (1\ <<\ TWEN)\ |\ (1\ <<\ TWIE)}}
+\DoxyCodeLine{00553\ \textcolor{stringliteral}{.equ\ STOP,\ (1\ <<\ TWINT)\ |\ (1\ <<\ TWEN)\ |\ (1\ <<\ TWIE)\ |\ (1\ <<\ TWSTO)\ |\ (1\ <<\ TWEA)}}
+\DoxyCodeLine{00554\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00555\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ registers\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00556\ \textcolor{stringliteral}{;\ r18\ -\/\ TWSR\ (never\ used\ after\ function\ call)}}
+\DoxyCodeLine{00557\ \textcolor{stringliteral}{;\ r19\ -\/\ general\ use}}
+\DoxyCodeLine{00558\ \textcolor{stringliteral}{;\ r30\ -\/\ general\ use}}
+\DoxyCodeLine{00559\ \textcolor{stringliteral}{;\ r31\ -\/\ general\ use}}
+\DoxyCodeLine{00560\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ prologue\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00561\ \textcolor{stringliteral}{push\ r18}}
+\DoxyCodeLine{00562\ \textcolor{stringliteral}{in\ r18,\ \_\_SREG\_\_}}
+\DoxyCodeLine{00563\ \textcolor{stringliteral}{push\ r18}}
+\DoxyCodeLine{00564\ \textcolor{stringliteral}{push\ r30}}
+\DoxyCodeLine{00565\ \textcolor{stringliteral}{push\ r31}}
+\DoxyCodeLine{00566\ \textcolor{stringliteral}{;\ save\ and\ restore\ call-\/clobbered\ registers}}
+\DoxyCodeLine{00567\ \textcolor{stringliteral}{;\ target\ (slave)\ could\ call\ function\ pointer\ }}
+\DoxyCodeLine{00568\ \textcolor{stringliteral}{push\ r19}}
+\DoxyCodeLine{00569\ \textcolor{stringliteral}{push\ r20}}
+\DoxyCodeLine{00570\ \textcolor{stringliteral}{push\ r21}}
+\DoxyCodeLine{00571\ \textcolor{stringliteral}{push\ r22}}
+\DoxyCodeLine{00572\ \textcolor{stringliteral}{push\ r23}}
+\DoxyCodeLine{00573\ \textcolor{stringliteral}{push\ r24}}
+\DoxyCodeLine{00574\ \textcolor{stringliteral}{push\ r25}}
+\DoxyCodeLine{00575\ \textcolor{stringliteral}{push\ r26}}
+\DoxyCodeLine{00576\ \textcolor{stringliteral}{push\ r27}}
+\DoxyCodeLine{00577\ \textcolor{stringliteral}{;\ save\ and\ restore\ tmp\ and\ zero\ registers\ (could\ be\ used\ in\ function\ calls)}}
+\DoxyCodeLine{00578\ \textcolor{stringliteral}{push\ \_\_tmp\_reg\_\_}}
+\DoxyCodeLine{00579\ \textcolor{stringliteral}{push\ \_\_zero\_reg\_\_}}
+\DoxyCodeLine{00580\ \textcolor{stringliteral}{clr\ \_\_zero\_reg\_\_}}
+\DoxyCodeLine{00581\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00582\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00583\ \textcolor{stringliteral}{;\ switch\ (TWSR)}}
+\DoxyCodeLine{00584\ \textcolor{stringliteral}{lds\ r18,\ TWSR\ ;\ no\ mask\ needed\ because\ prescaler\ bits\ are\ cleared}}
+\DoxyCodeLine{00585\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00586\ \textcolor{stringliteral}{cpi\ r18,\ 0x08}}
+\DoxyCodeLine{00587\ \textcolor{stringliteral}{breq\ TW\_START}}
+\DoxyCodeLine{00588\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00589\ \textcolor{stringliteral}{;\ MT\_MR}}
+\DoxyCodeLine{00590\ \textcolor{stringliteral}{cpi\ r18,\ 0x18}}
+\DoxyCodeLine{00591\ \textcolor{stringliteral}{breq\ TW\_MT\_SLA\_ACK}}
+\DoxyCodeLine{00592\ \textcolor{stringliteral}{cpi\ r18,\ 0x28\ }}
+\DoxyCodeLine{00593\ \textcolor{stringliteral}{breq\ TW\_MT\_DATA\_ACK}}
+\DoxyCodeLine{00594\ \textcolor{stringliteral}{cpi\ r18,\ 0x38}}
+\DoxyCodeLine{00595\ \textcolor{stringliteral}{breq\ TW\_MT\_ARB\_LOST\ ;\ same\ as\ TW\_MR\_ARB\_LOST}}
+\DoxyCodeLine{00596\ \textcolor{stringliteral}{cpi\ r18,\ 0x40}}
+\DoxyCodeLine{00597\ \textcolor{stringliteral}{breq\ TW\_MR\_SLA\_ACK}}
+\DoxyCodeLine{00598\ \textcolor{stringliteral}{cpi\ r18,\ 0x50}}
+\DoxyCodeLine{00599\ \textcolor{stringliteral}{breq\ TW\_MR\_DATA\_ACK}}
+\DoxyCodeLine{00600\ \textcolor{stringliteral}{cpi\ r18,\ 0x58}}
+\DoxyCodeLine{00601\ \textcolor{stringliteral}{breq\ TW\_MR\_DATA\_NACK}}
+\DoxyCodeLine{00602\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00603\ \textcolor{stringliteral}{;\ 64\ instruction\ limit\ on\ branches}}
+\DoxyCodeLine{00604\ \textcolor{stringliteral}{rjmp\ SR\_ST\ }}
+\DoxyCodeLine{00605\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00606\ \textcolor{stringliteral}{TW\_START:}}
+\DoxyCodeLine{00607\ \textcolor{stringliteral}{\ \ \ \ ;\ TWDR\ =\ i2c\_detail::slaRW;}}
+\DoxyCodeLine{00608\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[slaRW]}}
+\DoxyCodeLine{00609\ \textcolor{stringliteral}{\ \ \ \ sts\ TWDR,\ r30}}
+\DoxyCodeLine{00610\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_NACK;}}
+\DoxyCodeLine{00611\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_NACK}}
+\DoxyCodeLine{00612\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
+\DoxyCodeLine{00613\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00614\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
+\DoxyCodeLine{00615\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00616\ \textcolor{stringliteral}{TW\_MT\_SLA\_ACK:}}
+\DoxyCodeLine{00617\ \textcolor{stringliteral}{TW\_MT\_DATA\_ACK:}}
+\DoxyCodeLine{00618\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (i2c\_detail::bufferIdx\ >=\ bufferSize)\ \{\ stop();\ return;\ \}}}
+\DoxyCodeLine{00619\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
+\DoxyCodeLine{00620\ \textcolor{stringliteral}{\ \ \ \ lds\ r31,\ \%[bufferSize]}}
+\DoxyCodeLine{00621\ \textcolor{stringliteral}{\ \ \ \ cp\ r30,\ r31}}
+\DoxyCodeLine{00622\ \textcolor{stringliteral}{\ \ \ \ }}
+\DoxyCodeLine{00623\ \textcolor{stringliteral}{\ \ \ \ brlt\ 1f\ ;\ 64\ instruction\ limit\ on\ branches}}
+\DoxyCodeLine{00624\ \textcolor{stringliteral}{\ \ \ \ rjmp\ stop\_reti}}
+\DoxyCodeLine{00625\ \textcolor{stringliteral}{\ \ \ \ 1:}}
+\DoxyCodeLine{00626\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00627\ \textcolor{stringliteral}{\ \ \ \ ;\ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}}
+\DoxyCodeLine{00628\ \textcolor{stringliteral}{\ \ \ \ ;\ Increment\ bufferIdx\ but\ preserve\ r30}}
+\DoxyCodeLine{00629\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
+\DoxyCodeLine{00630\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
+\DoxyCodeLine{00631\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
+\DoxyCodeLine{00632\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00633\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
+\DoxyCodeLine{00634\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
+\DoxyCodeLine{00635\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[twiBuffer]))}}
+\DoxyCodeLine{00636\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[twiBuffer]))}}
+\DoxyCodeLine{00637\ \textcolor{stringliteral}{\ \ \ \ ld\ r30,\ Z}}
+\DoxyCodeLine{00638\ \textcolor{stringliteral}{\ \ \ \ sts\ TWDR,\ r30}}
+\DoxyCodeLine{00639\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00640\ \textcolor{stringliteral}{\ \ \ \ ;\ https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48APA88APA168APA328P-\/SiliConErrataClarif-\/DS80000855A.pdf}}
+\DoxyCodeLine{00641\ \textcolor{stringliteral}{\ \ \ \ ;\ Section\ 2.3.1}}
+\DoxyCodeLine{00642\ \textcolor{stringliteral}{\ \ \ \ lpm\ ;\ 3\ cycle\ delay}}
+\DoxyCodeLine{00643\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00644\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_NACK;}}
+\DoxyCodeLine{00645\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_NACK}}
+\DoxyCodeLine{00646\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
+\DoxyCodeLine{00647\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00648\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
 \DoxyCodeLine{00649\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00650\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
-\DoxyCodeLine{00651\ \textcolor{stringliteral}{\ \ \ \ lds\ r31,\ \%[bufferSize]}}
-\DoxyCodeLine{00652\ \textcolor{stringliteral}{\ \ \ \ cp\ r30,\ r31}}
-\DoxyCodeLine{00653\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
-\DoxyCodeLine{00654\ \textcolor{stringliteral}{\ \ \ \ brlt\ 1f}}
-\DoxyCodeLine{00655\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_NACK}}
-\DoxyCodeLine{00656\ \textcolor{stringliteral}{\ \ \ \ 1:}}
-\DoxyCodeLine{00657\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00658\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
-\DoxyCodeLine{00659\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00660\ \textcolor{stringliteral}{SR\_ST:}}
-\DoxyCodeLine{00661\ \textcolor{stringliteral}{cpi\ r18,\ 0x60}}
-\DoxyCodeLine{00662\ \textcolor{stringliteral}{breq\ TW\_SR\_SLA\_ACK}}
-\DoxyCodeLine{00663\ \textcolor{stringliteral}{cpi\ r18,\ 0x68}}
-\DoxyCodeLine{00664\ \textcolor{stringliteral}{breq\ TW\_SR\_ARB\_LOST\_SLA\_ACK}}
-\DoxyCodeLine{00665\ \textcolor{stringliteral}{cpi\ r18,\ 0x70}}
-\DoxyCodeLine{00666\ \textcolor{stringliteral}{breq\ TW\_SR\_GCALL\_ACK}}
-\DoxyCodeLine{00667\ \textcolor{stringliteral}{cpi\ r18,\ 0x78}}
-\DoxyCodeLine{00668\ \textcolor{stringliteral}{breq\ TW\_SR\_ARB\_LOST\_GCALL\_ACK}}
-\DoxyCodeLine{00669\ \textcolor{stringliteral}{cpi\ r18,\ 0x80}}
-\DoxyCodeLine{00670\ \textcolor{stringliteral}{breq\ TW\_SR\_DATA\_ACK}}
-\DoxyCodeLine{00671\ \textcolor{stringliteral}{cpi\ r18,\ 0x90}}
-\DoxyCodeLine{00672\ \textcolor{stringliteral}{breq\ TW\_SR\_GCALL\_DATA\_ACK}}
-\DoxyCodeLine{00673\ \textcolor{stringliteral}{cpi\ r18,\ 0xA0}}
-\DoxyCodeLine{00674\ \textcolor{stringliteral}{breq\ TW\_SR\_STOP}}
-\DoxyCodeLine{00675\ \textcolor{stringliteral}{cpi\ r18,\ 0xA8}}
-\DoxyCodeLine{00676\ \textcolor{stringliteral}{breq\ TW\_ST\_SLA\_ACK}}
-\DoxyCodeLine{00677\ \textcolor{stringliteral}{cpi\ r18,\ 0xB0}}
-\DoxyCodeLine{00678\ \textcolor{stringliteral}{breq\ TW\_ST\_ARB\_LOST\_SLA\_ACK}}
-\DoxyCodeLine{00679\ \textcolor{stringliteral}{cpi\ r18,\ 0xB8}}
-\DoxyCodeLine{00680\ \textcolor{stringliteral}{breq\ TW\_ST\_DATA\_ACK}}
-\DoxyCodeLine{00681\ \textcolor{stringliteral}{cpi\ r18,\ 0xC0}}
-\DoxyCodeLine{00682\ \textcolor{stringliteral}{breq\ TW\_ST\_DATA\_NACK}}
-\DoxyCodeLine{00683\ \textcolor{stringliteral}{cpi\ r18,\ 0xC8}}
-\DoxyCodeLine{00684\ \textcolor{stringliteral}{breq\ TW\_ST\_LAST\_DATA}}
-\DoxyCodeLine{00685\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00686\ \textcolor{stringliteral}{rjmp\ default}}
-\DoxyCodeLine{00687\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00688\ \textcolor{stringliteral}{TW\_SR\_SLA\_ACK:}}
-\DoxyCodeLine{00689\ \textcolor{stringliteral}{TW\_SR\_ARB\_LOST\_SLA\_ACK:}}
-\DoxyCodeLine{00690\ \textcolor{stringliteral}{TW\_SR\_GCALL\_ACK:}}
-\DoxyCodeLine{00691\ \textcolor{stringliteral}{TW\_SR\_ARB\_LOST\_GCALL\_ACK:}}
-\DoxyCodeLine{00692\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ TWSR;\ (true)}}
-\DoxyCodeLine{00693\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[active],\ r18\ ;\ r18\ holds\ TWSR}}
-\DoxyCodeLine{00694\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::bufferIdx\ =\ 0;}}
-\DoxyCodeLine{00695\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ \_\_zero\_reg\_\_}}
-\DoxyCodeLine{00696\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
-\DoxyCodeLine{00697\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
-\DoxyCodeLine{00698\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00699\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00650\ \textcolor{stringliteral}{TW\_MT\_ARB\_LOST:}}
+\DoxyCodeLine{00651\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
+\DoxyCodeLine{00652\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
+\DoxyCodeLine{00653\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
+\DoxyCodeLine{00654\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::error\ =\ TW\_MT\_ARB\_LOST;}}
+\DoxyCodeLine{00655\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ 0x38}}
+\DoxyCodeLine{00656\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[error],\ r30}}
+\DoxyCodeLine{00657\ \textcolor{stringliteral}{\ \ \ \ ;\ active\ =\ false;}}
+\DoxyCodeLine{00658\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00659\ \textcolor{stringliteral}{\ \ \ \ rjmp\ active\_false\_reti}}
+\DoxyCodeLine{00660\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00661\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00662\ \textcolor{stringliteral}{TW\_MR\_DATA\_NACK:}}
+\DoxyCodeLine{00663\ \textcolor{stringliteral}{TW\_MR\_DATA\_ACK:}}
+\DoxyCodeLine{00664\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::rxBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}}
+\DoxyCodeLine{00665\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
+\DoxyCodeLine{00666\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
+\DoxyCodeLine{00667\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
+\DoxyCodeLine{00668\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
+\DoxyCodeLine{00669\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00670\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
+\DoxyCodeLine{00671\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
+\DoxyCodeLine{00672\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[rxBuffer]))}}
+\DoxyCodeLine{00673\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[rxBuffer]))}}
+\DoxyCodeLine{00674\ \textcolor{stringliteral}{\ \ \ \ lds\ r19,\ TWDR}}
+\DoxyCodeLine{00675\ \textcolor{stringliteral}{\ \ \ \ st\ Z,\ r19}}
+\DoxyCodeLine{00676\ \textcolor{stringliteral}{\ \ \ \ }}
+\DoxyCodeLine{00677\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (TWSR\ ==\ TW\_MR\_DATA\_NACK)\ \{\ stop();\ return;\ \}}}
+\DoxyCodeLine{00678\ \textcolor{stringliteral}{\ \ \ \ ;\ r18\ holds\ TWSR}}
+\DoxyCodeLine{00679\ \textcolor{stringliteral}{\ \ \ \ cpi\ r18,\ 0x58}}
+\DoxyCodeLine{00680\ \textcolor{stringliteral}{\ \ \ \ brne\ 1f\ ;\ 64\ instruction\ limit\ on\ branches}}
+\DoxyCodeLine{00681\ \textcolor{stringliteral}{\ \ \ \ rjmp\ stop\_reti}}
+\DoxyCodeLine{00682\ \textcolor{stringliteral}{\ \ \ \ 1:}}
+\DoxyCodeLine{00683\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ fallthrough\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00684\ \textcolor{stringliteral}{TW\_MR\_SLA\_ACK:}}
+\DoxyCodeLine{00685\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}}
+\DoxyCodeLine{00686\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_ACK;}}
+\DoxyCodeLine{00687\ \textcolor{stringliteral}{\ \ \ \ ;\ \}\ else\ \{}}
+\DoxyCodeLine{00688\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_nACK;}}
+\DoxyCodeLine{00689\ \textcolor{stringliteral}{\ \ \ \ ;\ \}}}
+\DoxyCodeLine{00690\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00691\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00692\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
+\DoxyCodeLine{00693\ \textcolor{stringliteral}{\ \ \ \ lds\ r31,\ \%[bufferSize]}}
+\DoxyCodeLine{00694\ \textcolor{stringliteral}{\ \ \ \ cp\ r30,\ r31}}
+\DoxyCodeLine{00695\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
+\DoxyCodeLine{00696\ \textcolor{stringliteral}{\ \ \ \ brlt\ 1f}}
+\DoxyCodeLine{00697\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_NACK}}
+\DoxyCodeLine{00698\ \textcolor{stringliteral}{\ \ \ \ 1:}}
+\DoxyCodeLine{00699\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
 \DoxyCodeLine{00700\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
-\DoxyCodeLine{00701\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00702\ \textcolor{stringliteral}{TW\_SR\_DATA\_ACK:}}
-\DoxyCodeLine{00703\ \textcolor{stringliteral}{TW\_SR\_GCALL\_DATA\_ACK:}}
-\DoxyCodeLine{00704\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}}
-\DoxyCodeLine{00705\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
-\DoxyCodeLine{00706\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
-\DoxyCodeLine{00707\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
-\DoxyCodeLine{00708\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
-\DoxyCodeLine{00709\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00710\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
-\DoxyCodeLine{00711\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
-\DoxyCodeLine{00712\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[twiBuffer]))}}
-\DoxyCodeLine{00713\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[twiBuffer]))}}
-\DoxyCodeLine{00714\ \textcolor{stringliteral}{\ \ \ \ lds\ r19,\ TWDR}}
-\DoxyCodeLine{00715\ \textcolor{stringliteral}{\ \ \ \ st\ Z,\ r19}}
-\DoxyCodeLine{00716\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00717\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
-\DoxyCodeLine{00718\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
-\DoxyCodeLine{00719\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00720\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
-\DoxyCodeLine{00721\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
-\DoxyCodeLine{00722\ \textcolor{stringliteral}{TW\_SR\_STOP:}}
-\DoxyCodeLine{00723\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
-\DoxyCodeLine{00724\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
-\DoxyCodeLine{00725\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00726\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::onReceiveFunction();}}
-\DoxyCodeLine{00727\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[onReceiveFunction]}}
-\DoxyCodeLine{00728\ \textcolor{stringliteral}{\ \ \ \ lds\ r31,\ \%[onReceiveFunction]\ +\ 1}}
-\DoxyCodeLine{00729\ \textcolor{stringliteral}{\ \ \ \ icall}}
-\DoxyCodeLine{00730\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ false;}}
-\DoxyCodeLine{00731\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
-\DoxyCodeLine{00732\ \textcolor{stringliteral}{\ \ \ \ rjmp\ active\_false\_reti;}}
-\DoxyCodeLine{00733\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00734\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00735\ \textcolor{stringliteral}{TW\_ST\_ARB\_LOST\_SLA\_ACK:}}
-\DoxyCodeLine{00736\ \textcolor{stringliteral}{TW\_ST\_SLA\_ACK:}}
-\DoxyCodeLine{00737\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ TWSR;\ (true)}}
-\DoxyCodeLine{00738\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[active],\ r18}}
-\DoxyCodeLine{00739\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::onRequestFunction();}}
-\DoxyCodeLine{00740\ \textcolor{stringliteral}{\ \ \ \ lds\ 30,\ \%[onRequestFunction]}}
-\DoxyCodeLine{00741\ \textcolor{stringliteral}{\ \ \ \ lds\ 31,\ \%[onRequestFunction]\ +\ 1}}
-\DoxyCodeLine{00742\ \textcolor{stringliteral}{\ \ \ \ icall}}
-\DoxyCodeLine{00743\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ fallthrough\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00744\ \textcolor{stringliteral}{TW\_ST\_DATA\_ACK:}}
-\DoxyCodeLine{00745\ \textcolor{stringliteral}{\ \ \ \ ;\ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}}
-\DoxyCodeLine{00746\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]\ }}
-\DoxyCodeLine{00747\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
-\DoxyCodeLine{00748\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
-\DoxyCodeLine{00749\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
-\DoxyCodeLine{00750\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
-\DoxyCodeLine{00751\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
-\DoxyCodeLine{00752\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[twiBuffer]))}}
-\DoxyCodeLine{00753\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[twiBuffer]))}}
-\DoxyCodeLine{00754\ \textcolor{stringliteral}{\ \ \ \ ld\ r30,\ Z}}
-\DoxyCodeLine{00755\ \textcolor{stringliteral}{\ \ \ \ sts\ TWDR,\ r30}}
-\DoxyCodeLine{00756\ \textcolor{stringliteral}{\ \ \ \ }}
-\DoxyCodeLine{00757\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}}
-\DoxyCodeLine{00758\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_ACK;}}
-\DoxyCodeLine{00759\ \textcolor{stringliteral}{\ \ \ \ ;\ \}\ else\ \{}}
-\DoxyCodeLine{00760\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_NACK;}}
-\DoxyCodeLine{00761\ \textcolor{stringliteral}{\ \ \ \ ;\ \}}}
+\DoxyCodeLine{00701\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00702\ \textcolor{stringliteral}{SR\_ST:}}
+\DoxyCodeLine{00703\ \textcolor{stringliteral}{cpi\ r18,\ 0x60}}
+\DoxyCodeLine{00704\ \textcolor{stringliteral}{breq\ TW\_SR\_SLA\_ACK}}
+\DoxyCodeLine{00705\ \textcolor{stringliteral}{cpi\ r18,\ 0x68}}
+\DoxyCodeLine{00706\ \textcolor{stringliteral}{breq\ TW\_SR\_ARB\_LOST\_SLA\_ACK}}
+\DoxyCodeLine{00707\ \textcolor{stringliteral}{cpi\ r18,\ 0x70}}
+\DoxyCodeLine{00708\ \textcolor{stringliteral}{breq\ TW\_SR\_GCALL\_ACK}}
+\DoxyCodeLine{00709\ \textcolor{stringliteral}{cpi\ r18,\ 0x78}}
+\DoxyCodeLine{00710\ \textcolor{stringliteral}{breq\ TW\_SR\_ARB\_LOST\_GCALL\_ACK}}
+\DoxyCodeLine{00711\ \textcolor{stringliteral}{cpi\ r18,\ 0x80}}
+\DoxyCodeLine{00712\ \textcolor{stringliteral}{breq\ TW\_SR\_DATA\_ACK}}
+\DoxyCodeLine{00713\ \textcolor{stringliteral}{cpi\ r18,\ 0x90}}
+\DoxyCodeLine{00714\ \textcolor{stringliteral}{breq\ TW\_SR\_GCALL\_DATA\_ACK}}
+\DoxyCodeLine{00715\ \textcolor{stringliteral}{cpi\ r18,\ 0xA0}}
+\DoxyCodeLine{00716\ \textcolor{stringliteral}{breq\ TW\_SR\_STOP}}
+\DoxyCodeLine{00717\ \textcolor{stringliteral}{cpi\ r18,\ 0xA8}}
+\DoxyCodeLine{00718\ \textcolor{stringliteral}{breq\ TW\_ST\_SLA\_ACK}}
+\DoxyCodeLine{00719\ \textcolor{stringliteral}{cpi\ r18,\ 0xB0}}
+\DoxyCodeLine{00720\ \textcolor{stringliteral}{breq\ TW\_ST\_ARB\_LOST\_SLA\_ACK}}
+\DoxyCodeLine{00721\ \textcolor{stringliteral}{cpi\ r18,\ 0xB8}}
+\DoxyCodeLine{00722\ \textcolor{stringliteral}{breq\ TW\_ST\_DATA\_ACK}}
+\DoxyCodeLine{00723\ \textcolor{stringliteral}{cpi\ r18,\ 0xC0}}
+\DoxyCodeLine{00724\ \textcolor{stringliteral}{breq\ TW\_ST\_DATA\_NACK}}
+\DoxyCodeLine{00725\ \textcolor{stringliteral}{cpi\ r18,\ 0xC8}}
+\DoxyCodeLine{00726\ \textcolor{stringliteral}{breq\ TW\_ST\_LAST\_DATA}}
+\DoxyCodeLine{00727\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00728\ \textcolor{stringliteral}{rjmp\ default}}
+\DoxyCodeLine{00729\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00730\ \textcolor{stringliteral}{TW\_SR\_SLA\_ACK:}}
+\DoxyCodeLine{00731\ \textcolor{stringliteral}{TW\_SR\_ARB\_LOST\_SLA\_ACK:}}
+\DoxyCodeLine{00732\ \textcolor{stringliteral}{TW\_SR\_GCALL\_ACK:}}
+\DoxyCodeLine{00733\ \textcolor{stringliteral}{TW\_SR\_ARB\_LOST\_GCALL\_ACK:}}
+\DoxyCodeLine{00734\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ TWSR;\ (true)}}
+\DoxyCodeLine{00735\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[active],\ r18\ ;\ r18\ holds\ TWSR}}
+\DoxyCodeLine{00736\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::bufferIdx\ =\ 0;}}
+\DoxyCodeLine{00737\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ \_\_zero\_reg\_\_}}
+\DoxyCodeLine{00738\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
+\DoxyCodeLine{00739\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
+\DoxyCodeLine{00740\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
+\DoxyCodeLine{00741\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00742\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
+\DoxyCodeLine{00743\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00744\ \textcolor{stringliteral}{TW\_SR\_DATA\_ACK:}}
+\DoxyCodeLine{00745\ \textcolor{stringliteral}{TW\_SR\_GCALL\_DATA\_ACK:}}
+\DoxyCodeLine{00746\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}}
+\DoxyCodeLine{00747\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]}}
+\DoxyCodeLine{00748\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
+\DoxyCodeLine{00749\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
+\DoxyCodeLine{00750\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
+\DoxyCodeLine{00751\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00752\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
+\DoxyCodeLine{00753\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
+\DoxyCodeLine{00754\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[twiBuffer]))}}
+\DoxyCodeLine{00755\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[twiBuffer]))}}
+\DoxyCodeLine{00756\ \textcolor{stringliteral}{\ \ \ \ lds\ r19,\ TWDR}}
+\DoxyCodeLine{00757\ \textcolor{stringliteral}{\ \ \ \ st\ Z,\ r19}}
+\DoxyCodeLine{00758\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00759\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
+\DoxyCodeLine{00760\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
+\DoxyCodeLine{00761\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
 \DoxyCodeLine{00762\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
-\DoxyCodeLine{00763\ \textcolor{stringliteral}{\ \ \ \ ;\ (reuse\ code\ in\ MR)}}
-\DoxyCodeLine{00764\ \textcolor{stringliteral}{\ \ \ \ rjmp\ TW\_MR\_SLA\_ACK}}
-\DoxyCodeLine{00765\ \textcolor{stringliteral}{TW\_ST\_DATA\_NACK:}}
-\DoxyCodeLine{00766\ \textcolor{stringliteral}{TW\_ST\_LAST\_DATA:}}
-\DoxyCodeLine{00767\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
-\DoxyCodeLine{00768\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
-\DoxyCodeLine{00769\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00770\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ false;}}
-\DoxyCodeLine{00771\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
-\DoxyCodeLine{00772\ \textcolor{stringliteral}{\ \ \ \ rjmp\ active\_false\_reti}}
-\DoxyCodeLine{00773\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00774\ \textcolor{stringliteral}{default:}}
-\DoxyCodeLine{00775\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::error\ =\ TWSR;}}
-\DoxyCodeLine{00776\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[error],\ r18\ }}
-\DoxyCodeLine{00777\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00778\ \textcolor{stringliteral}{\ \ \ \ stop\_reti:}}
-\DoxyCodeLine{00779\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00780\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ STOP;}}
-\DoxyCodeLine{00781\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ STOP}}
-\DoxyCodeLine{00782\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
-\DoxyCodeLine{00783\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00784\ \textcolor{stringliteral}{\ \ \ \ ;\ while\ (TWCR\ \&\ \_BV(TWSTO))\ \{\}}}
-\DoxyCodeLine{00785\ \textcolor{stringliteral}{\ \ \ \ 1:}}
-\DoxyCodeLine{00786\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ TWCR}}
-\DoxyCodeLine{00787\ \textcolor{stringliteral}{\ \ \ \ sbrc\ r30,\ TWSTO\ ;\ skip\ if\ bit\ in\ register\ clear}}
-\DoxyCodeLine{00788\ \textcolor{stringliteral}{\ \ \ \ rjmp\ 1b}}
-\DoxyCodeLine{00789\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00790\ \textcolor{stringliteral}{\ \ \ \ active\_false\_reti:}}
-\DoxyCodeLine{00791\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ false;}}
-\DoxyCodeLine{00792\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[active],\ \_\_zero\_reg\_\_}}
-\DoxyCodeLine{00793\ \textcolor{stringliteral}{}}
-\DoxyCodeLine{00794\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ epilogue\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
-\DoxyCodeLine{00795\ \textcolor{stringliteral}{\ \ \ \ pop\_reti:}}
-\DoxyCodeLine{00796\ \textcolor{stringliteral}{\ \ \ \ pop\ \_\_zero\_reg\_\_}}
-\DoxyCodeLine{00797\ \textcolor{stringliteral}{\ \ \ \ pop\ \_\_tmp\_reg\_\_}}
-\DoxyCodeLine{00798\ \textcolor{stringliteral}{\ \ \ \ pop\ r27}}
-\DoxyCodeLine{00799\ \textcolor{stringliteral}{\ \ \ \ pop\ r26}}
-\DoxyCodeLine{00800\ \textcolor{stringliteral}{\ \ \ \ pop\ r25}}
-\DoxyCodeLine{00801\ \textcolor{stringliteral}{\ \ \ \ pop\ r24}}
-\DoxyCodeLine{00802\ \textcolor{stringliteral}{\ \ \ \ pop\ r23}}
-\DoxyCodeLine{00803\ \textcolor{stringliteral}{\ \ \ \ pop\ r22}}
-\DoxyCodeLine{00804\ \textcolor{stringliteral}{\ \ \ \ pop\ r21}}
-\DoxyCodeLine{00805\ \textcolor{stringliteral}{\ \ \ \ pop\ r20}}
-\DoxyCodeLine{00806\ \textcolor{stringliteral}{\ \ \ \ pop\ r19}}
-\DoxyCodeLine{00807\ \textcolor{stringliteral}{\ \ \ \ pop\ r31}}
-\DoxyCodeLine{00808\ \textcolor{stringliteral}{\ \ \ \ pop\ r30}}
-\DoxyCodeLine{00809\ \textcolor{stringliteral}{\ \ \ \ pop\ r18}}
-\DoxyCodeLine{00810\ \textcolor{stringliteral}{\ \ \ \ out\ \_\_SREG\_\_,\ r18}}
-\DoxyCodeLine{00811\ \textcolor{stringliteral}{\ \ \ \ pop\ r18}}
-\DoxyCodeLine{00812\ \textcolor{stringliteral}{\ \ \ \ reti}}
-\DoxyCodeLine{00813\ \textcolor{stringliteral}{)"{}}}
-\DoxyCodeLine{00814\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ :\ }\textcolor{comment}{//\ Output\ Operands}}
-\DoxyCodeLine{00815\ \ \ \ \ \ \ \ \ [error]\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::error),}
-\DoxyCodeLine{00816\ \ \ \ \ \ \ \ \ [active]\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::active),}
-\DoxyCodeLine{00817\ \ \ \ \ \ \ \ \ [bufferIdx]\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::bufferIdx),}
-\DoxyCodeLine{00818\ \ \ \ \ \ \ \ \ [rxBuffer]\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::rxBuffer),}
-\DoxyCodeLine{00819\ \ \ \ \ \ \ \ \ [twiBuffer]\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::twiBuffer)}
-\DoxyCodeLine{00820\ \ \ \ \ \ \ \ \ :\ \textcolor{comment}{//\ Input\ Operands}}
-\DoxyCodeLine{00821\ \ \ \ \ \ \ \ \ [onRequestFunction]\ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::onRequestFunction),}
-\DoxyCodeLine{00822\ \ \ \ \ \ \ \ \ [onReceiveFunction]\ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::onReceiveFunction),}
-\DoxyCodeLine{00823\ \ \ \ \ \ \ \ \ [bufferSize]\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::bufferSize),}
-\DoxyCodeLine{00824\ \ \ \ \ \ \ \ \ [slaRW]\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::slaRW)}
-\DoxyCodeLine{00825\ \ \ \ \ );}
-\DoxyCodeLine{00826\ \}}
-\DoxyCodeLine{00827\ }
-\DoxyCodeLine{00828\ \textcolor{preprocessor}{\#if\ 0}}
-\DoxyCodeLine{00829\ ISR(TWI\_vect)\ \{}
-\DoxyCodeLine{00830\ \ \ \ \ \textcolor{keywordflow}{switch}\ (TWSR)\ \{\ \textcolor{comment}{//\ prescaler\ bits\ are\ cleared,\ no\ mask\ needed}}
-\DoxyCodeLine{00831\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_START:}
-\DoxyCodeLine{00832\ \ \ \ \ \ \ \ \ TWDR\ =\ i2c\_detail::slaRW;}
-\DoxyCodeLine{00833\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
-\DoxyCodeLine{00834\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00835\ \ \ \ \ \textcolor{comment}{//\ MT}}
-\DoxyCodeLine{00836\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MT\_SLA\_ACK:}
-\DoxyCodeLine{00837\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MT\_DATA\_ACK:}
-\DoxyCodeLine{00838\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}
-\DoxyCodeLine{00839\ \ \ \ \ \ \ \ \ \ \ \ \ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}
-\DoxyCodeLine{00840\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
-\DoxyCodeLine{00841\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00842\ \ \ \ \ \ \ \ \ \ \ \ \ i2c\_detail::stop();}
-\DoxyCodeLine{00843\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00844\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00845\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MT\_ARB\_LOST:\ \textcolor{comment}{//\ same\ as\ TW\_MR\_ARB\_LOST}}
-\DoxyCodeLine{00846\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
-\DoxyCodeLine{00847\ \ \ \ \ \ \ \ \ i2c\_detail::error\ =\ TW\_MT\_ARB\_LOST;}
-\DoxyCodeLine{00848\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00849\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00850\ \ \ \ \ \textcolor{comment}{//\ MR}}
-\DoxyCodeLine{00851\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_DATA\_ACK:}
-\DoxyCodeLine{00852\ \ \ \ \ \ \ \ \ i2c\_detail::rxBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}
-\DoxyCodeLine{00853\ \ \ \ \ \ \ \ \ \_\_attribute\_\_((fallthrough));}
-\DoxyCodeLine{00854\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_SLA\_ACK:}
-\DoxyCodeLine{00855\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}
-\DoxyCodeLine{00856\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00857\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00858\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
-\DoxyCodeLine{00859\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00860\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00861\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_DATA\_NACK:}
-\DoxyCodeLine{00862\ \ \ \ \ \ \ \ \ i2c\_detail::rxBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}
-\DoxyCodeLine{00863\ \ \ \ \ \ \ \ \ i2c\_detail::stop();}
-\DoxyCodeLine{00864\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00865\ \ \ \ \ \textcolor{comment}{//\ ST}}
-\DoxyCodeLine{00866\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_SLA\_ACK:}
-\DoxyCodeLine{00867\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_ARB\_LOST\_SLA\_ACK:}
-\DoxyCodeLine{00868\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
-\DoxyCodeLine{00869\ \ \ \ \ \ \ \ \ i2c\_detail::onRequestFunction();}
-\DoxyCodeLine{00870\ \ \ \ \ \ \ \ \ \_\_attribute\_\_((fallthrough));}
-\DoxyCodeLine{00871\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_DATA\_ACK:}
-\DoxyCodeLine{00872\ \ \ \ \ \ \ \ \ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}
-\DoxyCodeLine{00873\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}
-\DoxyCodeLine{00874\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00875\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
-\DoxyCodeLine{00876\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
-\DoxyCodeLine{00877\ \ \ \ \ \ \ \ \ \}}
-\DoxyCodeLine{00878\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00879\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_DATA\_NACK:}
-\DoxyCodeLine{00880\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_LAST\_DATA:\ \textcolor{comment}{//\ last\ interrupt\ cleared\ TWEA}}
-\DoxyCodeLine{00881\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00882\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
-\DoxyCodeLine{00883\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00884\ \ \ \ \ \textcolor{comment}{//\ SR}}
-\DoxyCodeLine{00885\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_SLA\_ACK:}
-\DoxyCodeLine{00886\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_GCALL\_ACK:}
-\DoxyCodeLine{00887\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_ARB\_LOST\_SLA\_ACK:}
-\DoxyCodeLine{00888\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_ARB\_LOST\_GCALL\_ACK:}
-\DoxyCodeLine{00889\ \ \ \ \ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
-\DoxyCodeLine{00890\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
-\DoxyCodeLine{00891\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00892\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00893\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_GCALL\_DATA\_ACK:}
-\DoxyCodeLine{00894\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_DATA\_ACK:}
-\DoxyCodeLine{00895\ \ \ \ \ \ \ \ \ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}
-\DoxyCodeLine{00896\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00897\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00898\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_STOP:}
-\DoxyCodeLine{00899\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
-\DoxyCodeLine{00900\ \ \ \ \ \ \ \ \ i2c\_detail::onReceiveFunction(i2c\_detail::twiBuffer);}
-\DoxyCodeLine{00901\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00763\ \textcolor{stringliteral}{\ \ \ \ rjmp\ pop\_reti}}
+\DoxyCodeLine{00764\ \textcolor{stringliteral}{TW\_SR\_STOP:}}
+\DoxyCodeLine{00765\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
+\DoxyCodeLine{00766\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
+\DoxyCodeLine{00767\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
+\DoxyCodeLine{00768\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::onReceiveFunction();}}
+\DoxyCodeLine{00769\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[onReceiveFunction]}}
+\DoxyCodeLine{00770\ \textcolor{stringliteral}{\ \ \ \ lds\ r31,\ \%[onReceiveFunction]\ +\ 1}}
+\DoxyCodeLine{00771\ \textcolor{stringliteral}{\ \ \ \ icall}}
+\DoxyCodeLine{00772\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ false;}}
+\DoxyCodeLine{00773\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00774\ \textcolor{stringliteral}{\ \ \ \ rjmp\ active\_false\_reti;}}
+\DoxyCodeLine{00775\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00776\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00777\ \textcolor{stringliteral}{TW\_ST\_ARB\_LOST\_SLA\_ACK:}}
+\DoxyCodeLine{00778\ \textcolor{stringliteral}{TW\_ST\_SLA\_ACK:}}
+\DoxyCodeLine{00779\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ TWSR;\ (true)}}
+\DoxyCodeLine{00780\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[active],\ r18}}
+\DoxyCodeLine{00781\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::onRequestFunction();}}
+\DoxyCodeLine{00782\ \textcolor{stringliteral}{\ \ \ \ lds\ 30,\ \%[onRequestFunction]}}
+\DoxyCodeLine{00783\ \textcolor{stringliteral}{\ \ \ \ lds\ 31,\ \%[onRequestFunction]\ +\ 1}}
+\DoxyCodeLine{00784\ \textcolor{stringliteral}{\ \ \ \ icall}}
+\DoxyCodeLine{00785\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ fallthrough\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00786\ \textcolor{stringliteral}{TW\_ST\_DATA\_ACK:}}
+\DoxyCodeLine{00787\ \textcolor{stringliteral}{\ \ \ \ ;\ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}}
+\DoxyCodeLine{00788\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ \%[bufferIdx]\ }}
+\DoxyCodeLine{00789\ \textcolor{stringliteral}{\ \ \ \ inc\ r30}}
+\DoxyCodeLine{00790\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[bufferIdx],\ r30}}
+\DoxyCodeLine{00791\ \textcolor{stringliteral}{\ \ \ \ dec\ r30}}
+\DoxyCodeLine{00792\ \textcolor{stringliteral}{\ \ \ \ ;\ Use\ SUBI\ and\ SBCI\ as\ (non-\/existant)\ ADDI\ and\ (non-\/existant)\ ADCI}}
+\DoxyCodeLine{00793\ \textcolor{stringliteral}{\ \ \ \ clr\ r31}}
+\DoxyCodeLine{00794\ \textcolor{stringliteral}{\ \ \ \ subi\ r30,\ lo8(-\/(\%[twiBuffer]))}}
+\DoxyCodeLine{00795\ \textcolor{stringliteral}{\ \ \ \ sbci\ r31,\ hi8(-\/(\%[twiBuffer]))}}
+\DoxyCodeLine{00796\ \textcolor{stringliteral}{\ \ \ \ ld\ r30,\ Z}}
+\DoxyCodeLine{00797\ \textcolor{stringliteral}{\ \ \ \ sts\ TWDR,\ r30}}
+\DoxyCodeLine{00798\ \textcolor{stringliteral}{\ \ \ \ }}
+\DoxyCodeLine{00799\ \textcolor{stringliteral}{\ \ \ \ ;\ if\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}}
+\DoxyCodeLine{00800\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_ACK;}}
+\DoxyCodeLine{00801\ \textcolor{stringliteral}{\ \ \ \ ;\ \}\ else\ \{}}
+\DoxyCodeLine{00802\ \textcolor{stringliteral}{\ \ \ \ ;\ \ \ \ TWCR\ =\ REPLY\_NACK;}}
+\DoxyCodeLine{00803\ \textcolor{stringliteral}{\ \ \ \ ;\ \}}}
+\DoxyCodeLine{00804\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00805\ \textcolor{stringliteral}{\ \ \ \ ;\ (reuse\ code\ in\ MR)}}
+\DoxyCodeLine{00806\ \textcolor{stringliteral}{\ \ \ \ rjmp\ TW\_MR\_SLA\_ACK}}
+\DoxyCodeLine{00807\ \textcolor{stringliteral}{TW\_ST\_DATA\_NACK:}}
+\DoxyCodeLine{00808\ \textcolor{stringliteral}{TW\_ST\_LAST\_DATA:}}
+\DoxyCodeLine{00809\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ REPLY\_ACK;}}
+\DoxyCodeLine{00810\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ REPLY\_ACK}}
+\DoxyCodeLine{00811\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
+\DoxyCodeLine{00812\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ false;}}
+\DoxyCodeLine{00813\ \textcolor{stringliteral}{\ \ \ \ ;\ return;}}
+\DoxyCodeLine{00814\ \textcolor{stringliteral}{\ \ \ \ rjmp\ active\_false\_reti}}
+\DoxyCodeLine{00815\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00816\ \textcolor{stringliteral}{default:}}
+\DoxyCodeLine{00817\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::error\ =\ TWSR;}}
+\DoxyCodeLine{00818\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[error],\ r18\ }}
+\DoxyCodeLine{00819\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00820\ \textcolor{stringliteral}{\ \ \ \ stop\_reti:}}
+\DoxyCodeLine{00821\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00822\ \textcolor{stringliteral}{\ \ \ \ ;\ TWCR\ =\ STOP;}}
+\DoxyCodeLine{00823\ \textcolor{stringliteral}{\ \ \ \ ldi\ r30,\ STOP}}
+\DoxyCodeLine{00824\ \textcolor{stringliteral}{\ \ \ \ sts\ TWCR,\ r30}}
+\DoxyCodeLine{00825\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00826\ \textcolor{stringliteral}{\ \ \ \ ;\ while\ (TWCR\ \&\ \_BV(TWSTO))\ \{\}}}
+\DoxyCodeLine{00827\ \textcolor{stringliteral}{\ \ \ \ 1:}}
+\DoxyCodeLine{00828\ \textcolor{stringliteral}{\ \ \ \ lds\ r30,\ TWCR}}
+\DoxyCodeLine{00829\ \textcolor{stringliteral}{\ \ \ \ sbrc\ r30,\ TWSTO\ ;\ skip\ if\ bit\ in\ register\ clear}}
+\DoxyCodeLine{00830\ \textcolor{stringliteral}{\ \ \ \ rjmp\ 1b}}
+\DoxyCodeLine{00831\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00832\ \textcolor{stringliteral}{\ \ \ \ active\_false\_reti:}}
+\DoxyCodeLine{00833\ \textcolor{stringliteral}{\ \ \ \ ;\ i2c\_detail::active\ =\ false;}}
+\DoxyCodeLine{00834\ \textcolor{stringliteral}{\ \ \ \ sts\ \%[active],\ \_\_zero\_reg\_\_}}
+\DoxyCodeLine{00835\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00836\ \textcolor{stringliteral}{;\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ epilogue\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ ;}}
+\DoxyCodeLine{00837\ \textcolor{stringliteral}{\ \ \ \ pop\_reti:}}
+\DoxyCodeLine{00838\ \textcolor{stringliteral}{\ \ \ \ pop\ \_\_zero\_reg\_\_}}
+\DoxyCodeLine{00839\ \textcolor{stringliteral}{\ \ \ \ pop\ \_\_tmp\_reg\_\_}}
+\DoxyCodeLine{00840\ \textcolor{stringliteral}{\ \ \ \ pop\ r27}}
+\DoxyCodeLine{00841\ \textcolor{stringliteral}{\ \ \ \ pop\ r26}}
+\DoxyCodeLine{00842\ \textcolor{stringliteral}{\ \ \ \ pop\ r25}}
+\DoxyCodeLine{00843\ \textcolor{stringliteral}{\ \ \ \ pop\ r24}}
+\DoxyCodeLine{00844\ \textcolor{stringliteral}{\ \ \ \ pop\ r23}}
+\DoxyCodeLine{00845\ \textcolor{stringliteral}{\ \ \ \ pop\ r22}}
+\DoxyCodeLine{00846\ \textcolor{stringliteral}{\ \ \ \ pop\ r21}}
+\DoxyCodeLine{00847\ \textcolor{stringliteral}{\ \ \ \ pop\ r20}}
+\DoxyCodeLine{00848\ \textcolor{stringliteral}{\ \ \ \ pop\ r19}}
+\DoxyCodeLine{00849\ \textcolor{stringliteral}{\ \ \ \ pop\ r31}}
+\DoxyCodeLine{00850\ \textcolor{stringliteral}{\ \ \ \ pop\ r30}}
+\DoxyCodeLine{00851\ \textcolor{stringliteral}{\ \ \ \ pop\ r18}}
+\DoxyCodeLine{00852\ \textcolor{stringliteral}{\ \ \ \ out\ \_\_SREG\_\_,\ r18}}
+\DoxyCodeLine{00853\ \textcolor{stringliteral}{\ \ \ \ pop\ r18}}
+\DoxyCodeLine{00854\ \textcolor{stringliteral}{\ \ \ \ reti}}
+\DoxyCodeLine{00855\ \textcolor{stringliteral}{)"{}}}
+\DoxyCodeLine{00856\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ :\ }\textcolor{comment}{//\ Output\ Operands}}
+\DoxyCodeLine{00857\ \ \ \ \ \ \ \ \ [error]\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::error),}
+\DoxyCodeLine{00858\ \ \ \ \ \ \ \ \ [active]\ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::active),}
+\DoxyCodeLine{00859\ \ \ \ \ \ \ \ \ [bufferIdx]\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::bufferIdx),}
+\DoxyCodeLine{00860\ \ \ \ \ \ \ \ \ [rxBuffer]\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::rxBuffer),}
+\DoxyCodeLine{00861\ \ \ \ \ \ \ \ \ [twiBuffer]\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}=m"{}}\ (i2c\_detail::twiBuffer)}
+\DoxyCodeLine{00862\ \ \ \ \ \ \ \ \ :\ \textcolor{comment}{//\ Input\ Operands}}
+\DoxyCodeLine{00863\ \ \ \ \ \ \ \ \ [onRequestFunction]\ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::onRequestFunction),}
+\DoxyCodeLine{00864\ \ \ \ \ \ \ \ \ [onReceiveFunction]\ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::onReceiveFunction),}
+\DoxyCodeLine{00865\ \ \ \ \ \ \ \ \ [bufferSize]\ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::bufferSize),}
+\DoxyCodeLine{00866\ \ \ \ \ \ \ \ \ [slaRW]\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}m"{}}\ (i2c\_detail::slaRW)}
+\DoxyCodeLine{00867\ \ \ \ \ );}
+\DoxyCodeLine{00868\ \}}
+\DoxyCodeLine{00869\ }
+\DoxyCodeLine{00870\ \textcolor{preprocessor}{\#if\ 0}}
+\DoxyCodeLine{00871\ ISR(TWI\_vect)\ \{}
+\DoxyCodeLine{00872\ \ \ \ \ \textcolor{keywordflow}{switch}\ (TWSR)\ \{\ \textcolor{comment}{//\ prescaler\ bits\ are\ cleared,\ no\ mask\ needed}}
+\DoxyCodeLine{00873\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_START:}
+\DoxyCodeLine{00874\ \ \ \ \ \ \ \ \ TWDR\ =\ i2c\_detail::slaRW;}
+\DoxyCodeLine{00875\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
+\DoxyCodeLine{00876\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00877\ \ \ \ \ \textcolor{comment}{//\ MT}}
+\DoxyCodeLine{00878\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MT\_SLA\_ACK:}
+\DoxyCodeLine{00879\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MT\_DATA\_ACK:}
+\DoxyCodeLine{00880\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}
+\DoxyCodeLine{00881\ \ \ \ \ \ \ \ \ \ \ \ \ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}
+\DoxyCodeLine{00882\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
+\DoxyCodeLine{00883\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00884\ \ \ \ \ \ \ \ \ \ \ \ \ i2c\_detail::stop();}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00886\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00887\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MT\_ARB\_LOST:\ \textcolor{comment}{//\ same\ as\ TW\_MR\_ARB\_LOST}}
+\DoxyCodeLine{00888\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00889\ \ \ \ \ \ \ \ \ i2c\_detail::error\ =\ TW\_MT\_ARB\_LOST;}
+\DoxyCodeLine{00890\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00891\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00892\ \ \ \ \ \textcolor{comment}{//\ MR}}
+\DoxyCodeLine{00893\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_DATA\_ACK:}
+\DoxyCodeLine{00894\ \ \ \ \ \ \ \ \ i2c\_detail::rxBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}
+\DoxyCodeLine{00895\ \ \ \ \ \ \ \ \ \_\_attribute\_\_((fallthrough));}
+\DoxyCodeLine{00896\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_SLA\_ACK:}
+\DoxyCodeLine{00897\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}
+\DoxyCodeLine{00898\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00899\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00900\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
+\DoxyCodeLine{00901\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00902\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00903\ \ \ \ \ \textcolor{keywordflow}{default}:}
-\DoxyCodeLine{00904\ \ \ \ \ \ \ \ \ i2c\_detail::error\ =\ TWSR;}
+\DoxyCodeLine{00903\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_MR\_DATA\_NACK:}
+\DoxyCodeLine{00904\ \ \ \ \ \ \ \ \ i2c\_detail::rxBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}
 \DoxyCodeLine{00905\ \ \ \ \ \ \ \ \ i2c\_detail::stop();}
 \DoxyCodeLine{00906\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
-\DoxyCodeLine{00907\ \ \ \ \ \}}
-\DoxyCodeLine{00908\ \}}
-\DoxyCodeLine{00909\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ 0}}
-\DoxyCodeLine{00910\ }
-\DoxyCodeLine{00911\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#ifdef\ I2C\_IMPLEMENTATION}}
+\DoxyCodeLine{00907\ \ \ \ \ \textcolor{comment}{//\ ST}}
+\DoxyCodeLine{00908\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_SLA\_ACK:}
+\DoxyCodeLine{00909\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_ARB\_LOST\_SLA\_ACK:}
+\DoxyCodeLine{00910\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00911\ \ \ \ \ \ \ \ \ i2c\_detail::onRequestFunction();}
+\DoxyCodeLine{00912\ \ \ \ \ \ \ \ \ \_\_attribute\_\_((fallthrough));}
+\DoxyCodeLine{00913\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_DATA\_ACK:}
+\DoxyCodeLine{00914\ \ \ \ \ \ \ \ \ TWDR\ =\ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++];}
+\DoxyCodeLine{00915\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (i2c\_detail::bufferIdx\ <\ i2c\_detail::bufferSize)\ \{}
+\DoxyCodeLine{00916\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00917\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00918\ \ \ \ \ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE);}
+\DoxyCodeLine{00919\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00920\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00921\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_DATA\_NACK:}
+\DoxyCodeLine{00922\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_ST\_LAST\_DATA:\ \textcolor{comment}{//\ last\ interrupt\ cleared\ TWEA}}
+\DoxyCodeLine{00923\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00924\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00925\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00926\ \ \ \ \ \textcolor{comment}{//\ SR}}
+\DoxyCodeLine{00927\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_SLA\_ACK:}
+\DoxyCodeLine{00928\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_GCALL\_ACK:}
+\DoxyCodeLine{00929\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_ARB\_LOST\_SLA\_ACK:}
+\DoxyCodeLine{00930\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_ARB\_LOST\_GCALL\_ACK:}
+\DoxyCodeLine{00931\ \ \ \ \ \ \ \ \ i2c\_detail::bufferIdx\ =\ 0;}
+\DoxyCodeLine{00932\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{true};}
+\DoxyCodeLine{00933\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00934\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00935\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_GCALL\_DATA\_ACK:}
+\DoxyCodeLine{00936\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_DATA\_ACK:}
+\DoxyCodeLine{00937\ \ \ \ \ \ \ \ \ i2c\_detail::twiBuffer[i2c\_detail::bufferIdx++]\ =\ TWDR;}
+\DoxyCodeLine{00938\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00939\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00940\ \ \ \ \ \textcolor{keywordflow}{case}\ TW\_SR\_STOP:}
+\DoxyCodeLine{00941\ \ \ \ \ \ \ \ \ TWCR\ =\ \_BV(TWINT)\ |\ \_BV(TWEN)\ |\ \_BV(TWIE)\ |\ \_BV(TWEA);}
+\DoxyCodeLine{00942\ \ \ \ \ \ \ \ \ i2c\_detail::onReceiveFunction(i2c\_detail::twiBuffer);}
+\DoxyCodeLine{00943\ \ \ \ \ \ \ \ \ i2c\_detail::active\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00944\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00945\ \ \ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00946\ \ \ \ \ \ \ \ \ i2c\_detail::error\ =\ TWSR;}
+\DoxyCodeLine{00947\ \ \ \ \ \ \ \ \ i2c\_detail::stop();}
+\DoxyCodeLine{00948\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00949\ \ \ \ \ \}}
+\DoxyCodeLine{00950\ \}}
+\DoxyCodeLine{00951\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#if\ 0}}
+\DoxyCodeLine{00952\ }
+\DoxyCodeLine{00953\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ \#ifdef\ I2C\_IMPLEMENTATION}}
 
 \end{DoxyCode}

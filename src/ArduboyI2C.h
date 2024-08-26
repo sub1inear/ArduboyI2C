@@ -188,9 +188,24 @@ public:
      * \see transmit() read()
      */
     static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
-    
+
+    /** \brief
+     * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
+     * \tparam T The type of the data to write.
+     * \param address The 7-bit address which to send the data. To send a general call, use address 0.
+     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * \param buffer A pointer to the data to send.
+     * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
+     * \note
+     * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on every other device.
+     * \note
+     * Interally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
+     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
+     * must be defined before including to be larger.
+     * \see transmit() read()
+     */
     template<typename T>
-    static void write(uint8_t address, const T *buffer, bool wait);
+    static void write(uint8_t address, const T *object, bool wait);
     
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
@@ -198,14 +213,27 @@ public:
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the buffer in which to store the data.
      * \param size The maximum amount of bytes to receive. This cannot be zero.
+     * \details
      * \note
      * Unlike the `write` function, this function is bufferless and is not limited to 32 bytes.
      * \see write()
      */
     static void read(uint8_t address, void *buffer, uint8_t size);
-    
+
+    /** \brief
+     * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
+     * \tparam T The type of the data to read.
+     * \param address The 7-bit address which to receive the data from.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
+     * \param buffer A pointer to the buffer in which to store the data.
+     * \details
+     * Types with sizes larger than 255 should not be used with this function.
+     * \note
+     * Unlike the `write` function, this function is bufferless and is not limited to 32 bytes.
+     * \see write()
+     */
     template<typename T>
-    static void read(uint8_t address, T *buffer);
+    static void read(uint8_t address, T *object);
 
     /** \brief
      * Transmits data back to the controller (master).
@@ -222,7 +250,21 @@ public:
      * \see write() onRequest()
      */
     static void transmit(const void *buffer, uint8_t size);
-
+    
+    /** \brief
+     * Transmits data back to the controller (master).
+     * \tparam T The type of data to transmit.
+     * \param object A pointer to the data to send.
+     * \details
+     * This function is intended to be called once inside the onRequest callback.
+     * It fills the transmitting buffer with data to then be send one byte at a time.
+     * If it is called multiple times, only the last call will be sent.
+     * \note
+     * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
+     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
+     * must be defined before including to be larger.
+     * \see write() onRequest()
+     */
     template <typename T>
     static void transmit(const T *object);
     
