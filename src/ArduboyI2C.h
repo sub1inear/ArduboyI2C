@@ -145,7 +145,7 @@ SOFTWARE.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 20002
+#define I2C_LIB_VER 20003
 
 /** 
  * Provides all I2C functionality.
