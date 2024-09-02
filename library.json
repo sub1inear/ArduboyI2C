@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/sub1inear/ArduboyI2C.git"
     },
-    "version": "2.0.3",
+    "version": "2.0.4",
     "frameworks": "arduino",
     "platforms": "atmelavr"
 }

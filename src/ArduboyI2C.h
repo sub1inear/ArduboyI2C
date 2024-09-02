@@ -145,7 +145,7 @@ SOFTWARE.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 20003
+#define I2C_LIB_VER 20004
 
 /** 
  * Provides all I2C functionality.
@@ -625,15 +625,15 @@ TW_MT_DATA_ACK:
     1:
 
     ; TWDR = i2c_detail::twiBuffer[i2c_detail::bufferIdx++];
-    ; Increment bufferIdx but preserve r30
     inc r30
     sts %[bufferIdx], r30
-    dec r30
 
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; bufferIdx is already incremented so decrement to compensate
+
     clr r31
-    subi r30, lo8(-(%[twiBuffer]))
-    sbci r31, hi8(-(%[twiBuffer]))
+    subi r30, lo8(-(%[twiBuffer] - 1))
+    sbci r31, hi8(-(%[twiBuffer] - 1))
     ld r30, Z
     sts TWDR, r30
 
@@ -665,12 +665,13 @@ TW_MR_DATA_ACK:
     lds r30, %[bufferIdx]
     inc r30
     sts %[bufferIdx], r30
-    dec r30
 
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; bufferIdx is already incremented so decrement to compensate
+
     clr r31
-    subi r30, lo8(-(%[rxBuffer]))
-    sbci r31, hi8(-(%[rxBuffer]))
+    subi r30, lo8(-(%[rxBuffer] - 1))
+    sbci r31, hi8(-(%[rxBuffer] - 1))
     lds r19, TWDR
     st Z, r19
     
@@ -747,12 +748,13 @@ TW_SR_GCALL_DATA_ACK:
     lds r30, %[bufferIdx]
     inc r30
     sts %[bufferIdx], r30
-    dec r30
 
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; bufferIdx is already incremented so decrement to compensate
+
     clr r31
-    subi r30, lo8(-(%[twiBuffer]))
-    sbci r31, hi8(-(%[twiBuffer]))
+    subi r30, lo8(-(%[twiBuffer] - 1))
+    sbci r31, hi8(-(%[twiBuffer] - 1))
     lds r19, TWDR
     st Z, r19
 
@@ -788,11 +790,13 @@ TW_ST_DATA_ACK:
     lds r30, %[bufferIdx] 
     inc r30
     sts %[bufferIdx], r30
-    dec r30
+
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; bufferIdx is already incremented so decrement to compensate
+    
     clr r31
-    subi r30, lo8(-(%[twiBuffer]))
-    sbci r31, hi8(-(%[twiBuffer]))
+    subi r30, lo8(-(%[twiBuffer] - 1))
+    sbci r31, hi8(-(%[twiBuffer] - 1))
     ld r30, Z
     sts TWDR, r30
     
