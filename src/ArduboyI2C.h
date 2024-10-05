@@ -50,7 +50,7 @@ SOFTWARE.
  * Defaults to 32. If more than 32 bytes are needed for writes/target (slave) operations, increase. If more RAM is needed, decrease.
  */
 #define I2C_BUFFER_SIZE 32
-#elif I2C_BUFFER_SIZE >= 256
+#elif I2C_BUFFER_SIZE > 256
 #error "I2C_BUFFER_SIZE is too big."
 #endif
 
@@ -145,7 +145,7 @@ SOFTWARE.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 20004
+#define I2C_LIB_VER 20005
 
 /** 
  * Provides all I2C functionality.
@@ -364,12 +364,6 @@ volatile uint8_t  error;
 void            (*onRequestFunction)();
 void            (*onReceiveFunction)();
 
-void stop() {
-    TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
-    while (TWCR & _BV(TWSTO)) {  }
-    i2c_detail::active = false;
-}
-
 #ifdef I2C_MAX_PLAYERS
 
 #if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
@@ -420,7 +414,8 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
         if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
             busyChecks--;
         } else {
-            busyChecks = I2C_BUS_BUSY_CHECKS;
+            i2c_detail::error = TW_MT_ARB_LOST;
+            return;
         }
     }
 
@@ -454,7 +449,8 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
         if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
             busyChecks--;
         } else {
-            busyChecks = I2C_BUS_BUSY_CHECKS;
+            i2c_detail::error = TW_MR_ARB_LOST;
+            return;
         }
     }
 
@@ -636,10 +632,6 @@ TW_MT_DATA_ACK:
     sbci r31, hi8(-(%[twiBuffer] - 1))
     ld r30, Z
     sts TWDR, r30
-
-    ; https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48APA88APA168APA328P-SiliConErrataClarif-DS80000855A.pdf
-    ; Section 2.3.1
-    lpm ; 3 cycle delay
 
     ; TWCR = REPLY_NACK;
     ldi r30, REPLY_NACK
@@ -885,7 +877,9 @@ ISR(TWI_vect) {
             TWDR = i2c_detail::twiBuffer[i2c_detail::bufferIdx++];
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE);
         } else {
-            i2c_detail::stop();
+            TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
+            while (TWCR & _BV(TWSTO)) {  }
+            i2c_detail::active = false;
         }
         break;
     case TW_MT_ARB_LOST: // same as TW_MR_ARB_LOST
@@ -906,7 +900,9 @@ ISR(TWI_vect) {
         break;
     case TW_MR_DATA_NACK:
         i2c_detail::rxBuffer[i2c_detail::bufferIdx++] = TWDR;
-        i2c_detail::stop();
+        TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
+        while (TWCR & _BV(TWSTO)) {  }
+        i2c_detail::active = false;
         break;
     // ST
     case TW_ST_SLA_ACK:
@@ -948,7 +944,9 @@ ISR(TWI_vect) {
         break;
     default:
         i2c_detail::error = TWSR;
-        i2c_detail::stop();
+        TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
+        while (TWCR & _BV(TWSTO)) {  }
+        i2c_detail::active = false;
         break;
     }
 }
