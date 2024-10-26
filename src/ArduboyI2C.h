@@ -600,6 +600,7 @@ breq TW_MR_DATA_NACK
 rjmp SR_ST 
 
 TW_START:
+    rcall debugLED
     ; TWDR = i2c_detail::slaRW;
     lds r30, %[slaRW]
     sts TWDR, r30
@@ -654,16 +655,17 @@ TW_MT_ARB_LOST:
 TW_MR_DATA_NACK:
 TW_MR_DATA_ACK:
     ; i2c_detail::rxBuffer[i2c_detail::bufferIdx++] = TWDR;
-    lds r30, %[bufferIdx]
-    inc r30
-    sts %[bufferIdx], r30
+    lds r19, %[bufferIdx]
+    inc r19
+    sts %[bufferIdx], r19
+    dec r19
 
-    ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
-    ; bufferIdx is already incremented so decrement to compensate
+    lds r30, %[rxBuffer]
+    lds r31, %[rxBuffer] + 1
 
-    clr r31
-    subi r30, lo8(-(%[rxBuffer] - 1))
-    sbci r31, hi8(-(%[rxBuffer] - 1))
+    add r30, r19
+    adc r31, __zero_reg__
+
     lds r19, TWDR
     st Z, r19
     
