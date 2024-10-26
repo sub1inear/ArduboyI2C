@@ -600,7 +600,6 @@ breq TW_MR_DATA_NACK
 rjmp SR_ST 
 
 TW_START:
-    rcall debugLED
     ; TWDR = i2c_detail::slaRW;
     lds r30, %[slaRW]
     sts TWDR, r30
