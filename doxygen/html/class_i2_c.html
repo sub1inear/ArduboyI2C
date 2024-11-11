@@ -147,6 +147,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a5ca82bd463cf11cad3b544d3c8fc75cb" id="r_a5ca82bd463cf11cad3b544d3c8fc75cb"><td class="memItemLeft" align="right" valign="top">static uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ca82bd463cf11cad3b544d3c8fc75cb">getBuffer</a> ()</td></tr>
 <tr class="memdesc:a5ca82bd463cf11cad3b544d3c8fc75cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a pointer to the <a class="el" href="class_i2_c.html">I2C</a> buffer holding received data.  <br /></td></tr>
 <tr class="separator:a5ca82bd463cf11cad3b544d3c8fc75cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39f166dc447dcbf9a6964902ecbaf756" id="r_a39f166dc447dcbf9a6964902ecbaf756"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39f166dc447dcbf9a6964902ecbaf756">detectEmulator</a> ()</td></tr>
+<tr class="memdesc:a39f166dc447dcbf9a6964902ecbaf756"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an emulator without <a class="el" href="class_i2_c.html">I2C</a> support is being used to run the code.  <br /></td></tr>
+<tr class="separator:a39f166dc447dcbf9a6964902ecbaf756"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8fdf502548d5b86968e1a04b60f89cb" id="r_ad8fdf502548d5b86968e1a04b60f89cb"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8fdf502548d5b86968e1a04b60f89cb">getAddressFromId</a> (uint8_t id)</td></tr>
 <tr class="memdesc:ad8fdf502548d5b86968e1a04b60f89cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the address from a provided id.  <br /></td></tr>
 <tr class="separator:ad8fdf502548d5b86968e1a04b60f89cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,6 +160,34 @@ Static Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Provides all <a class="el" href="class_i2_c.html">I2C</a> functionality. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a39f166dc447dcbf9a6964902ecbaf756" name="a39f166dc447dcbf9a6964902ecbaf756"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39f166dc447dcbf9a6964902ecbaf756">&#9670;&#160;</a></span>detectEmulator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool I2C::detectEmulator </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if an emulator without <a class="el" href="class_i2_c.html">I2C</a> support is being used to run the code. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if an emulator without <a class="el" href="class_i2_c.html">I2C</a> support has been detected and false if it has not </dd></dl>
+
+</div>
+</div>
 <a id="ad8fdf502548d5b86968e1a04b60f89cb" name="ad8fdf502548d5b86968e1a04b60f89cb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad8fdf502548d5b86968e1a04b60f89cb">&#9670;&#160;</a></span>getAddressFromId()</h2>
 
