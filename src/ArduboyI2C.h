@@ -145,7 +145,7 @@ SOFTWARE.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 20007
+#define I2C_LIB_VER 20100
 
 /** 
  * Provides all I2C functionality.
@@ -327,6 +327,12 @@ public:
     static uint8_t *getBuffer();
 
     /** \brief
+     * Checks if an emulator without I2C support is being used to run the code.
+     * \return True if an emulator without I2C support has been detected and false if it has not
+     */
+    static bool detectEmulator();
+
+    /** \brief
      * Gets the address from a provided id.
      * \param id An id between 0 and I2C_MAX_ADDRESSES - 1
      * \return The address corresponding to that id.
@@ -334,6 +340,7 @@ public:
      * This function is provided to standardize addresses for each id. It is used by I2C::handshake.
      */
     static uint8_t getAddressFromId(uint8_t id);
+
     /** \brief
      * Handshakes with other devices and returns a unique id once complete.
      * \return A unique id for this device.
@@ -492,6 +499,13 @@ inline uint8_t I2C::getTWError() {
 
 inline uint8_t *I2C::getBuffer() {
     return i2c_detail::twiBuffer;
+}
+
+inline bool I2C::detectEmulator() {
+    // TWWC is set when TWDR is written to without TWINT being set
+    // Not done in emulator
+    TWDR = 0;
+    return !(TWCR & _BV(TWWC));
 }
 
 #ifdef I2C_MAX_PLAYERS
