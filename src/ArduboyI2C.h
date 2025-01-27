@@ -146,7 +146,7 @@ SOFTWARE.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 20100
+#define I2C_LIB_VER 20101
 
 /** 
  * Provides all I2C functionality.
@@ -362,7 +362,7 @@ namespace i2c_detail {
 struct i2c_data_t {
     void            (*onRequestFunction)();
     void            (*onReceiveFunction)();
-    
+
     volatile uint8_t *rxBuffer;
     uint8_t           twiBuffer[I2C_BUFFER_SIZE];
     volatile uint8_t  bufferIdx;
