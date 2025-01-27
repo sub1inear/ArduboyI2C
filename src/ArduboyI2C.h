@@ -30,6 +30,7 @@ SOFTWARE.
 #include <avr/power.h>
 #include <util/twi.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #ifndef I2C_FREQUENCY
 /** \brief
@@ -358,19 +359,20 @@ public:
  * Not officially part of the library.
  */
 namespace i2c_detail {
+struct i2c_data_t {
+    void            (*onRequestFunction)();
+    void            (*onReceiveFunction)();
+    
+    volatile uint8_t *rxBuffer;
+    uint8_t           twiBuffer[I2C_BUFFER_SIZE];
+    volatile uint8_t  bufferIdx;
+    volatile uint8_t  bufferSize;
 
-uint8_t           twiBuffer[I2C_BUFFER_SIZE];
-volatile uint8_t *rxBuffer;
-volatile uint8_t  bufferIdx;
-volatile uint8_t  bufferSize;
+    volatile bool     active;
+    volatile uint8_t  slaRW;
+    volatile uint8_t  error;
 
-volatile bool     active;
-volatile uint8_t  slaRW;
-volatile uint8_t  error;
-
-void            (*onRequestFunction)();
-void            (*onReceiveFunction)();
-
+} data;
 #ifdef I2C_MAX_PLAYERS
 
 #if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
@@ -403,32 +405,32 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
 }
 
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
-    while (i2c_detail::active) {}
+    while (i2c_detail::data.active) {}
     
     for (uint8_t i = 0; i < size; i++) {
-        i2c_detail::twiBuffer[i] = ((const uint8_t *)buffer)[i];
+        i2c_detail::data.twiBuffer[i] = ((const uint8_t *)buffer)[i];
     }
-    i2c_detail::bufferIdx = 0;
-    i2c_detail::bufferSize = size;
+    i2c_detail::data.bufferIdx = 0;
+    i2c_detail::data.bufferSize = size;
 
-    i2c_detail::error = TW_SUCCESS;
+    i2c_detail::data.error = TW_SUCCESS;
     
-    i2c_detail::active = true;
-    i2c_detail::slaRW = address << 1 | TW_WRITE;
+    i2c_detail::data.active = true;
+    i2c_detail::data.slaRW = address << 1 | TW_WRITE;
 
     uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
     while (busyChecks) {
         if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
             busyChecks--;
         } else {
-            i2c_detail::error = TW_MT_ARB_LOST;
+            i2c_detail::data.error = TW_MT_ARB_LOST;
             return;
         }
     }
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     if (wait) {
-        while (i2c_detail::active) {}
+        while (i2c_detail::data.active) {}
     }
 }
 
@@ -439,30 +441,30 @@ void I2C::write(uint8_t address, const T *buffer, bool wait) {
 }
 
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
-    while (i2c_detail::active) {}
+    while (i2c_detail::data.active) {}
     
-    i2c_detail::rxBuffer = (uint8_t *)buffer;
+    i2c_detail::data.rxBuffer = (uint8_t *)buffer;
 
-    i2c_detail::bufferIdx = 0;
-    i2c_detail::bufferSize = size - 1;
+    i2c_detail::data.bufferIdx = 0;
+    i2c_detail::data.bufferSize = size - 1;
 
-    i2c_detail::error = TW_SUCCESS;
+    i2c_detail::data.error = TW_SUCCESS;
 
-    i2c_detail::active = true;
-    i2c_detail::slaRW = address << 1 | TW_READ;
+    i2c_detail::data.active = true;
+    i2c_detail::data.slaRW = address << 1 | TW_READ;
 
     uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
     while (busyChecks) {
         if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
             busyChecks--;
         } else {
-            i2c_detail::error = TW_MR_ARB_LOST;
+            i2c_detail::data.error = TW_MR_ARB_LOST;
             return;
         }
     }
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
-    while (i2c_detail::active) {}
+    while (i2c_detail::data.active) {}
 }
 
 template<typename T>
@@ -474,10 +476,10 @@ void I2C::read(uint8_t address, T *object) {
 
 void I2C::transmit(const void *buffer, uint8_t size) {
     for (uint8_t i = 0; i < size; i++) {
-        i2c_detail::twiBuffer[i] = ((uint8_t *)buffer)[i];
+        i2c_detail::data.twiBuffer[i] = ((uint8_t *)buffer)[i];
     }
-    i2c_detail::bufferIdx = 0;
-    i2c_detail::bufferSize = size;
+    i2c_detail::data.bufferIdx = 0;
+    i2c_detail::data.bufferSize = size;
 }
 
 template <typename T>
@@ -487,18 +489,18 @@ void I2C::transmit(const T *object) {
 }
 
 void I2C::onRequest(void (*function)()) {
-    i2c_detail::onRequestFunction = function;
+    i2c_detail::data.onRequestFunction = function;
 }
 void I2C::onReceive(void (*function)()) {
-    i2c_detail::onReceiveFunction = function;
+    i2c_detail::data.onReceiveFunction = function;
 }
 
 inline uint8_t I2C::getTWError() {
-    return i2c_detail::error;
+    return i2c_detail::data.error;
 }
 
 inline uint8_t *I2C::getBuffer() {
-    return i2c_detail::twiBuffer;
+    return i2c_detail::data.twiBuffer;
 }
 
 inline bool I2C::detectEmulator() {
@@ -540,15 +542,14 @@ uint8_t I2C::handshake() {
 }
 
 #endif
-
 ISR(TWI_vect, ISR_NAKED) {
     asm volatile (
 R"(
 ; --------------------- defines ----------------------- ;
-
-.equ TWCR, 0xBC
-.equ TWSR, 0xB9
-.equ TWDR, 0xBB
+.equ TWPTR, 0xB9
+.equ TWCR, 3
+.equ TWSR, 0
+.equ TWDR, 2
 
 .equ TWIE, 0
 .equ TWEN, 2
@@ -563,18 +564,20 @@ R"(
 .equ STOP, (1 << TWINT) | (1 << TWEN) | (1 << TWIE) | (1 << TWSTO) | (1 << TWEA)
 
 ; -------------------- registers ---------------------- ;
-; r18 - TWSR (never used after function call)
-; r19 - general use
-; r30 - general use
-; r31 - general use
+; r18     - TWSR (never used after function call)
+; r19     - general use
+; r26 (X) - general use
+; r27 (X) - general use
+; r28 (Y) - data pointer
+; r29 (Y) - data pointer
+; r30 (Z) - TW register pointer
+; r31 (Z) - TW register pointer
 ; --------------------- prologue ---------------------- ;
 push r18
 in r18, __SREG__
 push r18
-push r30
-push r31
 ; save and restore call-clobbered registers
-; target (slave) could call function pointer 
+; target (slave) could call function pointer
 push r19
 push r20
 push r21
@@ -584,14 +587,25 @@ push r24
 push r25
 push r26
 push r27
+push r28
+push r29
+push r30
+push r31
 ; save and restore tmp and zero registers (could be used in function calls)
 push __tmp_reg__
 push __zero_reg__
 clr __zero_reg__
 ; ----------------------------------------------------- ;
+; set up Y pointer (data)
+ldi r28, lo8(%[data])
+ldi r29, hi8(%[data])
+
+; set up Z pointer (TW registers)
+ldi r30, TWPTR
+clr r31
 
 ; switch (TWSR)
-lds r18, TWSR ; no mask needed because prescaler bits are cleared
+ldd r18, Z + TWSR ; no mask needed because prescaler bits are cleared
 
 cpi r18, 0x08
 breq TW_START
@@ -614,52 +628,52 @@ breq TW_MR_DATA_NACK
 rjmp SR_ST 
 
 TW_START:
-    ; TWDR = i2c_detail::slaRW;
-    lds r30, %[slaRW]
-    sts TWDR, r30
+    ; TWDR = i2c_detail::data.slaRW;
+    ldd r26, Y + %[slaRW]
+    std Z + TWDR, r26
     ; TWCR = REPLY_NACK;
-    ldi r30, REPLY_NACK
-    sts TWCR, r30
+    ldi r26, REPLY_NACK
+    std Z + TWCR, r26
     ; return;
     rjmp pop_reti
 
 TW_MT_SLA_ACK:
 TW_MT_DATA_ACK:
-    ; if (i2c_detail::bufferIdx >= bufferSize) { stop(); return; }
-    lds r30, %[bufferIdx]
-    lds r31, %[bufferSize]
-    cp r30, r31
+    ; if (i2c_detail::data.bufferIdx >= i2c_detail::data.bufferSize) { stop(); return; }
+    ldd r26, Y + %[bufferIdx]
+    ldd r27, Y + %[bufferSize]
+    cp r26, r27
     
     brlt 1f ; 64 instruction limit on branches
     rjmp stop_reti
     1:
 
-    ; TWDR = i2c_detail::twiBuffer[i2c_detail::bufferIdx++];
-    inc r30
-    sts %[bufferIdx], r30
+    ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
+    inc r26
+    std Y + %[bufferIdx], r26
 
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
     ; bufferIdx is already incremented so decrement to compensate
 
-    clr r31
-    subi r30, lo8(-(%[twiBuffer] - 1))
-    sbci r31, hi8(-(%[twiBuffer] - 1))
-    ld r30, Z
-    sts TWDR, r30
+    clr r27
+    subi r26, lo8(-(%[twiBuffer] - 1))
+    sbci r27, hi8(-(%[twiBuffer] - 1))
+    ld r26, X
+    std Z + TWDR, r26
 
     ; TWCR = REPLY_NACK;
-    ldi r30, REPLY_NACK
-    sts TWCR, r30
+    ldi r26, REPLY_NACK
+    std Z + TWCR, r26
     ; return;
     rjmp pop_reti
 
 TW_MT_ARB_LOST:
     ; TWCR = REPLY_ACK;
-    ldi r30, REPLY_ACK
-    sts TWCR, r30
-    ; i2c_detail::error = TW_MT_ARB_LOST;
-    ldi r30, 0x38
-    sts %[error], r30
+    ldi r26, REPLY_ACK
+    std Z + TWCR, r26
+    ; i2c_detail::data.error = TW_MT_ARB_LOST;
+    ldi r26, 0x38
+    std Y + %[error], r26
     ; active = false;
     ; return;
     rjmp active_false_reti
@@ -667,20 +681,20 @@ TW_MT_ARB_LOST:
 
 TW_MR_DATA_NACK:
 TW_MR_DATA_ACK:
-    ; i2c_detail::rxBuffer[i2c_detail::bufferIdx++] = TWDR;
-    lds r19, %[bufferIdx]
+    ; i2c_detail::data.rxBuffer[i2c_detail::data.bufferIdx++] = TWDR;
+    ldd r19, Y + %[bufferIdx]
     inc r19
-    sts %[bufferIdx], r19
+    std Y + %[bufferIdx], r19
     dec r19
 
-    lds r30, %[rxBuffer]
-    lds r31, %[rxBuffer] + 1
+    ldd r26, Y + %[rxBuffer]
+    ldd r27, Y + %[rxBuffer] + 1
 
-    add r30, r19
-    adc r31, __zero_reg__
+    add r26, r19
+    adc r27, __zero_reg__
 
-    lds r19, TWDR
-    st Z, r19
+    ldd r19, Z + TWDR
+    st X, r19
     
     ; if (TWSR == TW_MR_DATA_NACK) { stop(); return; }
     ; r18 holds TWSR
@@ -690,21 +704,21 @@ TW_MR_DATA_ACK:
     1:
 ; ------------------ fallthrough ---------------------- ;
 TW_MR_SLA_ACK:
-    ; if (i2c_detail::bufferIdx < i2c_detail::bufferSize) {
+    ; if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
     ;    TWCR = REPLY_ACK;
     ; } else {
-    ;    TWCR = REPLY_nACK;
+    ;    TWCR = REPLY_NACK;
     ; }
     ; return;
 
-    lds r30, %[bufferIdx]
-    lds r31, %[bufferSize]
-    cp r30, r31
-    ldi r30, REPLY_ACK
+    ldd r26, Y + %[bufferIdx]
+    ldd r27, Y + %[bufferSize]
+    cp r26, r27
+    ldi r26, REPLY_ACK
     brlt 1f
-    ldi r30, REPLY_NACK
+    ldi r26, REPLY_NACK
     1:
-    sts TWCR, r30
+    std Z + TWCR, r26
     rjmp pop_reti
 ; ----------------------------------------------------- ;
 SR_ST:
@@ -739,75 +753,78 @@ TW_SR_SLA_ACK:
 TW_SR_ARB_LOST_SLA_ACK:
 TW_SR_GCALL_ACK:
 TW_SR_ARB_LOST_GCALL_ACK:
-    ; i2c_detail::active = TWSR; (true)
-    sts %[active], r18 ; r18 holds TWSR
-    ; i2c_detail::bufferIdx = 0;
-    sts %[bufferIdx], __zero_reg__
+    ; i2c_detail::data.active = TWSR; (true)
+    std Y + %[active], r18 ; r18 holds TWSR
+    ; i2c_detail::data.bufferIdx = 0;
+    std Y + %[bufferIdx], __zero_reg__
     ; TWCR = REPLY_ACK;
-    ldi r30, REPLY_ACK
-    sts TWCR, r30
+    ldi r26, REPLY_ACK
+    std Z + TWCR, r26
     ; return;
     rjmp pop_reti
 
 TW_SR_DATA_ACK:
 TW_SR_GCALL_DATA_ACK:
-    ; i2c_detail::twiBuffer[i2c_detail::bufferIdx++] = TWDR;
-    lds r30, %[bufferIdx]
-    inc r30
-    sts %[bufferIdx], r30
+    ; i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++] = TWDR;
+    ldd r26, Y + %[bufferIdx]
+    inc r26
+    std Y + %[bufferIdx], r26
 
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
     ; bufferIdx is already incremented so decrement to compensate
 
-    clr r31
-    subi r30, lo8(-(%[twiBuffer] - 1))
-    sbci r31, hi8(-(%[twiBuffer] - 1))
-    lds r19, TWDR
-    st Z, r19
+    clr r27
+    subi r26, lo8(-(%[twiBuffer] - 1))
+    sbci r27, hi8(-(%[twiBuffer] - 1))
+    ldd r19, Z + TWDR
+    st X, r19
 
     ; TWCR = REPLY_ACK;
-    ldi r30, REPLY_ACK
-    sts TWCR, r30
+    ldi r26, REPLY_ACK
+    std Z + TWCR, r26
     ; return;
     rjmp pop_reti
 TW_SR_STOP:
     ; TWCR = REPLY_ACK;
-    ldi r30, REPLY_ACK
-    sts TWCR, r30
-    ; i2c_detail::onReceiveFunction();
-    lds r30, %[onReceiveFunction]
-    lds r31, %[onReceiveFunction] + 1
+    ldi r26, REPLY_ACK
+    std Z + TWCR, r26
+    ; i2c_detail::data.onReceiveFunction();
+    ldd r30, Y + %[onReceiveFunction]
+    ldd r31, Y + %[onReceiveFunction] + 1
     icall
-    ; i2c_detail::active = false;
+    ; i2c_detail::data.active = false;
     ; return;
     rjmp active_false_reti;
 
 ; ----------------------------------------------------- ;
 TW_ST_ARB_LOST_SLA_ACK:
 TW_ST_SLA_ACK:
-    ; i2c_detail::active = TWSR; (true)
-    sts %[active], r18
-    ; i2c_detail::onRequestFunction();
-    lds 30, %[onRequestFunction]
-    lds 31, %[onRequestFunction] + 1
+    ; i2c_detail::data.active = TWSR; (true)
+    std Y + %[active], r18
+    ; i2c_detail::data.onRequestFunction();
+    ldd r30, Y + %[onRequestFunction]
+    ldd r31, Y + %[onRequestFunction] + 1
     icall
+    ; restore Z pointer
+    ldi r30, TWPTR
+    clr r31
 ; ------------------ fallthrough ---------------------- ;
 TW_ST_DATA_ACK:
-    ; TWDR = i2c_detail::twiBuffer[i2c_detail::bufferIdx++];
-    lds r30, %[bufferIdx] 
-    inc r30
-    sts %[bufferIdx], r30
+    ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
+    ldd r26, Y + %[bufferIdx] 
+    inc r26
+    std Y + %[bufferIdx], r26
 
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
     ; bufferIdx is already incremented so decrement to compensate
     
-    clr r31
-    subi r30, lo8(-(%[twiBuffer] - 1))
-    sbci r31, hi8(-(%[twiBuffer] - 1))
-    ld r30, Z
-    sts TWDR, r30
+    clr r27
+    subi r26, lo8(-(%[twiBuffer] - 1))
+    sbci r27, hi8(-(%[twiBuffer] - 1))
+    ld r26, X
+    std Z + TWDR, r26
     
-    ; if (i2c_detail::bufferIdx < i2c_detail::bufferSize) {
+    ; if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
     ;    TWCR = REPLY_ACK;
     ; } else {
     ;    TWCR = REPLY_NACK;
@@ -818,36 +835,40 @@ TW_ST_DATA_ACK:
 TW_ST_DATA_NACK:
 TW_ST_LAST_DATA:
     ; TWCR = REPLY_ACK;
-    ldi r30, REPLY_ACK
-    sts TWCR, r30
-    ; i2c_detail::active = false;
+    ldi r26, REPLY_ACK
+    std Z + TWCR, r26
+    ; i2c_detail::data.active = false;
     ; return;
     rjmp active_false_reti
 ; ----------------------------------------------------- ;
 default:
-    ; i2c_detail::error = TWSR;
-    sts %[error], r18 
+    ; i2c_detail::data.error = TWSR;
+    std Y + %[error], r18 
 
     stop_reti:
 
     ; TWCR = STOP;
-    ldi r30, STOP
-    sts TWCR, r30
+    ldi r26, STOP
+    std Z + TWCR, r26
 
     ; while (TWCR & _BV(TWSTO)) {}
     1:
-    lds r30, TWCR
-    sbrc r30, TWSTO ; skip if bit in register clear
+    ldd r26, Z + TWCR
+    sbrc r26, TWSTO ; skip if bit in register clear
     rjmp 1b
 
     active_false_reti:
-    ; i2c_detail::active = false;
-    sts %[active], __zero_reg__
+    ; i2c_detail::data.active = false;
+    std Y + %[active], __zero_reg__
 
 ; --------------------- epilogue ---------------------- ;
     pop_reti:
     pop __zero_reg__
     pop __tmp_reg__
+    pop r31
+    pop r30
+    pop r29
+    pop r28
     pop r27
     pop r26
     pop r25
@@ -857,24 +878,23 @@ default:
     pop r21
     pop r20
     pop r19
-    pop r31
-    pop r30
     pop r18
     out __SREG__, r18
     pop r18
     reti
 )"
         : // Output Operands
-        [error]            "=m" (i2c_detail::error),
-        [active]           "=m" (i2c_detail::active),
-        [bufferIdx]        "=m" (i2c_detail::bufferIdx),
-        [rxBuffer]         "=m" (i2c_detail::rxBuffer),
-        [twiBuffer]        "=m" (i2c_detail::twiBuffer)
+        [data]             "=m" (i2c_detail::data),
+        [twiBuffer]        "=m" (i2c_detail::data.twiBuffer)
         : // Input Operands
-        [onRequestFunction] "m" (i2c_detail::onRequestFunction),
-        [onReceiveFunction] "m" (i2c_detail::onReceiveFunction),
-        [bufferSize]        "m" (i2c_detail::bufferSize),
-        [slaRW]             "m" (i2c_detail::slaRW)
+        [error]             "i" (offsetof(i2c_detail::i2c_data_t, error)),
+        [active]            "i" (offsetof(i2c_detail::i2c_data_t, active)),
+        [bufferIdx]         "i" (offsetof(i2c_detail::i2c_data_t, bufferIdx)),
+        [rxBuffer]          "i" (offsetof(i2c_detail::i2c_data_t, rxBuffer)),
+        [onRequestFunction] "i" (offsetof(i2c_detail::i2c_data_t, onRequestFunction)),
+        [onReceiveFunction] "i" (offsetof(i2c_detail::i2c_data_t, onReceiveFunction)),
+        [bufferSize]        "i" (offsetof(i2c_detail::i2c_data_t, bufferSize)),
+        [slaRW]             "i" (offsetof(i2c_detail::i2c_data_t, slaRW))
     );
 }
 
@@ -882,52 +902,52 @@ default:
 ISR(TWI_vect) {
     switch (TWSR) { // prescaler bits are cleared, no mask needed
     case TW_START:
-        TWDR = i2c_detail::slaRW;
+        TWDR = i2c_detail::data.slaRW;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE);
         break;
     // MT
     case TW_MT_SLA_ACK:
     case TW_MT_DATA_ACK:
-        if (i2c_detail::bufferIdx < i2c_detail::bufferSize) {
-            TWDR = i2c_detail::twiBuffer[i2c_detail::bufferIdx++];
+        if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
+            TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE);
         } else {
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
             while (TWCR & _BV(TWSTO)) {  }
-            i2c_detail::active = false;
+            i2c_detail::data.active = false;
         }
         break;
     case TW_MT_ARB_LOST: // same as TW_MR_ARB_LOST
-        i2c_detail::active = false;
-        i2c_detail::error = TW_MT_ARB_LOST;
+        i2c_detail::data.active = false;
+        i2c_detail::data.error = TW_MT_ARB_LOST;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         break;
     // MR
     case TW_MR_DATA_ACK:
-        i2c_detail::rxBuffer[i2c_detail::bufferIdx++] = TWDR;
+        i2c_detail::data.rxBuffer[i2c_detail::data.bufferIdx++] = TWDR;
         __attribute__((fallthrough));
     case TW_MR_SLA_ACK:
-        if (i2c_detail::bufferIdx < i2c_detail::bufferSize) {
+        if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         } else {
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE);
         }
         break;
     case TW_MR_DATA_NACK:
-        i2c_detail::rxBuffer[i2c_detail::bufferIdx++] = TWDR;
+        i2c_detail::data.rxBuffer[i2c_detail::data.bufferIdx++] = TWDR;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
         while (TWCR & _BV(TWSTO)) {  }
-        i2c_detail::active = false;
+        i2c_detail::data.active = false;
         break;
     // ST
     case TW_ST_SLA_ACK:
     case TW_ST_ARB_LOST_SLA_ACK:
-        i2c_detail::active = true;
-        i2c_detail::onRequestFunction();
+        i2c_detail::data.active = true;
+        i2c_detail::data.onRequestFunction();
         __attribute__((fallthrough));
     case TW_ST_DATA_ACK:
-        TWDR = i2c_detail::twiBuffer[i2c_detail::bufferIdx++];
-        if (i2c_detail::bufferIdx < i2c_detail::bufferSize) {
+        TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
+        if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         } else {
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE);
@@ -936,32 +956,32 @@ ISR(TWI_vect) {
     case TW_ST_DATA_NACK:
     case TW_ST_LAST_DATA: // last interrupt cleared TWEA
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-        i2c_detail::active = false;
+        i2c_detail::data.active = false;
         break;
     // SR
     case TW_SR_SLA_ACK:
     case TW_SR_GCALL_ACK:
     case TW_SR_ARB_LOST_SLA_ACK:
     case TW_SR_ARB_LOST_GCALL_ACK:
-        i2c_detail::bufferIdx = 0;
-        i2c_detail::active = true;
+        i2c_detail::data.bufferIdx = 0;
+        i2c_detail::data.active = true;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         break;
     case TW_SR_GCALL_DATA_ACK:
     case TW_SR_DATA_ACK:
-        i2c_detail::twiBuffer[i2c_detail::bufferIdx++] = TWDR;
+        i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++] = TWDR;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         break;
     case TW_SR_STOP:
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-        i2c_detail::onReceiveFunction(i2c_detail::twiBuffer);
-        i2c_detail::active = false;
+        i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer);
+        i2c_detail::data.active = false;
         break;
     default:
-        i2c_detail::error = TWSR;
+        i2c_detail::data.error = TWSR;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
         while (TWCR & _BV(TWSTO)) {  }
-        i2c_detail::active = false;
+        i2c_detail::data.active = false;
         break;
     }
 }
