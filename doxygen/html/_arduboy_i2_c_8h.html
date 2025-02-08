@@ -110,6 +110,7 @@ $(function(){initNavTree('_arduboy_i2_c_8h.html',''); initResizable(true); });
 <code>#include &lt;avr/power.h&gt;</code><br />
 <code>#include &lt;util/twi.h&gt;</code><br />
 <code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;stddef.h&gt;</code><br />
 </div>
 <p><a href="_arduboy_i2_c_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -144,6 +145,10 @@ Macros</h2></td></tr>
 <tr class="memitem:a7b1d0a049421f122f95c1e80542a532b" id="r_a7b1d0a049421f122f95c1e80542a532b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7b1d0a049421f122f95c1e80542a532b">I2C_MAX_PLAYERS</a></td></tr>
 <tr class="memdesc:a7b1d0a049421f122f95c1e80542a532b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maxmimum number of players in the handshake/lobby.  <br /></td></tr>
 <tr class="separator:a7b1d0a049421f122f95c1e80542a532b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fde0847ec4521eadb61b01ba451fbc2" id="r_a7fde0847ec4521eadb61b01ba451fbc2"><td class="memItemLeft" align="right" valign="top"><a id="a7fde0847ec4521eadb61b01ba451fbc2" name="a7fde0847ec4521eadb61b01ba451fbc2"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>I2C_CUSTOM_HANDSHAKE</b></td></tr>
+<tr class="memdesc:a7fde0847ec4521eadb61b01ba451fbc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">When defined, removes overhead for handshaking included when I2C_MAX_PLAYERS is defined. <br /></td></tr>
+<tr class="separator:a7fde0847ec4521eadb61b01ba451fbc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa8a379ca27da629fb7eb67cacc5d86a" id="r_aaa8a379ca27da629fb7eb67cacc5d86a"><td class="memItemLeft" align="right" valign="top"><a id="aaa8a379ca27da629fb7eb67cacc5d86a" name="aaa8a379ca27da629fb7eb67cacc5d86a"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>TW_SUCCESS</b>&#160;&#160;&#160;0xFF</td></tr>
 <tr class="memdesc:aaa8a379ca27da629fb7eb67cacc5d86a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code used to mean success, returned by <a class="el" href="class_i2_c.html#a03dfacb57e2a02b10b61cf093b2f6171" title="Gets the hardware error which happened in a previous read or write.">I2C::getTWError()</a>. <br /></td></tr>
@@ -155,7 +160,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a79cc8450ce152950948306f7590c3919" id="r_a79cc8450ce152950948306f7590c3919"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a79cc8450ce152950948306f7590c3919">I2C_MAX_ADDRESSES</a>&#160;&#160;&#160;112</td></tr>
 <tr class="memdesc:a79cc8450ce152950948306f7590c3919"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum amount of addresses available to a device.  <br /></td></tr>
 <tr class="separator:a79cc8450ce152950948306f7590c3919"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89cb379c38e2b4b8e1a1c00df7d6ab45" id="r_a89cb379c38e2b4b8e1a1c00df7d6ab45"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89cb379c38e2b4b8e1a1c00df7d6ab45">I2C_LIB_VER</a>&#160;&#160;&#160;20100</td></tr>
+<tr class="memitem:a89cb379c38e2b4b8e1a1c00df7d6ab45" id="r_a89cb379c38e2b4b8e1a1c00df7d6ab45"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89cb379c38e2b4b8e1a1c00df7d6ab45">I2C_LIB_VER</a>&#160;&#160;&#160;20102</td></tr>
 <tr class="memdesc:a89cb379c38e2b4b8e1a1c00df7d6ab45"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_i2_c.html">I2C</a> library version. <br  />
   <br /></td></tr>
 <tr class="separator:a89cb379c38e2b4b8e1a1c00df7d6ab45"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,7 +229,7 @@ Standard frequencies: <br  />
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define I2C_LIB_VER&#160;&#160;&#160;20100</td>
+          <td class="memname">#define I2C_LIB_VER&#160;&#160;&#160;20102</td>
         </tr>
       </table>
 </div><div class="memdoc">

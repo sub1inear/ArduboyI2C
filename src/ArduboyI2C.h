@@ -115,6 +115,11 @@ SOFTWARE.
  */
 #define I2C_MAX_PLAYERS
 
+/** \brief
+ * When defined, removes overhead for handshaking included when I2C_MAX_PLAYERS is defined.
+ */
+#define I2C_CUSTOM_HANDSHAKE
+
 #endif
 
 
@@ -146,7 +151,7 @@ SOFTWARE.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 20101
+#define I2C_LIB_VER 20102
 
 /** 
  * Provides all I2C functionality.
@@ -379,6 +384,7 @@ struct i2c_data_t {
 #error "Too many players. Max is I2C_MAX_ADDRESSES."
 #endif // #if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
 
+#ifndef I2C_CUSTOM_HANDSHAKE    
 volatile uint8_t handshakeState;
 
 void handshakeOnReceive() {
@@ -389,6 +395,7 @@ void handshakeOnRequest() {
     handshakeState++;
     I2C::transmit(&handshakeState);
 }
+#endif // #ifndef I2C_CUSTOM_HANDSHAKE
 #endif // #ifdef I2C_MAX_PLAYERS
 
 }
@@ -516,6 +523,8 @@ inline uint8_t I2C::getAddressFromId(uint8_t id) {
     return 0x8 + id;
 }
 
+#ifndef I2C_CUSTOM_LOBBY
+
 uint8_t I2C::handshake() {
     for (int8_t i = I2C_MAX_PLAYERS - 1; i >= 0; ) {
         uint8_t dummy;
@@ -541,7 +550,9 @@ uint8_t I2C::handshake() {
     return I2C_HANDSHAKE_FAILED;
 }
 
-#endif
+#endif // #ifndef I2C_CUSTOM_LOBBY
+
+#endif // #ifdef I2C_MAX_PLAYERS
 ISR(TWI_vect, ISR_NAKED) {
     asm volatile (
 R"(
