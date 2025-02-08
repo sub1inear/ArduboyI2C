@@ -3,7 +3,7 @@
 #define I2C_IMPLEMENTATION
 // declare the number of players in the handshake
 // cannot be greater than I2C_MAX_ADDRESSES
-#define I2C_MAX_PLAYERS 4
+#define I2C_MAX_PLAYERS 2
 #include "ArduboyI2C.h"
 
 Arduboy2 arduboy;
