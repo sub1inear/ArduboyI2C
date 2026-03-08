@@ -419,6 +419,9 @@ void I2C::init() {
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
     TWSR = 0; // clear prescaler bits
     TWBR = (F_CPU / I2C_FREQUENCY - 16) / 2;
+    // enable internal pullups
+    DDRD &= ~(_BV(I2C_SCL_BIT) | _BV(I2C_SDA_BIT));
+    PORTD |= _BV(I2C_SCL_BIT) | _BV(I2C_SDA_BIT);
 }
 
 void I2C::setAddress(uint8_t address, bool generalCall) {
