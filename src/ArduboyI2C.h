@@ -69,6 +69,16 @@ SOFTWARE.
 #define I2C_BUS_BUSY_CHECKS 16
 #endif
 
+#ifndef I2C_USE_HANDSHAKE
+/** \brief
+ * Whether or not to enable handshake functionality.
+ * \details
+ * Defaults to 1.
+ * Set to 0 if you do not use the built-in handshake (e.g. you use a custom handshake or no handshake at all) to save memory.
+ */
+#define I2C_USE_HANDSHAKE 1
+#endif
+
 
 #ifndef I2C_SCL_PIN
 /** \brief
@@ -106,22 +116,12 @@ SOFTWARE.
 #define I2C_SDA_BIT PIND1
 #endif
 
-#ifdef __DOXYGEN__
-
 /** \brief
- * The maxmimum number of players in the handshake/lobby.
+ * The address used for general calls.
  * \details
- * Cannot be more than I2C_MAX_ADDRESSES.
+ * General calls are sent to this address and are received by all devices on the bus.
  */
-#define I2C_MAX_PLAYERS
-
-/** \brief
- * When defined, removes overhead for handshaking included when I2C_MAX_PLAYERS is defined.
- */
-#define I2C_CUSTOM_HANDSHAKE
-
-#endif
-
+#define I2C_GENERAL_CALL 0x00
 
 /** \brief
  * Error code used to mean success, returned by I2C::getTWError().
@@ -173,13 +173,13 @@ public:
      * \param generalCall Whether to enable or disable general calls. Defaults to false.
      * \note
      * General calls are a way for a device to broadcast data to every other device without addressing them individually.
-     * They are sent by sending a write to address 0. If they are disabled, the device will not respond to them.
+     * They are sent by sending a write to address I2C_GENERAL_CALL. If they are disabled, the device will not respond to them.
      */
     static void setAddress(uint8_t address, bool generalCall = false);
 
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
-     * \param address The 7-bit address which to send the data. To send a general call, use address 0.
+     * \param address The 7-bit address which to send the data. To send a general call, use address I2C_GENERAL_CALL.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param size The amount of data in bytes to send. This cannot be zero.
@@ -198,7 +198,7 @@ public:
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
      * \tparam T The type of the data to write.
-     * \param address The 7-bit address which to send the data. To send a general call, use address 0.
+     * \param address The 7-bit address which to send the data. To send a general call, use address I2C_GENERAL_CALL.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
@@ -349,14 +349,13 @@ public:
 
     /** \brief
      * Handshakes with other devices and returns a unique id once complete.
+     * \param numPlayers The amount of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_ADDRESSES.
      * \return A unique id for this device.
      * \details
-     * I2C_MAX_PLAYERS must be defined to 1 or more before including the header file to the number of players in the handshake.
      * This function will wait until every single player has joined.
      *
      */
-    static uint8_t handshake();
-
+    static uint8_t handshake(uint8_t numPlayers);
 };
 
 #ifdef I2C_IMPLEMENTATION
@@ -378,13 +377,8 @@ struct i2c_data_t {
     volatile uint8_t  error;
 
 } data;
-#ifdef I2C_MAX_PLAYERS
 
-#if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
-#error "Too many players. Max is I2C_MAX_ADDRESSES."
-#endif // #if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
-
-#ifndef I2C_CUSTOM_HANDSHAKE
+#if I2C_USE_HANDSHAKE
 volatile uint8_t handshakeState;
 
 void handshakeOnReceive() {
@@ -395,8 +389,7 @@ void handshakeOnRequest() {
     handshakeState++;
     I2C::transmit(&handshakeState);
 }
-#endif // #ifndef I2C_CUSTOM_HANDSHAKE
-#endif // #ifdef I2C_MAX_PLAYERS
+#endif // #ifdef I2C_USE_HANDSHAKE
 
 bool checkBusBusy() {
     uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
@@ -518,16 +511,13 @@ inline bool I2C::detectEmulator() {
     return !(TWCR & _BV(TWWC));
 }
 
-#ifdef I2C_MAX_PLAYERS
-
 inline uint8_t I2C::getAddressFromId(uint8_t id) {
     return 0x8 + id;
 }
 
-#ifndef I2C_CUSTOM_LOBBY
-
-uint8_t I2C::handshake() {
-    for (int8_t i = I2C_MAX_PLAYERS - 1; i >= 0; ) {
+#if I2C_USE_HANDSHAKE
+uint8_t I2C::handshake(uint8_t numPlayers) {
+    for (int8_t i = numPlayers - 1; i >= 0; ) {
         uint8_t dummy;
 
         I2C::read(I2C::getAddressFromId(i), &dummy, 1);
@@ -551,9 +541,8 @@ uint8_t I2C::handshake() {
     return I2C_HANDSHAKE_FAILED;
 }
 
-#endif // #ifndef I2C_CUSTOM_LOBBY
+#endif // #if I2C_USE_HANDSHAKE
 
-#endif // #ifdef I2C_MAX_PLAYERS
 ISR(TWI_vect, ISR_NAKED) {
     asm volatile (
 R"(
