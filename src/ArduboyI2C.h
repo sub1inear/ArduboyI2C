@@ -49,9 +49,10 @@ SOFTWARE.
  * The size of the buffer used for writes/target (slave) operations.
  * \details
  * Defaults to 32. If more than 32 bytes are needed for writes/target (slave) operations, increase. If more RAM is needed, decrease.
+ * Maximum is 255.
  */
 #define I2C_BUFFER_SIZE 32
-#elif I2C_BUFFER_SIZE > 256
+#elif I2C_BUFFER_SIZE > 255
 #error "I2C_BUFFER_SIZE is too big."
 #endif
 
