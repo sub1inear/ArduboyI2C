@@ -410,8 +410,16 @@ bool checkBusBusy() {
 void I2C::init() {
     power_twi_enable();
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-    TWSR = 0; // clear prescaler bits
+
     TWBR = (F_CPU / I2C_FREQUENCY - 16) / 2;
+
+    // clear prescaler bits
+    TWSR = 0;
+
+    // exit to bootloader/restart will not clear TWAR,
+    // so we clear it here to prevent any issues with handshakes.
+    TWAR = 0;
+
     // enable internal pullups
     DDRD &= ~(_BV(I2C_SCL_BIT) | _BV(I2C_SDA_BIT));
     PORTD |= _BV(I2C_SCL_BIT) | _BV(I2C_SDA_BIT);
