@@ -303,9 +303,10 @@ public:
      * \details
      * Example Callback and Usage:
      * \code{.cpp}
-     * void dataReceive() {
-     *   uint8_t *buffer = I2C::getBuffer();
-     *   players[buffer[0]] = *(player_t *)buffer;
+     * void dataReceive(const uint8_t *buffer, uint8_t size) {
+     *   uint8_t newId = buffer[0];
+     *   players[newId].x = buffer[1];
+     *   players[newId].y = buffer[2];
      * }
      * ...
      * void setup() {
@@ -315,7 +316,7 @@ public:
      * \endcode
      * \see onRequest() write()
      */
-    static void onReceive(void (*function)());
+    static void onReceive(void (*function)(const uint8_t *buffer, uint8_t size));
 
     /** \brief
      * Gets the hardware error which happened in a previous read or write.
@@ -365,7 +366,7 @@ public:
 namespace i2c_detail {
 struct i2c_data_t {
     void            (*onRequestFunction)();
-    void            (*onReceiveFunction)();
+    void            (*onReceiveFunction)(const uint8_t *buffer, uint8_t size);
 
     volatile uint8_t *rxBuffer;
     uint8_t           twiBuffer[I2C_BUFFER_SIZE];
@@ -381,7 +382,7 @@ struct i2c_data_t {
 #if I2C_USE_HANDSHAKE
 volatile uint8_t handshakeState;
 
-void handshakeOnReceive() {
+void handshakeOnReceive(const uint8_t *buffer, uint8_t size) {
     return;
 }
 
@@ -500,7 +501,8 @@ void I2C::transmit(const T *object) {
 void I2C::onRequest(void (*function)()) {
     i2c_detail::data.onRequestFunction = function;
 }
-void I2C::onReceive(void (*function)()) {
+
+void I2C::onReceive(void (*function)(const uint8_t *buffer, uint8_t size)) {
     i2c_detail::data.onReceiveFunction = function;
 }
 
@@ -797,7 +799,7 @@ TW_SR_STOP:
     ; TWCR = REPLY_ACK;
     ldi r26, REPLY_ACK
     std Z + TWCR, r26
-    ; i2c_detail::data.onReceiveFunction();
+    ; i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
     ldd r30, Y + %[onReceiveFunction]
     ldd r31, Y + %[onReceiveFunction] + 1
     icall
@@ -810,7 +812,11 @@ TW_ST_ARB_LOST_SLA_ACK:
 TW_ST_SLA_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18
-    ; i2c_detail::data.onRequestFunction();
+    ; i2c_detail::data.onRequestFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+    ldd r22, Y + %[bufferIdx]
+    ldi r24, lo8(%[twiBuffer])
+    ldi r25, hi8(%[twiBuffer])
+
     ldd r30, Y + %[onRequestFunction]
     ldd r31, Y + %[onRequestFunction] + 1
     icall
@@ -983,7 +989,7 @@ ISR(TWI_vect) {
         break;
     case TW_SR_STOP:
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-        i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer);
+        i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
         i2c_detail::data.active = false;
         break;
     default:
