@@ -141,7 +141,7 @@ SOFTWARE.
 /** \brief
  * The maximum amount of addresses available to a device.
  * \details
- * I2C uses a 7-bit addressing scheme with 127 available unique addresses.
+ * I2C uses a 7-bit addressing scheme with 128 available unique addresses.
  * However, addresses 0-7 and 120-127 are reserved by the standard and should not be used.
  * This leaves 112 addresses for devices to use.
  */
@@ -160,9 +160,9 @@ SOFTWARE.
 class I2C {
 public:
     /** \brief
-     * Initalizes I2C hardware.
+     * Initializes I2C hardware.
      * \details
-     * This functions powers on, initializes, and sets up the clock on the TWI hardware.
+     * This function powers on, initializes, and sets up the clock on the TWI hardware.
      * Must be called after the arduboy hardware is initialized as `arduboy.boot()` disables the I2C(TWI) hardware.
      */
     static void init();
@@ -189,7 +189,7 @@ public:
      * \note
      * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on every other device.
      * \note
-     * Interally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
+     * Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
      * must be defined before including to be larger.
      * \see transmit() read()
@@ -291,7 +291,7 @@ public:
      * Example Callback and Usage:
      * \code{.cpp}
      * void dataRequest() {
-     *   I2C::transmit(players[id], 2);
+     *   I2C::transmit(players[id]);
      * }
      * ...
      * void setup() {
