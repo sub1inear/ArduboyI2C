@@ -371,7 +371,9 @@ public:
      * \return A unique id for this device.
      * \details
      * This function will wait until every single player has joined.
-     *
+     * \note
+     * The onReceive() callback will be overriden by this function.
+     * The onRequest() callback will be set to a dummy function which does nothing.
      */
     static uint8_t handshake(uint8_t numPlayers);
 };
