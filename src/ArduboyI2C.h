@@ -200,7 +200,7 @@ public:
      * \tparam T The type of the data to write.
      * \param address The 7-bit address which to send the data. To send a general call, use address I2C_GENERAL_CALL.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
-     * \param buffer A pointer to the data to send.
+     * \param buffer A reference to the data to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \note
      * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on every other device.
@@ -211,7 +211,10 @@ public:
      * \see transmit() read()
      */
     template<typename T>
-    static void write(uint8_t address, const T *object, bool wait);
+    static void write(uint8_t address, const T &object, bool wait) {
+        static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
+        I2C::write(address, (const void *)&object, sizeof(T), wait);
+    }
 
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
@@ -231,7 +234,7 @@ public:
      * \tparam T The type of the data to read.
      * \param address The 7-bit address which to receive the data from.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
-     * \param buffer A pointer to the buffer in which to store the data.
+     * \param buffer A reference to the object in which to store the data.
      * \details
      * Types with sizes larger than 255 should not be used with this function.
      * \note
@@ -239,7 +242,10 @@ public:
      * \see write()
      */
     template<typename T>
-    static void read(uint8_t address, T *object);
+    static void read(uint8_t address, T &object) {
+        static_assert(sizeof(T) < 256, "Size of T must be less than 256.");
+        I2C::read(address, (void *)&object, sizeof(T));
+    }
 
     /** \brief
      * Transmits data back to the controller (master).
@@ -260,7 +266,7 @@ public:
     /** \brief
      * Transmits data back to the controller (master).
      * \tparam T The type of data to transmit.
-     * \param object A pointer to the data to send.
+     * \param object A reference to the data to send.
      * \details
      * This function is intended to be called once inside the onRequest callback.
      * It fills the transmitting buffer with data to then be send one byte at a time.
@@ -272,7 +278,10 @@ public:
      * \see write() onRequest()
      */
     template <typename T>
-    static void transmit(const T *object);
+    static void transmit(const T &object) {
+        static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
+        I2C::transmit((const void *)&object, sizeof(T));
+    }
 
     /** \brief
      * Sets up the callback to be called when data is requested from the device's address (a read).
@@ -281,7 +290,7 @@ public:
      * Example Callback and Usage:
      * \code{.cpp}
      * void dataRequest() {
-     *   I2C::transmit(&players[id], 2);
+     *   I2C::transmit(players[id], 2);
      * }
      * ...
      * void setup() {
@@ -444,12 +453,6 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     }
 }
 
-template<typename T>
-void I2C::write(uint8_t address, const T *buffer, bool wait) {
-    static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
-    I2C::write(address, (const void *)buffer, sizeof(T), wait);
-}
-
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     while (i2c_detail::data.active) {}
 
@@ -469,25 +472,12 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     while (i2c_detail::data.active) {}
 }
 
-template<typename T>
-void I2C::read(uint8_t address, T *object) {
-    static_assert(sizeof(T) < 256, "Size of T must be less than 256.");
-    I2C::read(address, (void *)object, sizeof(T));
-}
-
-
 void I2C::transmit(const void *buffer, uint8_t size) {
     for (uint8_t i = 0; i < size; i++) {
         i2c_detail::data.twiBuffer[i] = ((uint8_t *)buffer)[i];
     }
     i2c_detail::data.bufferIdx = 0;
     i2c_detail::data.bufferSize = size;
-}
-
-template <typename T>
-void I2C::transmit(const T *object) {
-    static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
-    I2C::transmit((const void *)object, sizeof(T));
 }
 
 void I2C::onRequest(void (*function)()) {
