@@ -488,18 +488,18 @@ void I2C::onReceive(void (*function)(const uint8_t *buffer, uint8_t size)) {
     i2c_detail::data.onReceiveFunction = function;
 }
 
-inline uint8_t I2C::getTWError() {
+uint8_t I2C::getTWError() {
     return i2c_detail::data.error;
 }
 
-inline bool I2C::detectEmulator() {
+bool I2C::detectEmulator() {
     // TWWC is set when TWDR is written to without TWINT being set
     // Not done in emulator
     TWDR = 0;
     return !(TWCR & _BV(TWWC));
 }
 
-inline uint8_t I2C::getAddressFromId(uint8_t id) {
+uint8_t I2C::getAddressFromId(uint8_t id) {
     return 0x8 + id;
 }
 
