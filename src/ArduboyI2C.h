@@ -175,6 +175,7 @@ public:
      * \note
      * General calls are a way for a device to broadcast data to every other device without addressing them individually.
      * They are sent by sending a write to address I2C_GENERAL_CALL. If they are disabled, the device will not respond to them.
+     * These two functionalities are combined for efficiency, as together they make up the TWAR register.
      */
     static void setAddress(uint8_t address, bool generalCall = true);
 
