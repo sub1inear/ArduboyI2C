@@ -382,8 +382,8 @@ public:
  */
 namespace i2c_detail {
 struct i2c_data_t {
-    void            (*onRequestFunction)();
-    void            (*onReceiveFunction)(const uint8_t *buffer, uint8_t size);
+    void            (*onRequestFunction)()                                    = nullptr;
+    void            (*onReceiveFunction)(const uint8_t *buffer, uint8_t size) = nullptr;
 
     volatile uint8_t *rxBuffer;
     uint8_t           twiBuffer[I2C_BUFFER_SIZE];
