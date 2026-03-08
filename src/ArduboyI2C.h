@@ -326,14 +326,6 @@ public:
     static uint8_t getTWError();
 
     /** \brief
-     * Gets a pointer to the I2C buffer holding received data.
-     * \details
-     * Intended to be used inside the onReceive callback.
-     * \see onReceive()
-     */
-    static uint8_t *getBuffer();
-
-    /** \brief
      * Checks if an emulator without I2C support is being used to run the code.
      * \return True if an emulator without I2C support has been detected and false if it has not
      */
@@ -508,10 +500,6 @@ void I2C::onReceive(void (*function)(const uint8_t *buffer, uint8_t size)) {
 
 inline uint8_t I2C::getTWError() {
     return i2c_detail::data.error;
-}
-
-inline uint8_t *I2C::getBuffer() {
-    return i2c_detail::data.twiBuffer;
 }
 
 inline bool I2C::detectEmulator() {
