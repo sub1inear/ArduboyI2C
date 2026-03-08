@@ -212,11 +212,11 @@ public:
     static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
 
     /** \brief
-     * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
-     * \tparam T The type of the data to write.
+     * Attempts to become the bus controller (master) and sends an object over I2C to the specified address.
+     * \tparam T The type of the object to write.
      * \param address The 7-bit address which to send the data. To send a general call, use address I2C_GENERAL_CALL.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
-     * \param buffer A reference to the data to send.
+     * \param object A reference to the object to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \note
      * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on every other device.
@@ -246,11 +246,11 @@ public:
     static void read(uint8_t address, void *buffer, uint8_t size);
 
     /** \brief
-     * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
-     * \tparam T The type of the data to read.
+     * Attempts to become the bus controller (master) and reads an object over I2C from the specified address.
+     * \tparam T The type of the object to read.
      * \param address The 7-bit address which to receive the data from.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
-     * \param buffer A reference to the object in which to store the data.
+     * \param object A reference to the object in which to store the data.
      * \details
      * Types with sizes larger than 255 should not be used with this function.
      * \note
@@ -280,9 +280,9 @@ public:
     static void transmit(const void *buffer, uint8_t size);
 
     /** \brief
-     * Transmits data back to the controller (master).
-     * \tparam T The type of data to transmit.
-     * \param object A reference to the data to send.
+     * Transmits an object back to the controller (master).
+     * \tparam T The type of the object to transmit.
+     * \param object A reference to the object to send.
      * \details
      * This function is intended to be called once inside the onRequest callback.
      * It fills the transmitting buffer with data to then be send one byte at a time.
