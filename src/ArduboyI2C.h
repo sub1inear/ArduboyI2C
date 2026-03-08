@@ -389,7 +389,7 @@ void handshakeOnReceive(const uint8_t *buffer, uint8_t size) {
 
 void handshakeOnRequest() {
     handshakeState++;
-    I2C::transmit(&handshakeState);
+    I2C::transmit(handshakeState);
 }
 #endif // #ifdef I2C_USE_HANDSHAKE
 
