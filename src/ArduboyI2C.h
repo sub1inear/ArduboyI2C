@@ -131,7 +131,7 @@ SOFTWARE.
 #define TW_SUCCESS 0xFF
 
 /** \brief
- * Error code RETURNED by I2C::handshake, meaning the handshake has already been completed.
+ * Error code RETURNED by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
  * \details
  *
  */
@@ -167,15 +167,15 @@ public:
     static void init();
 
     /** \brief
-     * Set the address of the device and enable/disable general calls on the I2C bus.
+     * Set the address of the device and whether to enable or disable general calls for it.
      * \param address The 7-bit address which to respond to.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
-     * \param generalCall Whether to enable or disable general calls. Defaults to false.
+     * \param generalCall Whether to enable or disable general calls. Defaults to true.
      * \note
      * General calls are a way for a device to broadcast data to every other device without addressing them individually.
      * They are sent by sending a write to address I2C_GENERAL_CALL. If they are disabled, the device will not respond to them.
      */
-    static void setAddress(uint8_t address, bool generalCall = false);
+    static void setAddress(uint8_t address, bool generalCall = true);
 
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
@@ -524,7 +524,7 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
 
         switch (I2C::getTWError()) {
         case TW_MR_SLA_NACK:
-            I2C::setAddress(I2C::getAddressFromId(i), true);
+            I2C::setAddress(I2C::getAddressFromId(i));
             I2C::onReceive(i2c_detail::handshakeOnReceive);
             I2C::onRequest(i2c_detail::handshakeOnRequest);
 
