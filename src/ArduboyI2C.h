@@ -103,6 +103,8 @@ SOFTWARE.
  * The pin on which the SDA and SCL lines is connected.
  * \details
  * Defaults to PIND.
+ * \note
+ * There can be only one pin for the SDA and SCL lines to increase optimization.
  */
 #define I2C_PIN PIND
 #endif
@@ -112,6 +114,8 @@ SOFTWARE.
  * The port on which the SDA and SCL lines is connected.
  * \details
  * Defaults to PORTD.
+ * \note
+ * There can be only one port for the SDA and SCL lines to increase optimization.
  */
 #define I2C_PORT PORTD
 #endif
@@ -121,6 +125,8 @@ SOFTWARE.
  * The data direction register for the SDA and SCL lines.
  * \details
  * Defaults to DDRD.
+ * \note
+ * There can be only one data direction register for the SDA and SCL lines to increase optimization.
  */
 #define I2C_DDR DDRD
 #endif
