@@ -80,14 +80,13 @@ SOFTWARE.
 #define I2C_USE_HANDSHAKE 1
 #endif
 
-
-#ifndef I2C_SCL_PIN
+#ifndef I2C_SDA_BIT
 /** \brief
- * The pin on which the SCL line is connected.
+ * The bit of the pin on which the SDA line is connected.
  * \details
- * Defaults to PIND.
+ * Defaults to PIND1.
  */
-#define I2C_SCL_PIN PIND
+#define I2C_SDA_BIT PIND1
 #endif
 
 #ifndef I2C_SCL_BIT
@@ -99,22 +98,31 @@ SOFTWARE.
 #define I2C_SCL_BIT PIND0
 #endif
 
-#ifndef I2C_SDA_PIN
+#ifndef I2C_PIN
 /** \brief
- * The pin on which the SDA line is connected.
+ * The pin on which the SDA and SCL lines is connected.
  * \details
  * Defaults to PIND.
  */
-#define I2C_SDA_PIN PIND
+#define I2C_PIN PIND
 #endif
 
-#ifndef I2C_SDA_BIT
+#ifndef I2C_PORT
 /** \brief
- * The bit of the pin on which the sda line is connected.
+ * The port on which the SDA and SCL lines is connected.
  * \details
- * Defaults to PIND1.
+ * Defaults to PORTD.
  */
-#define I2C_SDA_BIT PIND1
+#define I2C_PORT PORTD
+#endif
+
+#ifndef I2C_DDR
+/** \brief
+ * The data direction register for the SDA and SCL lines.
+ * \details
+ * Defaults to DDRD.
+ */
+#define I2C_DDR DDRD
 #endif
 
 /** \brief
@@ -398,7 +406,7 @@ void handshakeOnRequest() {
 bool checkBusBusy() {
     uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
     while (busyChecks) {
-        if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
+        if (I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
             busyChecks--;
         } else {
             i2c_detail::data.error = TW_MT_ARB_LOST;
@@ -425,8 +433,8 @@ void I2C::init() {
     TWAR = 0;
 
     // enable internal pullups
-    DDRD &= ~(_BV(I2C_SCL_BIT) | _BV(I2C_SDA_BIT));
-    PORTD |= _BV(I2C_SCL_BIT) | _BV(I2C_SDA_BIT);
+    I2C_DDR &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
+    I2C_PORT |= _BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT);
 }
 
 void I2C::setAddress(uint8_t address, bool generalCall) {
