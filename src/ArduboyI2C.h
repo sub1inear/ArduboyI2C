@@ -126,14 +126,14 @@ SOFTWARE.
 /** \brief
  * Error code used to mean success, returned by I2C::getTWError().
  * \details
- *  
+ *
  */
 #define TW_SUCCESS 0xFF
 
 /** \brief
  * Error code RETURNED by I2C::handshake, meaning the handshake has already been completed.
  * \details
- *  
+ *
  */
 #define I2C_HANDSHAKE_FAILED 0xFE
 
@@ -147,13 +147,13 @@ SOFTWARE.
 #define I2C_MAX_ADDRESSES 112
 
 /** \brief
- * I2C library version.  
+ * I2C library version.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
 #define I2C_LIB_VER 20102
 
-/** 
+/**
  * Provides all I2C functionality.
  */
 class I2C {
@@ -212,7 +212,7 @@ public:
      */
     template<typename T>
     static void write(uint8_t address, const T *object, bool wait);
-    
+
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
      * \param address The 7-bit address which to receive the data from.
@@ -256,7 +256,7 @@ public:
      * \see write() onRequest()
      */
     static void transmit(const void *buffer, uint8_t size);
-    
+
     /** \brief
      * Transmits data back to the controller (master).
      * \tparam T The type of data to transmit.
@@ -273,7 +273,7 @@ public:
      */
     template <typename T>
     static void transmit(const T *object);
-    
+
     /** \brief
      * Sets up the callback to be called when data is requested from the device's address (a read).
      * \param function The function to be called when data is requested.
@@ -353,7 +353,7 @@ public:
      * \details
      * I2C_MAX_PLAYERS must be defined to 1 or more before including the header file to the number of players in the handshake.
      * This function will wait until every single player has joined.
-     * 
+     *
      */
     static uint8_t handshake();
 
@@ -384,7 +384,7 @@ struct i2c_data_t {
 #error "Too many players. Max is I2C_MAX_ADDRESSES."
 #endif // #if I2C_MAX_PLAYERS > I2C_MAX_ADDRESSES
 
-#ifndef I2C_CUSTOM_HANDSHAKE    
+#ifndef I2C_CUSTOM_HANDSHAKE
 volatile uint8_t handshakeState;
 
 void handshakeOnReceive() {
@@ -397,6 +397,20 @@ void handshakeOnRequest() {
 }
 #endif // #ifndef I2C_CUSTOM_HANDSHAKE
 #endif // #ifdef I2C_MAX_PLAYERS
+
+bool checkBusBusy() {
+    uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
+    while (busyChecks) {
+        if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
+            busyChecks--;
+        } else {
+            i2c_detail::data.error = TW_MT_ARB_LOST;
+            i2c_detail::data.active = false;
+            return true;
+        }
+    }
+    return false;
+}
 
 }
 
@@ -413,7 +427,7 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
 
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     while (i2c_detail::data.active) {}
-    
+
     for (uint8_t i = 0; i < size; i++) {
         i2c_detail::data.twiBuffer[i] = ((const uint8_t *)buffer)[i];
     }
@@ -421,19 +435,11 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     i2c_detail::data.bufferSize = size;
 
     i2c_detail::data.error = TW_SUCCESS;
-    
+
     i2c_detail::data.active = true;
     i2c_detail::data.slaRW = address << 1 | TW_WRITE;
 
-    uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
-    while (busyChecks) {
-        if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
-            busyChecks--;
-        } else {
-            i2c_detail::data.error = TW_MT_ARB_LOST;
-            return;
-        }
-    }
+    if (i2c_detail::checkBusBusy()) { return; }
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     if (wait) {
@@ -449,7 +455,7 @@ void I2C::write(uint8_t address, const T *buffer, bool wait) {
 
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     while (i2c_detail::data.active) {}
-    
+
     i2c_detail::data.rxBuffer = (uint8_t *)buffer;
 
     i2c_detail::data.bufferIdx = 0;
@@ -460,15 +466,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::data.active = true;
     i2c_detail::data.slaRW = address << 1 | TW_READ;
 
-    uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
-    while (busyChecks) {
-        if ((I2C_SCL_PIN & _BV(I2C_SCL_BIT)) && (I2C_SDA_PIN & _BV(I2C_SDA_BIT))) {
-            busyChecks--;
-        } else {
-            i2c_detail::data.error = TW_MR_ARB_LOST;
-            return;
-        }
-    }
+    if (i2c_detail::checkBusBusy()) { return; }
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     while (i2c_detail::data.active) {}
@@ -624,7 +622,7 @@ breq TW_START
 ; MT_MR
 cpi r18, 0x18
 breq TW_MT_SLA_ACK
-cpi r18, 0x28 
+cpi r18, 0x28
 breq TW_MT_DATA_ACK
 cpi r18, 0x38
 breq TW_MT_ARB_LOST ; same as TW_MR_ARB_LOST
@@ -636,7 +634,7 @@ cpi r18, 0x58
 breq TW_MR_DATA_NACK
 
 ; 64 instruction limit on branches
-rjmp SR_ST 
+rjmp SR_ST
 
 TW_START:
     ; TWDR = i2c_detail::data.slaRW;
@@ -654,7 +652,7 @@ TW_MT_DATA_ACK:
     ldd r26, Y + %[bufferIdx]
     ldd r27, Y + %[bufferSize]
     cp r26, r27
-    
+
     brlt 1f ; 64 instruction limit on branches
     rjmp stop_reti
     1:
@@ -706,7 +704,7 @@ TW_MR_DATA_ACK:
 
     ldd r19, Z + TWDR
     st X, r19
-    
+
     ; if (TWSR == TW_MR_DATA_NACK) { stop(); return; }
     ; r18 holds TWSR
     cpi r18, 0x58
@@ -822,19 +820,19 @@ TW_ST_SLA_ACK:
 ; ------------------ fallthrough ---------------------- ;
 TW_ST_DATA_ACK:
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
-    ldd r26, Y + %[bufferIdx] 
+    ldd r26, Y + %[bufferIdx]
     inc r26
     std Y + %[bufferIdx], r26
 
     ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
     ; bufferIdx is already incremented so decrement to compensate
-    
+
     clr r27
     subi r26, lo8(-(%[twiBuffer] - 1))
     sbci r27, hi8(-(%[twiBuffer] - 1))
     ld r26, X
     std Z + TWDR, r26
-    
+
     ; if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
     ;    TWCR = REPLY_ACK;
     ; } else {
@@ -854,7 +852,7 @@ TW_ST_LAST_DATA:
 ; ----------------------------------------------------- ;
 default:
     ; i2c_detail::data.error = TWSR;
-    std Y + %[error], r18 
+    std Y + %[error], r18
 
     stop_reti:
 
