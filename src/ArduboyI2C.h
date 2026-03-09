@@ -796,6 +796,10 @@ TW_SR_STOP:
     ldi r26, REPLY_ACK
     std Z + TWCR, r26
     ; i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+    ldd r22, Y + %[bufferIdx]
+    ldi r24, lo8(%[twiBuffer])
+    ldi r25, hi8(%[twiBuffer])
+
     ldd r30, Y + %[onReceiveFunction]
     ldd r31, Y + %[onReceiveFunction] + 1
     icall
@@ -808,11 +812,7 @@ TW_ST_ARB_LOST_SLA_ACK:
 TW_ST_SLA_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18
-    ; i2c_detail::data.onRequestFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
-    ldd r22, Y + %[bufferIdx]
-    ldi r24, lo8(%[twiBuffer])
-    ldi r25, hi8(%[twiBuffer])
-
+    ; i2c_detail::data.onRequestFunction();
     ldd r30, Y + %[onRequestFunction]
     ldd r31, Y + %[onRequestFunction] + 1
     icall
