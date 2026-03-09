@@ -414,7 +414,7 @@ void handshakeOnRequest() {
 bool checkBusBusy() {
     uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
     while (busyChecks) {
-        if (I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
+        if ((I2C_PIN & I2C_SDA_BIT) && (I2C_PIN & I2C_SCL_BIT)) {
             busyChecks--;
         } else {
             i2c_detail::data.error = TW_MT_ARB_LOST;
