@@ -392,7 +392,7 @@ struct i2c_data_t {
     volatile uint8_t  bufferIdx;
     volatile uint8_t  bufferSize;
 
-    volatile bool     active;
+    volatile uint8_t  active;
     volatile uint8_t  slaRW;
     volatile uint8_t  error;
 
