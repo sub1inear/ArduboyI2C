@@ -451,6 +451,7 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
 
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     while (i2c_detail::data.active) {}
+    i2c_detail::data.active = true;
 
     for (uint8_t i = 0; i < size; i++) {
         i2c_detail::data.twiBuffer[i] = ((const uint8_t *)buffer)[i];
@@ -460,7 +461,6 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
     i2c_detail::data.error = TW_SUCCESS;
 
-    i2c_detail::data.active = true;
     i2c_detail::data.slaRW = address << 1 | TW_WRITE;
 
     if (i2c_detail::checkBusBusy()) { return; }
@@ -473,6 +473,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     while (i2c_detail::data.active) {}
+    i2c_detail::data.active = true;
 
     i2c_detail::data.rxBuffer = (uint8_t *)buffer;
 
@@ -481,7 +482,6 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 
     i2c_detail::data.error = TW_SUCCESS;
 
-    i2c_detail::data.active = true;
     i2c_detail::data.slaRW = address << 1 | TW_READ;
 
     if (i2c_detail::checkBusBusy()) { return; }
