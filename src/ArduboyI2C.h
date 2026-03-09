@@ -409,7 +409,7 @@ void handshakeOnRequest() {
     handshakeState++;
     I2C::transmit(handshakeState);
 }
-#endif // #ifdef I2C_USE_HANDSHAKE
+#endif // #if I2C_USE_HANDSHAKE
 
 bool checkBusBusy() {
     uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
