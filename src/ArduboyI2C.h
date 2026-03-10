@@ -237,7 +237,7 @@ public:
      * \param address The 7-bit address which to receive the data from.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the buffer in which to store the data.
-     * \param size The maximum amount of bytes to receive. This cannot be zero.
+     * \param size The maximum amount of bytes to receive. This cannot be 0 or 255.
      * \details
      * \note
      * Unlike the `write` function, this function is bufferless and is not limited to 32 bytes.
@@ -252,14 +252,14 @@ public:
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object in which to store the data.
      * \details
-     * Types with sizes larger than 255 should not be used with this function.
+     * Types with sizes greater than or equal to 255 should not be used with this function.
      * \note
      * Unlike the `write` function, this function is bufferless and is not limited to 32 bytes.
      * \see write()
      */
     template<typename T>
     static void read(uint8_t address, T &object) {
-        static_assert(sizeof(T) < 256, "Size of T must be less than 256.");
+        static_assert(sizeof(T) < 255, "Size of T must be less than 255.");
         I2C::read(address, (void *)&object, sizeof(T));
     }
 
