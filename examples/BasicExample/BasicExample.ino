@@ -8,7 +8,7 @@ constexpr uint8_t numPlayers = 2;
 Arduboy2 arduboy;
 
 struct player_t {
-    // this is used to identify our message as belonging to us
+    // used to identify our message as belonging to us
     uint8_t id;
     // general data
     uint8_t x;

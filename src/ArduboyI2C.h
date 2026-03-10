@@ -177,7 +177,7 @@ public:
      * Initializes I2C hardware.
      * \details
      * This function powers on, initializes, and sets up the clock on the TWI hardware.
-     * Must be called after the arduboy hardware is initialized as `arduboy.boot()` disables the I2C(TWI) hardware.
+     * Must be called after the arduboy hardware is initialized as `arduboy.boot()` disables the I2C (TWI) hardware.
      */
     static void init();
 
