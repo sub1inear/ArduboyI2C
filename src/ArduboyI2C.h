@@ -909,6 +909,7 @@ default:
     );
 }
 
+// C++ ISR version for reference.
 #if 0
 ISR(TWI_vect) {
     switch (TWSR) { // prescaler bits are cleared, no mask needed
