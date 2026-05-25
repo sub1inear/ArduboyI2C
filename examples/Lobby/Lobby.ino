@@ -166,7 +166,7 @@ void startLobby() {
             players[i].timeout = activeTimeout;
 
             // register handshake callback
-            // (before setting addressto avoid race condition)
+            // (before setting address to avoid race condition)
             I2C::onReceive(handshakeOnReceive);
 
             // set our address to this address
