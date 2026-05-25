@@ -506,19 +506,29 @@ bool checkCableFlippedCore(bool disconnectFlip = false) {
     uint8_t sdaHigh = 0;
     uint8_t sclHigh = 0;
     for (uint8_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_CHECKS; i++) {
+        // probably should buffer the pin reads
+        // but saves an instruction not to
+        // and will only be off by a very small amount
         if (I2C_PIN & _BV(I2C_SDA_BIT)) { sdaHigh++; }
         if (I2C_PIN & _BV(I2C_SCL_BIT)) { sclHigh++; }
-        // half-period delay
+        // half-period delay (otherwise way too fast to detect changes)
         delayMicroseconds((unsigned int)(1000000.0f / I2C_FREQUENCY / 2.0f));
     }
+    // if the cable disconnected (both lines high) for the entire check
+    // and disconnectFlip is true, return true (flipped)
+    // otherwise will return false in same case
+    // (sdaScore = halfChecks, sclScore = halfChecks, sdaScore < sclScore is false)
     if (disconnectFlip &&
         sdaHigh == I2C_CHECK_CABLE_FLIPPED_CHECKS &&
         sclHigh == I2C_CHECK_CABLE_FLIPPED_CHECKS) {
         return true;
     }
+    // score each line based on its distance from half the checks being high
     constexpr uint8_t halfChecks = I2C_CHECK_CABLE_FLIPPED_CHECKS / 2;
     uint8_t sdaScore = (uint8_t)abs((int8_t)(sdaHigh - halfChecks));
     uint8_t sclScore = (uint8_t)abs((int8_t)(sclHigh - halfChecks));
+    // less score means more like a clock
+    // so flipped if sdaScore is less than sclScore
     return sdaScore < sclScore;
 }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
@@ -614,10 +624,12 @@ uint8_t I2C::getTWError() {
 
 #if I2C_USE_CHECK_CABLE_FLIPPED
 void I2C::checkCableFlipped(void (*function)(void)) {
+    // wait to finish ongoing operations
     while (i2c_detail::data.active) { }
     TWCR = 0; // disable TWI
 
     if (i2c_detail::checkCableFlippedCore()) {
+        // inform the user of the flipped cable
         function();
         // wait for cable to be flipped back
         // debounce cable changes for 1 second
