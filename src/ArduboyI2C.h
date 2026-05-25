@@ -531,6 +531,9 @@ bool checkCableFlippedCore(bool disconnectFlip = false) {
     // so flipped if sdaScore is less than sclScore
     return sdaScore < sclScore;
 }
+uint16_t millisShort() {
+    return (uint16_t)millis();
+}
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
 }
@@ -633,11 +636,11 @@ void I2C::checkCableFlipped(void (*function)()) {
         function();
         // wait for cable to be flipped back
         // debounce cable changes for 1 second
-        uint16_t start = (uint16_t)millis();
+        uint16_t start = i2c_detail::checkBusBusy();
         while (true) {
             if (i2c_detail::checkCableFlippedCore(true)) {
-                start = (uint16_t)millis();
-            } else if ((uint16_t)millis() - start >
+                start = i2c_detail::millisShort();
+            } else if (i2c_detail::millisShort() - start >
                        I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT) {
                 break;
             }
