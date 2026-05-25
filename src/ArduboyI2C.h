@@ -425,7 +425,7 @@ public:
      * });
      * uint8_t id = I2C::handshake(2);
      */
-    static void checkCableFlipped(void (*function)(void));
+    static void checkCableFlipped(void (*function)());
     /** \brief
      * Checks if an emulator without I2C support is being used to run the code.
      * \return True if an emulator without I2C support has been detected and false if it has not
@@ -623,7 +623,7 @@ uint8_t I2C::getTWError() {
 }
 
 #if I2C_USE_CHECK_CABLE_FLIPPED
-void I2C::checkCableFlipped(void (*function)(void)) {
+void I2C::checkCableFlipped(void (*function)()) {
     // wait to finish ongoing operations
     while (i2c_detail::data.active) { }
     TWCR = 0; // disable TWI
