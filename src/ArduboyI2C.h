@@ -29,12 +29,13 @@ SOFTWARE.
 #include <avr/interrupt.h>
 #include <avr/power.h>
 #include <util/twi.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
 
 #ifndef I2C_FREQUENCY
 /** \brief
- * The initial I2C frequency.
+ * The initial I2C frequency in Hz.
  * \details
  * Defaults to 100000 Hz. \n
  * Standard frequencies: \n
@@ -56,18 +57,41 @@ SOFTWARE.
 #error "I2C_BUFFER_SIZE is too big."
 #endif
 
-#ifndef I2C_BUS_BUSY_CHECKS
+#ifndef I2C_CHECK_BUS_BUSY_CHECKS
 /** \brief
  * The amount of times the bus is checked before continuing with a read/write operation.
  * \details
- * Defaults to 16. Fixes design flaw where TWI hardware does not check if the bus has become busy during a stop interrupt,
+ * Defaults to 16, with a maximum of 255. Fixes design flaw where TWI hardware does not check if the bus has become busy during a stop interrupt,
  * so if multiple targets (slaves) receive the stop interrupt right before
  * they become the controller (master) and send a start, they all will think the bus is free and clobber each other.
- * Can be set to 0 when there is only one controller (master).
  * Increase if the game ever freezes.
  * More information: https://www.robotroom.com/Atmel-AVR-TWI-I2C-Multi-Master-Problem.html
  */
-#define I2C_BUS_BUSY_CHECKS 16
+#define I2C_CHECK_BUS_BUSY_CHECKS 16
+#elif I2C_CHECK_BUS_BUSY_CHECKS > 255
+#error "I2C_CHECK_BUS_BUSY_CHECKS is too big."
+#endif
+
+#ifndef I2C_CHECK_CABLE_FLIPPED_CHECKS
+/** \brief
+ * The total number of checks to perform when checking for a flipped cable.
+ * \details
+ * Defaults to 128, with a maximum of 255. Increase for a more accurate detection at the cost of a longer detection time.
+ */
+#define I2C_CHECK_CABLE_FLIPPED_CHECKS 128
+#elif I2C_CHECK_CABLE_FLIPPED_CHECKS > 255
+#error "I2C_CHECK_CABLE_FLIPPED_CHECKS is too big."
+#endif
+
+#ifndef I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT
+/** \brief
+ * The amount of time in milliseconds to debounce cable changes when checking for a flipped cable.
+ * \details
+ * Defaults to 1000 ms, with a maximum of 32767 ms. Increase for more stable detection at the cost of a longer wait time when flipping the cable.
+ */
+#define I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT 1000
+#elif I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT > 32767
+#error "I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT is too big."
 #endif
 
 #ifndef I2C_USE_HANDSHAKE
@@ -78,6 +102,26 @@ SOFTWARE.
  * Set to 0 if you do not use the built-in handshake (e.g. you use a custom handshake or no handshake at all) to save memory.
  */
 #define I2C_USE_HANDSHAKE 1
+#endif
+
+#ifndef I2C_USE_CHECK_BUS_BUSY
+/** \brief
+ * Whether or not to enable bus busy checking functionality.
+ * \details
+ * Defaults to 1.
+ * Set to 0 if you do not need to check if the bus is busy (e.g. you only have one controller (master)).
+ */
+#define I2C_USE_CHECK_BUS_BUSY 1
+#endif
+
+#ifndef I2C_USE_CHECK_CABLE_FLIPPED
+/** \brief
+ * Whether or not to enable flipped cable detection functionality.
+ * \details
+ * Defaults to 1.
+ * Set to 0 if you do not need to detect flipped cables (e.g. you are only targeting the Arduboy Mini) to save memory.
+ */
+#define I2C_USE_CHECK_CABLE_FLIPPED 1
 #endif
 
 #ifndef I2C_SDA_BIT
@@ -140,33 +184,29 @@ SOFTWARE.
 
 /** \brief
  * Error code used to mean success, returned by I2C::getTWError().
- * \details
- *
  */
 #define TW_SUCCESS 0xFF
 
 /** \brief
- * Error code RETURNED by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
- * \details
- *
+ * Error code returned by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
  */
 #define I2C_HANDSHAKE_FAILED 0xFE
 
 /** \brief
- * The maximum amount of addresses available to a device.
+ * The maximum amount of ids available to a device.
  * \details
  * I2C uses a 7-bit addressing scheme with 128 available unique addresses.
  * However, addresses 0-7 and 120-127 are reserved by the standard and should not be used.
- * This leaves 112 addresses for devices to use.
+ * This leaves 112 unique addresses, and by exention, ids, for a device to use.
  */
-#define I2C_MAX_ADDRESSES 112
+#define I2C_MAX_IDS 112
 
 /** \brief
  * I2C library version.
  * \details
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
-#define I2C_LIB_VER 20102
+#define I2C_LIB_VER 30000
 
 /**
  * Provides all I2C functionality.
@@ -179,7 +219,7 @@ public:
      * This function powers on, initializes, and sets up the clock on the TWI hardware.
      * Must be called after the arduboy hardware is initialized as `arduboy.boot()` disables the I2C (TWI) hardware.
      */
-    static void init();
+    static void begin();
 
     /** \brief
      * Set the address of the device and whether to enable or disable general calls for it.
@@ -232,6 +272,12 @@ public:
         I2C::write(address, (const void *)&object, sizeof(T), wait);
     }
 
+    /*
+     * This function is deleted to prevent accidental use with pointers.
+     */
+    template <typename T>
+    static void write(uint8_t address, T *object, bool wait) = delete;
+
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
      * \param address The 7-bit address which to receive the data from.
@@ -262,6 +308,12 @@ public:
         static_assert(sizeof(T) < 255, "Size of T must be less than 255.");
         I2C::read(address, (void *)&object, sizeof(T));
     }
+
+    /*
+     * This function is deleted to prevent accidental use with pointers.
+     */
+    template <typename T>
+    static void read(uint8_t address, T *object) = delete;
 
     /** \brief
      * Transmits data back to the controller (master).
@@ -299,9 +351,15 @@ public:
         I2C::transmit((const void *)&object, sizeof(T));
     }
 
+    /*
+     * This function is deleted to prevent accidental use with pointers.
+     */
+    template <typename T>
+    static void transmit(T *object) = delete;
+
     /** \brief
-     * Sets up the callback to be called when data is requested from the device's address (a read).
-     * \param function The function to be called when data is requested.
+     * Sets up/disables the callback to be called when data is requested from the device's address (a read).
+     * \param function The function to be called when data is requested, or `nullptr` to disable.
      * \details
      * Example Callback and Usage:
      * \code{.cpp}
@@ -323,8 +381,8 @@ public:
     static void onRequest(void (*function)());
 
     /** \brief
-     * Sets up the callback to be called when data is sent to the device's address (a write)
-     * \param function The function to be called when data is received.
+     * Sets up/disables the callback to be called when data is sent to the device's address (a write)
+     * \param function The function to be called when data is received, or `nullptr` to disable.
      * \details
      * Example Callback and Usage:
      * \code{.cpp}
@@ -351,6 +409,24 @@ public:
     static uint8_t getTWError();
 
     /** \brief
+     * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
+     * \param function The function to be called if the cable is flipped.
+     * \details
+     * This function works by seeing which line behaves more like a clock (equal high and low) over a sampling period.
+     * It is by no means perfect, but it should suffice.
+     * This is only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable.
+     * This method must be used with I2C::handshake.
+     * Example Usage:
+     * \code{.cpp}
+     * I2C::checkCableFlipped([] {
+     *     arduboy.clear();
+     *     arduboy.print(F("Please flip the cable\non this device."));
+     *     arduboy.display();
+     * });
+     * uint8_t id = I2C::handshake(2);
+     */
+    static void checkCableFlipped(void (*function)(void));
+    /** \brief
      * Checks if an emulator without I2C support is being used to run the code.
      * \return True if an emulator without I2C support has been detected and false if it has not
      */
@@ -358,7 +434,7 @@ public:
 
     /** \brief
      * Gets the address from a provided id.
-     * \param id An id between 0 and I2C_MAX_ADDRESSES - 1
+     * \param id An id between 0 and I2C_MAX_IDS.
      * \return The address corresponding to that id.
      * \details
      * This function is provided to standardize addresses for each id. It is used by I2C::handshake.
@@ -367,9 +443,10 @@ public:
 
     /** \brief
      * Handshakes with other devices and returns a unique id once complete.
-     * \param numPlayers The amount of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_ADDRESSES.
+     * \param numPlayers The amount of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS.
      * \return A unique id for this device.
      * \details
+     * This function may be called only once; further calls will not work.
      * This function will wait until every single player has joined.
      * \note
      * The onReceive() callback will be overriden by this function.
@@ -383,27 +460,8 @@ public:
  * Not officially part of the library.
  */
 namespace i2c_detail {
-struct i2c_data_t {
-    void            (*onRequestFunction)()                                    = nullptr;
-    void            (*onReceiveFunction)(const uint8_t *buffer, uint8_t size) = nullptr;
-
-    volatile uint8_t *rxBuffer;
-    uint8_t           twiBuffer[I2C_BUFFER_SIZE];
-    volatile uint8_t  bufferIdx;
-    volatile uint8_t  bufferSize;
-
-    volatile uint8_t  active;
-    volatile uint8_t  slaRW;
-    volatile uint8_t  error;
-
-} data;
-
 #if I2C_USE_HANDSHAKE
 volatile uint8_t handshakeState;
-
-void handshakeOnReceive(const uint8_t *buffer, uint8_t size) {
-    return;
-}
 
 void handshakeOnRequest() {
     handshakeState++;
@@ -411,10 +469,26 @@ void handshakeOnRequest() {
 }
 #endif // #if I2C_USE_HANDSHAKE
 
+struct i2c_data_t {
+    void (*onRequestFunction)() = nullptr;
+    void (*onReceiveFunction)(const uint8_t *buffer, uint8_t size) = nullptr;
+
+    volatile uint8_t *rxBuffer;
+    uint8_t twiBuffer[I2C_BUFFER_SIZE];
+    volatile uint8_t bufferIdx;
+    volatile uint8_t bufferSize;
+
+    volatile uint8_t active;
+    volatile uint8_t slaRW;
+    volatile uint8_t error;
+
+} data;
+
+#if I2C_USE_CHECK_BUS_BUSY
 bool checkBusBusy() {
-    uint8_t busyChecks = I2C_BUS_BUSY_CHECKS;
+    uint8_t busyChecks = I2C_CHECK_BUS_BUSY_CHECKS;
     while (busyChecks) {
-        if ((I2C_PIN & I2C_SDA_BIT) && (I2C_PIN & I2C_SCL_BIT)) {
+        if ((I2C_PIN & _BV(I2C_SDA_BIT)) && (I2C_PIN & _BV(I2C_SCL_BIT))) {
             busyChecks--;
         } else {
             i2c_detail::data.error = TW_MT_ARB_LOST;
@@ -424,10 +498,34 @@ bool checkBusBusy() {
     }
     return false;
 }
+#endif // #if I2C_USE_CHECK_BUS_BUSY
+
+#if I2C_USE_CHECK_CABLE_FLIPPED
+bool checkCableFlippedCore(bool disconnectFlip = false) {
+    // count frequency of each state of the SDA and SCL lines
+    uint8_t sdaHigh = 0;
+    uint8_t sclHigh = 0;
+    for (uint8_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_CHECKS; i++) {
+        if (I2C_PIN & _BV(I2C_SDA_BIT)) { sdaHigh++; }
+        if (I2C_PIN & _BV(I2C_SCL_BIT)) { sclHigh++; }
+        // half-period delay
+        delayMicroseconds((unsigned int)(1000000.0f / I2C_FREQUENCY / 2.0f));
+    }
+    if (disconnectFlip &&
+        sdaHigh == I2C_CHECK_CABLE_FLIPPED_CHECKS &&
+        sclHigh == I2C_CHECK_CABLE_FLIPPED_CHECKS) {
+        return true;
+    }
+    constexpr uint8_t halfChecks = I2C_CHECK_CABLE_FLIPPED_CHECKS / 2;
+    uint8_t sdaScore = (uint8_t)abs((int8_t)(sdaHigh - halfChecks));
+    uint8_t sclScore = (uint8_t)abs((int8_t)(sclHigh - halfChecks));
+    return sdaScore < sclScore;
+}
+#endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
 }
 
-void I2C::init() {
+void I2C::begin() {
     power_twi_enable();
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 
@@ -463,7 +561,9 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
     i2c_detail::data.slaRW = address << 1 | TW_WRITE;
 
+#ifdef I2C_USE_CHECK_BUS_BUSY
     if (i2c_detail::checkBusBusy()) { return; }
+#endif // #ifdef I2C_USE_CHECK_BUS_BUSY
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     if (wait) {
@@ -484,7 +584,9 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 
     i2c_detail::data.slaRW = address << 1 | TW_READ;
 
+#ifdef I2C_USE_CHECK_BUS_BUSY
     if (i2c_detail::checkBusBusy()) { return; }
+#endif // #ifdef I2C_USE_CHECK_BUS_BUSY
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     while (i2c_detail::data.active) {}
@@ -510,9 +612,33 @@ uint8_t I2C::getTWError() {
     return i2c_detail::data.error;
 }
 
+#if I2C_USE_CHECK_CABLE_FLIPPED
+void I2C::checkCableFlipped(void (*function)(void)) {
+    while (i2c_detail::data.active) { }
+    TWCR = 0; // disable TWI
+
+    if (i2c_detail::checkCableFlippedCore()) {
+        function();
+        // wait for cable to be flipped back
+        // debounce cable changes for 1 second
+        uint16_t start = (uint16_t)millis();
+        while (true) {
+            if (i2c_detail::checkCableFlippedCore(true)) {
+                start = (uint16_t)millis();
+            } else if ((uint16_t)millis() - start >
+                       I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT) {
+                break;
+            }
+        }
+    }
+
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT); // re-enable TWI
+}
+#endif // #if I2C_USE_CHECK_CABLE_FLIPPED
+
 bool I2C::detectEmulator() {
     // TWWC is set when TWDR is written to without TWINT being set
-    // Not done in emulator
+    // not done in emulator
     TWDR = 0;
     return !(TWCR & _BV(TWWC));
 }
@@ -526,17 +652,27 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
     for (int8_t i = numPlayers - 1; i >= 0; ) {
         uint8_t dummy;
 
-        I2C::read(I2C::getAddressFromId(i), &dummy, 1);
+        I2C::read(I2C::getAddressFromId(i), dummy);
 
         switch (I2C::getTWError()) {
         case TW_MR_SLA_NACK:
             I2C::setAddress(I2C::getAddressFromId(i));
-            I2C::onReceive(i2c_detail::handshakeOnReceive);
             I2C::onRequest(i2c_detail::handshakeOnRequest);
 
             // handshakeState is the number of times the callback has been called.
-            // When the callback has been called i times, the final Arduboy has joined.
+            // when the callback has been called i times, the final Arduboy has joined.
+            // cable flipped detection relies on clock detection,
+            // so we send 0b00000000 to have SDA never change
+            // while detecting it.
+
+#ifdef I2C_USE_CHECK_CABLE_FLIPPED
+            dummy = 0b00000000;
+            while (i2c_detail::handshakeState < i) {
+                I2C::write(I2C_GENERAL_CALL, dummy, true);
+            }
+#else
             while (i2c_detail::handshakeState < i) { }
+#endif
 
             return i;
         case TW_SUCCESS:
@@ -795,13 +931,21 @@ TW_SR_STOP:
     ; TWCR = REPLY_ACK;
     ldi r26, REPLY_ACK
     std Z + TWCR, r26
-    ; i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+
+    ; if (i2c_detail::data.onReceiveFunction) {
+    ;     i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+    ; }
     ldd r22, Y + %[bufferIdx]
     ldi r24, lo8(%[twiBuffer])
     ldi r25, hi8(%[twiBuffer])
 
     ldd r30, Y + %[onReceiveFunction]
     ldd r31, Y + %[onReceiveFunction] + 1
+
+    cp r30, __zero_reg__
+    cpc r31, __zero_reg__
+    breq active_false_reti
+
     icall
     ; i2c_detail::data.active = false;
     ; return;
@@ -812,10 +956,18 @@ TW_ST_ARB_LOST_SLA_ACK:
 TW_ST_SLA_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18
+    ; if (i2c_detail::data.onRequestFunction) {
+    ;     i2c_detail::data.onRequestFunction();
+    ; }
     ; i2c_detail::data.onRequestFunction();
     ldd r30, Y + %[onRequestFunction]
     ldd r31, Y + %[onRequestFunction] + 1
+
+    cp r30, __zero_reg__
+    cpc r31, __zero_reg__
+
     icall
+skip_request_function:
     ; restore Z pointer
     ldi r30, TWPTR
     clr r31

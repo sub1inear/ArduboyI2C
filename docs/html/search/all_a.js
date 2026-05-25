@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['transmit_0',['transmit',['../class_i2_c.html#a6d2695878ede6f9ded985230afeaad99',1,'I2C::transmit(const void *buffer, uint8_t size)'],['../class_i2_c.html#afd29bdb2964b73959871c7e5f5e9456d',1,'I2C::transmit(const T &amp;object)']]],
-  ['tw_5fsuccess_1',['TW_SUCCESS',['../_arduboy_i2_c_8h.html#aaa8a379ca27da629fb7eb67cacc5d86a',1,'ArduboyI2C.h']]]
+  ['write_0',['write',['../class_i2_c.html#abbcec8a69f6c3932b9936f048488ac15',1,'I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait)'],['../class_i2_c.html#aa0054f1d24c4bab77b2a8c37700f56cc',1,'I2C::write(uint8_t address, const T &amp;object, bool wait)']]]
 ];
