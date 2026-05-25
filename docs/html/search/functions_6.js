@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['write_0',['write',['../class_i2_c.html#abbcec8a69f6c3932b9936f048488ac15',1,'I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait)'],['../class_i2_c.html#aa0054f1d24c4bab77b2a8c37700f56cc',1,'I2C::write(uint8_t address, const T &amp;object, bool wait)']]]
+  ['read_0',['read',['../class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0',1,'I2C::read(uint8_t address, void *buffer, uint8_t size)'],['../class_i2_c.html#aecef3517445837858950b1ecc722cc9a',1,'I2C::read(uint8_t address, T &amp;object)']]]
 ];

@@ -26,6 +26,7 @@ SOFTWARE.
  * An I2C library for Arduboy multiplayer games.
  */
 #pragma once
+#include <Arduino.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
 #include <util/twi.h>
@@ -424,6 +425,10 @@ public:
      *     arduboy.display();
      * });
      * uint8_t id = I2C::handshake(2);
+     * \endcode
+     * \note
+     * In order to work with this function, custom handshaking functions must send data at a regular interval.
+     * Sending 0b00000000 is recommended as it will increase the chance of detection.
      */
     static void checkCableFlipped(void (*function)());
     /** \brief
@@ -434,7 +439,7 @@ public:
 
     /** \brief
      * Gets the address from a provided id.
-     * \param id An id between 0 and I2C_MAX_IDS.
+     * \param id An id between 0 and I2C_MAX_IDS - 1.
      * \return The address corresponding to that id.
      * \details
      * This function is provided to standardize addresses for each id. It is used by I2C::handshake.
@@ -450,7 +455,6 @@ public:
      * This function will wait until every single player has joined.
      * \note
      * The onReceive() callback will be overriden by this function.
-     * The onRequest() callback will be set to a dummy function which does nothing.
      */
     static uint8_t handshake(uint8_t numPlayers);
 };
@@ -531,6 +535,7 @@ bool checkCableFlippedCore(bool disconnectFlip = false) {
     // so flipped if sdaScore is less than sclScore
     return sdaScore < sclScore;
 }
+// optimizes for debounce in checkCableFlipped (only needs uint16_t)
 uint16_t millisShort() {
     return (uint16_t)millis();
 }
@@ -636,7 +641,7 @@ void I2C::checkCableFlipped(void (*function)()) {
         function();
         // wait for cable to be flipped back
         // debounce cable changes for 1 second
-        uint16_t start = i2c_detail::checkBusBusy();
+        uint16_t start = i2c_detail::millisShort();
         while (true) {
             if (i2c_detail::checkCableFlippedCore(true)) {
                 start = i2c_detail::millisShort();
@@ -666,13 +671,14 @@ uint8_t I2C::getAddressFromId(uint8_t id) {
 uint8_t I2C::handshake(uint8_t numPlayers) {
     for (int8_t i = numPlayers - 1; i >= 0; ) {
         uint8_t dummy;
+        uint8_t address = I2C::getAddressFromId(i);
 
-        I2C::read(I2C::getAddressFromId(i), dummy);
+        I2C::read(address, dummy);
 
         switch (I2C::getTWError()) {
         case TW_MR_SLA_NACK:
-            I2C::setAddress(I2C::getAddressFromId(i));
             I2C::onRequest(i2c_detail::handshakeOnRequest);
+            I2C::setAddress(address);
 
             // handshakeState is the number of times the callback has been called.
             // when the callback has been called i times, the final Arduboy has joined.
@@ -1122,7 +1128,9 @@ ISR(TWI_vect) {
     case TW_ST_SLA_ACK:
     case TW_ST_ARB_LOST_SLA_ACK:
         i2c_detail::data.active = true;
-        i2c_detail::data.onRequestFunction();
+        if (i2c_detail::data.onRequestFunction) {
+            i2c_detail::data.onRequestFunction();
+        }
         __attribute__((fallthrough));
     case TW_ST_DATA_ACK:
         TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
@@ -1153,7 +1161,9 @@ ISR(TWI_vect) {
         break;
     case TW_SR_STOP:
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-        i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+        if (i2c_detail::data.onReceiveFunction) {
+            i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+        }
         i2c_detail::data.active = false;
         break;
     default:

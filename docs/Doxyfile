@@ -134,7 +134,7 @@ FILE_PATTERNS          = *.h \
                          *.hpp \
                          *.cpp
 RECURSIVE              = NO
-EXCLUDE                =
+EXCLUDE                = examples
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        =

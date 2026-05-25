@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gettwerror_0',['getTWError',['../class_i2_c.html#aaa8cbd684439d10e33d92a6cf2427e0e',1,'I2C']]]
+  ['checkcableflipped_0',['checkCableFlipped',['../class_i2_c.html#a2146f1685988390f3674df95868e88e3',1,'I2C']]]
 ];
