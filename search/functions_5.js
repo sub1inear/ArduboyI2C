@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['transmit_0',['transmit',['../class_i2_c.html#a96bf8759d46090d8659c4fa7e0632699',1,'I2C::transmit(const void *buffer, uint8_t size)'],['../class_i2_c.html#afd29bdb2964b73959871c7e5f5e9456d',1,'I2C::transmit(const T &amp;object)']]]
+  ['onreceive_0',['onReceive',['../class_i2_c.html#ad2f0a1a57e640663c1ad386dc505054a',1,'I2C']]],
+  ['onrequest_1',['onRequest',['../class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d',1,'I2C']]]
 ];

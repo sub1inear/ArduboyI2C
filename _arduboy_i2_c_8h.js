@@ -1,12 +1,13 @@
 var _arduboy_i2_c_8h =
 [
     [ "I2C", "class_i2_c.html", "class_i2_c" ],
-    [ "i2c_detail::i2c_data_t", "structi2c__detail_1_1i2c__data__t.html", null ],
     [ "I2C_FREQUENCY", "_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222", null ],
     [ "I2C_BUFFER_SIZE", "_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd", null ],
-    [ "I2C_BUS_BUSY_CHECKS", "_arduboy_i2_c_8h.html#a419daf161333923dae12b87e7a942d6f", null ],
+    [ "I2C_CHECK_BUS_BUSY_CHECKS", "_arduboy_i2_c_8h.html#aecf378ba83ad4073823cc7c41de5f14c", null ],
     [ "I2C_CHECK_CABLE_FLIPPED_CHECKS", "_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57", null ],
+    [ "I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT", "_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0", null ],
     [ "I2C_USE_HANDSHAKE", "_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650", null ],
+    [ "I2C_USE_CHECK_BUS_BUSY", "_arduboy_i2_c_8h.html#a46613027f9a3fd1acede15144779992e", null ],
     [ "I2C_USE_CHECK_CABLE_FLIPPED", "_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4", null ],
     [ "I2C_SDA_BIT", "_arduboy_i2_c_8h.html#ab37c7049d3f4f3dc7d89b5c02e88f7c7", null ],
     [ "I2C_SCL_BIT", "_arduboy_i2_c_8h.html#a5e7834d040f89e2e7fc864785e80f981", null ],
@@ -16,6 +17,6 @@ var _arduboy_i2_c_8h =
     [ "I2C_GENERAL_CALL", "_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4", null ],
     [ "TW_SUCCESS", "_arduboy_i2_c_8h.html#aaa8a379ca27da629fb7eb67cacc5d86a", null ],
     [ "I2C_HANDSHAKE_FAILED", "_arduboy_i2_c_8h.html#a439f3615789ffec435412484d25e584d", null ],
-    [ "I2C_MAX_ADDRESSES", "_arduboy_i2_c_8h.html#a79cc8450ce152950948306f7590c3919", null ],
+    [ "I2C_MAX_IDS", "_arduboy_i2_c_8h.html#aeddb4fb18bc6bd7822797a2029c5fff6", null ],
     [ "I2C_LIB_VER", "_arduboy_i2_c_8h.html#a89cb379c38e2b4b8e1a1c00df7d6ab45", null ]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['documentation_0',['Library Documentation',['../index.html#autotoc_md1',1,'']]]
+  ['checkcableflipped_0',['checkCableFlipped',['../class_i2_c.html#a2146f1685988390f3674df95868e88e3',1,'I2C']]]
 ];

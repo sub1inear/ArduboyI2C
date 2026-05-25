@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['library_0',['ArduboyI2C Library',['../index.html',1,'']]],
-  ['library_20documentation_1',['Library Documentation',['../index.html#autotoc_md1',1,'']]]
+  ['handshake_0',['handshake',['../class_i2_c.html#a048b60bd3ab9bedaecb295a1eb369e0e',1,'I2C']]]
 ];

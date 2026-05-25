@@ -1,21 +1,5 @@
 var searchData=
 [
-  ['i2c_0',['I2C',['../class_i2_c.html',1,'']]],
-  ['i2c_5fbuffer_5fsize_1',['I2C_BUFFER_SIZE',['../_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd',1,'ArduboyI2C.h']]],
-  ['i2c_5fbus_5fbusy_5fchecks_2',['I2C_BUS_BUSY_CHECKS',['../_arduboy_i2_c_8h.html#a419daf161333923dae12b87e7a942d6f',1,'ArduboyI2C.h']]],
-  ['i2c_5fcheck_5fcable_5fflipped_5fchecks_3',['I2C_CHECK_CABLE_FLIPPED_CHECKS',['../_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57',1,'ArduboyI2C.h']]],
-  ['i2c_5fdata_5ft_4',['i2c_data_t',['../structi2c__detail_1_1i2c__data__t.html',1,'i2c_detail']]],
-  ['i2c_5fddr_5',['I2C_DDR',['../_arduboy_i2_c_8h.html#ab4386d053f69f39963bebf5f03b6eeee',1,'ArduboyI2C.h']]],
-  ['i2c_5fdetail_6',['i2c_detail',['../namespacei2c__detail.html',1,'']]],
-  ['i2c_5ffrequency_7',['I2C_FREQUENCY',['../_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222',1,'ArduboyI2C.h']]],
-  ['i2c_5fgeneral_5fcall_8',['I2C_GENERAL_CALL',['../_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4',1,'ArduboyI2C.h']]],
-  ['i2c_5fhandshake_5ffailed_9',['I2C_HANDSHAKE_FAILED',['../_arduboy_i2_c_8h.html#a439f3615789ffec435412484d25e584d',1,'ArduboyI2C.h']]],
-  ['i2c_5flib_5fver_10',['I2C_LIB_VER',['../_arduboy_i2_c_8h.html#a89cb379c38e2b4b8e1a1c00df7d6ab45',1,'ArduboyI2C.h']]],
-  ['i2c_5fmax_5faddresses_11',['I2C_MAX_ADDRESSES',['../_arduboy_i2_c_8h.html#a79cc8450ce152950948306f7590c3919',1,'ArduboyI2C.h']]],
-  ['i2c_5fpin_12',['I2C_PIN',['../_arduboy_i2_c_8h.html#ab7540bab4da9f607f5b7f9266837207c',1,'ArduboyI2C.h']]],
-  ['i2c_5fport_13',['I2C_PORT',['../_arduboy_i2_c_8h.html#ad9ecf80e1eac083d16ec47f9d3aeb39f',1,'ArduboyI2C.h']]],
-  ['i2c_5fscl_5fbit_14',['I2C_SCL_BIT',['../_arduboy_i2_c_8h.html#a5e7834d040f89e2e7fc864785e80f981',1,'ArduboyI2C.h']]],
-  ['i2c_5fsda_5fbit_15',['I2C_SDA_BIT',['../_arduboy_i2_c_8h.html#ab37c7049d3f4f3dc7d89b5c02e88f7c7',1,'ArduboyI2C.h']]],
-  ['i2c_5fuse_5fcheck_5fcable_5fflipped_16',['I2C_USE_CHECK_CABLE_FLIPPED',['../_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4',1,'ArduboyI2C.h']]],
-  ['i2c_5fuse_5fhandshake_17',['I2C_USE_HANDSHAKE',['../_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650',1,'ArduboyI2C.h']]]
+  ['getaddressfromid_0',['getAddressFromId',['../class_i2_c.html#ad8fdf502548d5b86968e1a04b60f89cb',1,'I2C']]],
+  ['gettwerror_1',['getTWError',['../class_i2_c.html#a03dfacb57e2a02b10b61cf093b2f6171',1,'I2C']]]
 ];
