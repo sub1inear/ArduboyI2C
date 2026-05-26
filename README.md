@@ -18,6 +18,7 @@ Install via the Library Manager:
 1. Open the Arduino IDE.
 2. Go to **Sketch > Include Library > Manage Libraries...**
 3. Search for "ArduboyI2C" and install the library by sub1inear.
+
 ### PlatformIO
 Add to your `platformio.ini`:
 ```ini
@@ -50,7 +51,6 @@ I2C::write(I2C_GENERAL_CALL, data, length);
 I2C::read(I2C::getAddressFromId(id), buffer, length);
 ```
 
-
 ## Configuration
 Define these before including `ArduboyI2C.h` to customize behavior:
 - `I2C_FREQUENCY` (default 100000), increase for faster communication
@@ -64,8 +64,8 @@ Define these before including `ArduboyI2C.h` to customize behavior:
 
 ## Differences from the Wire Library
 - Highly optimized (saves ~2KiB of PROGMEM and ~200 bytes of RAM)
+- Built-in handshake function for multiplayer games
 - Multi-controller support for easy peer-to-peer communication
     - Optional bus busy checks to prevent freezes
-- Built-in handshake function for multiplayer games
 - Built-in cable flip detection for FX-C
 - Bufferless reading (unlike Wire)
