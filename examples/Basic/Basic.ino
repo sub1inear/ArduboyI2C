@@ -43,6 +43,13 @@ Player players[numPlayers];
 // stores unique id from 0 to numPlayers - 1
 uint8_t id;
 
+void displayMessage(const __FlashStringHelper *message) {
+    // __FlashStringHelper ensures message is stored in flash memory (with the F() macro)
+    arduboy.clear();
+    arduboy.print(message);
+    arduboy.display();
+}
+
 void onReceive(const uint8_t *buffer, uint8_t size) {
     // interpret the received data as a player struct
     Player *newPlayer = (Player *)buffer;
@@ -73,16 +80,12 @@ void setup() {
     // only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable
     I2C::checkCableFlipped([]() {
         // display cable flipped message
-        arduboy.clear();
-        arduboy.print(F("Please flip the cable\non this device."));
-        arduboy.display();
+        displayMessage(F("Please flip the cable\non this device."));
     });
 
     // display handshaking message,
     // I2C::handshake blocks
-    arduboy.clear();
-    arduboy.print(F("Waiting for other\nplayer..."));
-    arduboy.display();
+    displayMessage(F("Waiting for other\nplayer..."));
 
     // get unique id and wait for other players to join
     // note: I2C::handshake enables general calls by default
