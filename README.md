@@ -6,10 +6,13 @@ Full API documentation: https://sub1inear.github.io/ArduboyI2C/
 
 ## Features
 - Controller (master) and target (slave) I2C support.
-- Optional multi-controller safety checks for bus contention.
-- Built-in multiplayer handshake with address assignment.
-- Optional cable-flip detection for FX-C.
+- Built-in handshake function for multiplayer games.
+- Multi-controller support for easy peer-to-peer communication.
+    - Optional bus busy checks to prevent freezes.
+- Built-in cable flip detection for FX-C.
+- Bufferless reading.
 - Minimal memory overhead.
+- Customizable configuration.
 
 ## Installation
 
@@ -64,8 +67,11 @@ Define these before including `ArduboyI2C.h` to customize behavior:
 
 ## Differences from the Wire Library
 - Highly optimized (saves ~2KiB of PROGMEM and ~200 bytes of RAM)
-- Built-in handshake function for multiplayer games
-- Multi-controller support for easy peer-to-peer communication
-    - Optional bus busy checks to prevent freezes
-- Built-in cable flip detection for FX-C
-- Bufferless reading (unlike Wire)
+- Controller (master) and target (slave) I2C support.
+- Built-in handshake function for multiplayer games.
+- Multi-controller support for easy peer-to-peer communication.
+    - Optional bus busy checks to prevent freezes.
+- Built-in cable flip detection for FX-C.
+- Bufferless reading.
+- Minimal memory overhead.
+- Customizable configuration.
