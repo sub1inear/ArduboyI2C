@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['documentation_0',['Library Documentation',['../index.html#autotoc_md1',1,'']]]
+  ['configuration_0',['Configuration',['../index.html#autotoc_md7',1,'']]]
 ];
