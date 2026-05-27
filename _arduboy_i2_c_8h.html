@@ -99,6 +99,7 @@ $(function(){initNavTree('_arduboy_i2_c_8h.html','',''); });
 <code>#include &lt;avr/interrupt.h&gt;</code><br />
 <code>#include &lt;avr/power.h&gt;</code><br />
 <code>#include &lt;util/twi.h&gt;</code><br />
+<code>#include &lt;util/delay.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &lt;stddef.h&gt;</code><br />
@@ -166,7 +167,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 
 <p>The initial <a class="el" href="class_i2_c.html">I2C</a> frequency in Hz. </p>
-<p>Defaults to 100000 Hz. <br  />
+<p>Defaults to 100000 Hz, with a maximum of 400000 Hz. <br  />
 Standard frequencies: <br  />
 100000 Hz - Standard Mode <br  />
 400000 Hz - Fast Mode </p>
