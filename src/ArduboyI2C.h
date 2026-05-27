@@ -693,7 +693,7 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             }
 #else
             while (i2c_detail::handshakeState < i) { }
-#endif
+#endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
             return i;
         case TW_SUCCESS:
