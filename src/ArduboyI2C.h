@@ -986,7 +986,7 @@ TW_ST_SLA_ACK:
 
     cp r30, __zero_reg__
     cpc r31, __zero_reg__
-
+    breq skip_request_function
     icall
 skip_request_function:
     ; restore Z pointer
