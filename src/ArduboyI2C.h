@@ -39,12 +39,14 @@ SOFTWARE.
 /** \brief
  * The initial I2C frequency in Hz.
  * \details
- * Defaults to 100000 Hz. \n
+ * Defaults to 100000 Hz, with a maximum of 400000 Hz. \n
  * Standard frequencies: \n
  * 100000 Hz - Standard Mode \n
  * 400000 Hz - Fast Mode
  */
 #define I2C_FREQUENCY 100000
+#elif I2C_FREQUENCY > 400000
+#error "I2C_FREQUENCY is too high."
 #endif
 
 #ifndef I2C_BUFFER_SIZE
