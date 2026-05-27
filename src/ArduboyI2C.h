@@ -30,6 +30,7 @@ SOFTWARE.
 #include <avr/interrupt.h>
 #include <avr/power.h>
 #include <util/twi.h>
+#include <util/delay.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -516,7 +517,8 @@ bool checkCableFlippedCore(bool disconnectFlip = false) {
         if (I2C_PIN & _BV(I2C_SDA_BIT)) { sdaHigh++; }
         if (I2C_PIN & _BV(I2C_SCL_BIT)) { sclHigh++; }
         // half-period delay (otherwise way too fast to detect changes)
-        delayMicroseconds((unsigned int)(1000000.0f / I2C_FREQUENCY / 2.0f));
+        // double will be optimized away into constant cycle loop
+        _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
     // if the cable disconnected (both lines high) for the entire check
     // and disconnectFlip is true, return true (flipped)
