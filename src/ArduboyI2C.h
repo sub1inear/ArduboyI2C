@@ -579,9 +579,9 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
     i2c_detail::data.slaRW = address << 1 | TW_WRITE;
 
-#ifdef I2C_USE_CHECK_BUS_BUSY
+#if I2C_USE_CHECK_BUS_BUSY
     if (i2c_detail::checkBusBusy()) { return; }
-#endif // #ifdef I2C_USE_CHECK_BUS_BUSY
+#endif // #if I2C_USE_CHECK_BUS_BUSY
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     if (wait) {
@@ -602,9 +602,9 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 
     i2c_detail::data.slaRW = address << 1 | TW_READ;
 
-#ifdef I2C_USE_CHECK_BUS_BUSY
+#if I2C_USE_CHECK_BUS_BUSY
     if (i2c_detail::checkBusBusy()) { return; }
-#endif // #ifdef I2C_USE_CHECK_BUS_BUSY
+#endif // #if I2C_USE_CHECK_BUS_BUSY
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     while (i2c_detail::data.active) {}
@@ -686,7 +686,7 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             // so we send 0b00000000 to have SDA never change
             // while detecting it.
 
-#ifdef I2C_USE_CHECK_CABLE_FLIPPED
+#if I2C_USE_CHECK_CABLE_FLIPPED
             dummy = 0b00000000;
             while (i2c_detail::handshakeState < i) {
                 I2C::write(I2C_GENERAL_CALL, dummy, true);
