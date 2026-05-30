@@ -583,7 +583,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
 
-    i2c_detail::data.bufferIdx = 0;
+    i2c_detail::data.bufferSize = size;
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     if (wait) {
