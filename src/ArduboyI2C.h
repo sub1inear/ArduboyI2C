@@ -582,9 +582,8 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     i2c_detail::readWriteStart(address, TW_WRITE);
 
-    for (uint8_t i = 0; i < size; i++) {
-        i2c_detail::data.twiBuffer[i] = ((const uint8_t *)buffer)[i];
-    }
+    memcpy(i2c_detail::data.twiBuffer, buffer, size);
+
     i2c_detail::data.bufferIdx = 0;
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
@@ -606,9 +605,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 void I2C::transmit(const void *buffer, uint8_t size) {
     uint8_t decSize = i2c_detail::data.bufferSize - 1;
     uint8_t endSize = decSize + size;
-    for (uint8_t i = decSize; i < endSize; i++) {
-        i2c_detail::data.twiBuffer[i] = ((uint8_t *)buffer)[i];
-    }
+    memcpy(i2c_detail::data.twiBuffer + decSize, buffer, size);
     i2c_detail::data.bufferSize = endSize;
 }
 
