@@ -603,9 +603,8 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 
 void I2C::reply(const void *buffer, uint8_t size) {
     uint8_t decSize = i2c_detail::data.bufferSize - 1;
-    uint8_t endSize = decSize + size;
     memcpy(i2c_detail::data.twiBuffer + decSize, buffer, size);
-    i2c_detail::data.bufferSize = endSize;
+    i2c_detail::data.bufferSize = decSize + size;
 }
 
 void I2C::onRequest(void (*function)()) {
