@@ -201,7 +201,7 @@ SOFTWARE.
  * \details
  * I2C uses a 7-bit addressing scheme with 128 available unique addresses.
  * However, addresses 0-7 and 120-127 are reserved by the standard and should not be used.
- * This leaves 112 unique addresses, and by exention, ids, for a device to use.
+ * This leaves 112 unique addresses, and by extension, ids, for a device to use.
  */
 #define I2C_MAX_IDS 112
 
