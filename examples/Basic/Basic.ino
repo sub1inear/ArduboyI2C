@@ -91,8 +91,8 @@ void setup() {
     // note: I2C::handshake enables general calls by default
     id = I2C::handshake(numPlayers);
 
-    // if the handshaking failed (numPlayers has been reached already), exit
-    if (id == I2C_HANDSHAKE_FAILED) {
+    // if the handshaking is full (numPlayers has been reached already), exit
+    if (id == I2C_HANDSHAKE_FULL) {
         arduboy.exitToBootloader();
     }
     // setup our receive event to be called when we receive a write
@@ -113,6 +113,7 @@ void loop() {
     players[id].y += arduboy.pressed(DOWN_BUTTON) - arduboy.pressed(UP_BUTTON);
 
     // send out a general call to give every other device our data
+    // false -> will not wait for the write to complete
     I2C::write(I2C_GENERAL_CALL, players[id], false);
     // draw all of the players
     for (uint8_t i = 0; i < numPlayers; i++) {

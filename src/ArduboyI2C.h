@@ -194,7 +194,7 @@ SOFTWARE.
 /** \brief
  * Error code returned by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
  */
-#define I2C_HANDSHAKE_FAILED 0xFE
+#define I2C_HANDSHAKE_FULL 0xFE
 
 /** \brief
  * The maximum amount of ids available to a device.
