@@ -187,7 +187,7 @@ SOFTWARE.
 #define I2C_GENERAL_CALL 0x00
 
 /** \brief
- * Error code used to mean success, returned by I2C::getTWError().
+ * Error code used to mean success, returned by I2C::getError().
  */
 #define TW_SUCCESS 0xFF
 
@@ -408,7 +408,7 @@ public:
      * \return A byte indicating the error. TW_SUCCESS means no error has occurred.
      * The full list of error codes are available in the avr utils\twi.h.
      */
-    static uint8_t getTWError();
+    static uint8_t getError();
 
     /** \brief
      * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
@@ -617,7 +617,7 @@ void I2C::onReceive(void (*function)(const uint8_t *buffer, uint8_t size)) {
     i2c_detail::data.onReceiveFunction = function;
 }
 
-uint8_t I2C::getTWError() {
+uint8_t I2C::getError() {
     return i2c_detail::data.error;
 }
 
@@ -666,7 +666,7 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
 
         I2C::read(address, dummy);
 
-        switch (I2C::getTWError()) {
+        switch (I2C::getError()) {
         case TW_MR_SLA_NACK:
             I2C::onRequest(i2c_detail::handshakeOnRequest);
             I2C::setAddress(address);
