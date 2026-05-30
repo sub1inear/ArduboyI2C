@@ -182,12 +182,12 @@ SOFTWARE.
 /** \brief
  * The address used for general calls.
  * \details
- * General calls are sent to this address and are received by all devices on the bus.
+ * General calls are sent to this address and are received by every device on the bus.
  */
 #define I2C_GENERAL_CALL 0x00
 
 /** \brief
- * Error code used to mean success, returned by I2C::getError().
+ * Error code returned by I2C::error(), meaning success.
  */
 #define TW_SUCCESS 0xFF
 
@@ -320,12 +320,12 @@ public:
     static void read(uint8_t address, T *object) = delete;
 
     /** \brief
-     * Transmits data back to the controller (master).
-     * \param buffer A pointer to the data to send.
-     * \param size The amount of the data in bytes to send.
+     * Replies back to the controller (master).
+     * \param buffer A pointer to the data to reply with.
+     * \param size The amount of the data in bytes to reply with.
      * \details
      * This function is intended to be called inside the onRequest callback.
-     * It fills the transmitting buffer with data to then be send one byte at a time.
+     * It fills the reply buffer with data to then be send one byte at a time.
      * It may be called multiple times to accumulate data.
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
@@ -333,15 +333,15 @@ public:
      * must be defined before including to be larger.
      * \see write() onRequest()
      */
-    static void transmit(const void *buffer, uint8_t size);
+    static void reply(const void *buffer, uint8_t size);
 
     /** \brief
-     * Transmits an object back to the controller (master).
-     * \tparam T The type of the object to transmit.
-     * \param object A reference to the object to send.
+     * Replies back to the controller (master).
+     * \tparam T The type of the object to reply with.
+     * \param object A reference to the object to reply with.
      * \details
      * This function is intended to be called inside the onRequest callback.
-     * It fills the transmitting buffer with data to then be send one byte at a time.
+     * It fills the reply buffer with data to then be send one byte at a time.
      * It may be called multiple times to accumulate data.
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
@@ -350,16 +350,16 @@ public:
      * \see write() onRequest()
      */
     template <typename T>
-    static void transmit(const T &object) {
+    static void reply(const T &object) {
         static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
-        I2C::transmit((const void *)&object, sizeof(T));
+        I2C::reply((const void *)&object, sizeof(T));
     }
 
     /*
      * This function is deleted to prevent accidental use with pointers.
      */
     template <typename T>
-    static void transmit(T *object) = delete;
+    static void reply(T *object) = delete;
 
     /** \brief
      * Sets up/disables the callback to be called when data is requested from the device's address (a read).
@@ -368,7 +368,7 @@ public:
      * Example Callback and Usage:
      * \code{.cpp}
      * void dataRequest() {
-     *   I2C::transmit(players[id]);
+     *   I2C::reply(players[id]);
      * }
      * ...
      * void setup() {
@@ -377,8 +377,8 @@ public:
      * }
      * \endcode
      * \note
-     * To respond to the controller (master), use `transmit` instead of `write`.
-     * \see onReceive() transmit() read()
+     * To respond to the controller (master), use `reply` instead of `write`.
+     * \see onReceive() reply() read()
      */
     static void onRequest(void (*function)());
 
@@ -399,7 +399,7 @@ public:
      *   I2C::onReceive(dataReceive);
      * }
      * \endcode
-     * \see onRequest() write()
+     * \see onRequest() reply() read()
      */
     static void onReceive(void (*function)(const uint8_t *buffer, uint8_t size));
 
@@ -408,7 +408,7 @@ public:
      * \return A byte indicating the error. TW_SUCCESS means no error has occurred.
      * The full list of error codes are available in the avr utils\twi.h.
      */
-    static uint8_t getError();
+    static uint8_t error();
 
     /** \brief
      * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
@@ -445,7 +445,7 @@ public:
      * \details
      * This function is provided to standardize addresses for each id. It is used by I2C::handshake.
      */
-    static uint8_t getAddressFromId(uint8_t id);
+    static uint8_t idToAddress(uint8_t id);
 
     /** \brief
      * Handshakes with other devices and returns a unique id once complete.
@@ -470,7 +470,6 @@ volatile uint8_t handshakeState;
 
 void handshakeOnRequest() {
     handshakeState++;
-    I2C::transmit(handshakeState);
 }
 #endif // #if I2C_USE_HANDSHAKE
 
@@ -496,7 +495,7 @@ bool checkBusBusy() {
         if ((I2C_PIN & _BV(I2C_SDA_BIT)) && (I2C_PIN & _BV(I2C_SCL_BIT))) {
             busyChecks--;
         } else {
-            i2c_detail::data.error = TW_MT_ARB_LOST;
+            i2c_detail::data.error = TW_MT_ARB_LOST; // same as TW_MR_ARB_LOST
             i2c_detail::data.active = false;
             return true;
         }
@@ -602,7 +601,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     while (i2c_detail::data.active) {}
 }
 
-void I2C::transmit(const void *buffer, uint8_t size) {
+void I2C::reply(const void *buffer, uint8_t size) {
     uint8_t decSize = i2c_detail::data.bufferSize - 1;
     uint8_t endSize = decSize + size;
     memcpy(i2c_detail::data.twiBuffer + decSize, buffer, size);
@@ -617,7 +616,7 @@ void I2C::onReceive(void (*function)(const uint8_t *buffer, uint8_t size)) {
     i2c_detail::data.onReceiveFunction = function;
 }
 
-uint8_t I2C::getError() {
+uint8_t I2C::error() {
     return i2c_detail::data.error;
 }
 
@@ -654,7 +653,7 @@ bool I2C::detectEmulator() {
     return !(TWCR & _BV(TWWC));
 }
 
-uint8_t I2C::getAddressFromId(uint8_t id) {
+uint8_t I2C::idToAddress(uint8_t id) {
     return 0x8 + id;
 }
 
@@ -662,11 +661,11 @@ uint8_t I2C::getAddressFromId(uint8_t id) {
 uint8_t I2C::handshake(uint8_t numPlayers) {
     for (int8_t i = numPlayers - 1; i >= 0; ) {
         uint8_t dummy;
-        uint8_t address = I2C::getAddressFromId(i);
+        uint8_t address = I2C::idToAddress(i);
 
         I2C::read(address, dummy);
 
-        switch (I2C::getError()) {
+        switch (I2C::error()) {
         case TW_MR_SLA_NACK:
             I2C::onRequest(i2c_detail::handshakeOnRequest);
             I2C::setAddress(address);
