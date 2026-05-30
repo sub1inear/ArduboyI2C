@@ -324,9 +324,9 @@ public:
      * \param buffer A pointer to the data to send.
      * \param size The amount of the data in bytes to send.
      * \details
-     * This function is intended to be called once inside the onRequest callback.
+     * This function is intended to be called inside the onRequest callback.
      * It fills the transmitting buffer with data to then be send one byte at a time.
-     * If it is called multiple times, only the last call will be sent.
+     * It may be called multiple times to accumulate data.
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
@@ -340,9 +340,9 @@ public:
      * \tparam T The type of the object to transmit.
      * \param object A reference to the object to send.
      * \details
-     * This function is intended to be called once inside the onRequest callback.
+     * This function is intended to be called inside the onRequest callback.
      * It fills the transmitting buffer with data to then be send one byte at a time.
-     * If it is called multiple times, only the last call will be sent.
+     * It may be called multiple times to accumulate data.
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
@@ -378,8 +378,6 @@ public:
      * \endcode
      * \note
      * To respond to the controller (master), use `transmit` instead of `write`.
-     * \note
-     * If no bytes are send in the callback, the result of the transmission is undefined.
      * \see onReceive() transmit() read()
      */
     static void onRequest(void (*function)());
@@ -615,11 +613,12 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 }
 
 void I2C::transmit(const void *buffer, uint8_t size) {
-    for (uint8_t i = 0; i < size; i++) {
+    uint8_t decSize = i2c_detail::data.bufferSize - 1;
+    uint8_t endSize = decSize + size;
+    for (uint8_t i = decSize; i < endSize; i++) {
         i2c_detail::data.twiBuffer[i] = ((uint8_t *)buffer)[i];
     }
-    i2c_detail::data.bufferIdx = 0;
-    i2c_detail::data.bufferSize = size;
+    i2c_detail::data.bufferSize = endSize;
 }
 
 void I2C::onRequest(void (*function)()) {
@@ -981,6 +980,11 @@ TW_ST_ARB_LOST_SLA_ACK:
 TW_ST_SLA_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18
+    ; i2c_detail::data.bufferIdx = 0;
+    std Y + %[bufferIdx], __zero_reg__
+    ; i2c_detail::data.bufferSize = 1;
+    ldi r26, 1
+    std Y + %[bufferSize], r26
     ; if (i2c_detail::data.onRequestFunction) {
     ;     i2c_detail::data.onRequestFunction();
     ; }
@@ -990,9 +994,11 @@ TW_ST_SLA_ACK:
 
     cp r30, __zero_reg__
     cpc r31, __zero_reg__
-    breq skip_request_function
+    breq 1f
     icall
-skip_request_function:
+
+    1:
+
     ; restore Z pointer
     ldi r30, TWPTR
     clr r31
@@ -1132,6 +1138,8 @@ ISR(TWI_vect) {
     case TW_ST_SLA_ACK:
     case TW_ST_ARB_LOST_SLA_ACK:
         i2c_detail::data.active = true;
+        i2c_detail::data.bufferIdx = 0;
+        i2c_detail::data.bufferSize = 1;
         if (i2c_detail::data.onRequestFunction) {
             i2c_detail::data.onRequestFunction();
         }
