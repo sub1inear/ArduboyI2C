@@ -543,6 +543,18 @@ uint16_t millisShort() {
 }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
+void readWriteStart(uint8_t address, bool readWrite) {
+    while (i2c_detail::data.active) {}
+    i2c_detail::data.active = true;
+
+    i2c_detail::data.error = TW_SUCCESS;
+    i2c_detail::data.slaRW = address << 1 | readWrite;
+    i2c_detail::data.bufferIdx = 0;
+
+#if I2C_USE_CHECK_BUS_BUSY
+    if (i2c_detail::checkBusBusy()) { return; }
+#endif // #if I2C_USE_CHECK_BUS_BUSY
+}
 }
 
 void I2C::begin() {
@@ -568,22 +580,12 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
 }
 
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
-    while (i2c_detail::data.active) {}
-    i2c_detail::data.active = true;
+    i2c_detail::readWriteStart(address, TW_WRITE);
 
     for (uint8_t i = 0; i < size; i++) {
         i2c_detail::data.twiBuffer[i] = ((const uint8_t *)buffer)[i];
     }
     i2c_detail::data.bufferIdx = 0;
-    i2c_detail::data.bufferSize = size;
-
-    i2c_detail::data.error = TW_SUCCESS;
-
-    i2c_detail::data.slaRW = address << 1 | TW_WRITE;
-
-#if I2C_USE_CHECK_BUS_BUSY
-    if (i2c_detail::checkBusBusy()) { return; }
-#endif // #if I2C_USE_CHECK_BUS_BUSY
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     if (wait) {
@@ -592,21 +594,10 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 }
 
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
-    while (i2c_detail::data.active) {}
-    i2c_detail::data.active = true;
+    i2c_detail::readWriteStart(address, TW_READ);
 
     i2c_detail::data.rxBuffer = (uint8_t *)buffer;
-
-    i2c_detail::data.bufferIdx = 0;
     i2c_detail::data.bufferSize = size - 1;
-
-    i2c_detail::data.error = TW_SUCCESS;
-
-    i2c_detail::data.slaRW = address << 1 | TW_READ;
-
-#if I2C_USE_CHECK_BUS_BUSY
-    if (i2c_detail::checkBusBusy()) { return; }
-#endif // #if I2C_USE_CHECK_BUS_BUSY
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     while (i2c_detail::data.active) {}
