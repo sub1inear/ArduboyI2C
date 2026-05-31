@@ -16,7 +16,7 @@ var _arduboy_i2_c_8h =
     [ "I2C_DDR", "_arduboy_i2_c_8h.html#ab4386d053f69f39963bebf5f03b6eeee", null ],
     [ "I2C_GENERAL_CALL", "_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4", null ],
     [ "TW_SUCCESS", "_arduboy_i2_c_8h.html#aaa8a379ca27da629fb7eb67cacc5d86a", null ],
-    [ "I2C_HANDSHAKE_FAILED", "_arduboy_i2_c_8h.html#a439f3615789ffec435412484d25e584d", null ],
+    [ "I2C_HANDSHAKE_FULL", "_arduboy_i2_c_8h.html#a7de1c5a6ceac4c8213b51a9dd54c9bf6", null ],
     [ "I2C_MAX_IDS", "_arduboy_i2_c_8h.html#aeddb4fb18bc6bd7822797a2029c5fff6", null ],
     [ "I2C_LIB_VER", "_arduboy_i2_c_8h.html#a89cb379c38e2b4b8e1a1c00df7d6ab45", null ]
 ];
