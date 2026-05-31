@@ -377,6 +377,8 @@ public:
      * }
      * \endcode
      * \note
+     * Interrupts are disabled during this callback.
+     * Any functions called within it should not rely on interrupts (i.e. no `Serial`, `delay`, `millis`, etc.).
      * To respond to the controller (master), use `reply` instead of `write`.
      * \see onReceive() reply() read()
      */
@@ -549,10 +551,6 @@ void readWriteStart(uint8_t address, bool readWrite) {
     i2c_detail::data.error = TW_SUCCESS;
     i2c_detail::data.slaRW = address << 1 | readWrite;
     i2c_detail::data.bufferIdx = 0;
-
-#if I2C_USE_CHECK_BUS_BUSY
-    if (i2c_detail::checkBusBusy()) { return; }
-#endif // #if I2C_USE_CHECK_BUS_BUSY
 }
 }
 
@@ -585,6 +583,10 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
     i2c_detail::data.bufferSize = size;
 
+#if I2C_USE_CHECK_BUS_BUSY
+    if (i2c_detail::checkBusBusy()) { return; }
+#endif // #if I2C_USE_CHECK_BUS_BUSY
+
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     if (wait) {
         while (i2c_detail::data.active) {}
@@ -597,14 +599,19 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::data.rxBuffer = (uint8_t *)buffer;
     i2c_detail::data.bufferSize = size - 1;
 
+#if I2C_USE_CHECK_BUS_BUSY
+    if (i2c_detail::checkBusBusy()) { return; }
+#endif // #if I2C_USE_CHECK_BUS_BUSY
+
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
     while (i2c_detail::data.active) {}
 }
 
 void I2C::reply(const void *buffer, uint8_t size) {
-    uint8_t decSize = i2c_detail::data.bufferSize - 1;
-    memcpy(i2c_detail::data.twiBuffer + decSize, buffer, size);
-    i2c_detail::data.bufferSize = decSize + size;
+    // cache to avoid volatile access
+    uint8_t bufferSize = i2c_detail::data.bufferSize;
+    memcpy(i2c_detail::data.twiBuffer + bufferSize, buffer, size);
+    i2c_detail::data.bufferSize = bufferSize + size;
 }
 
 void I2C::onRequest(void (*function)()) {
@@ -629,7 +636,7 @@ void I2C::checkCableFlipped(void (*function)()) {
         // inform the user of the flipped cable
         function();
         // wait for cable to be flipped back
-        // debounce cable changes for 1 second
+        // debounce cable changes
         uint16_t start = i2c_detail::millisShort();
         while (true) {
             if (i2c_detail::checkCableFlippedCore(true)) {
@@ -690,7 +697,7 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             break;
         }
     }
-    return I2C_HANDSHAKE_FAILED;
+    return I2C_HANDSHAKE_FULL;
 }
 
 #endif // #if I2C_USE_HANDSHAKE
@@ -968,9 +975,9 @@ TW_ST_SLA_ACK:
     std Y + %[active], r18
     ; i2c_detail::data.bufferIdx = 0;
     std Y + %[bufferIdx], __zero_reg__
-    ; i2c_detail::data.bufferSize = 1;
-    ldi r26, 1
-    std Y + %[bufferSize], r26
+    ; i2c_detail::data.bufferSize = 0;
+    std Y + %[bufferSize], __zero_reg__
+
     ; if (i2c_detail::data.onRequestFunction) {
     ;     i2c_detail::data.onRequestFunction();
     ; }
@@ -984,6 +991,19 @@ TW_ST_SLA_ACK:
     icall
 
     1:
+    ; if (i2c_detail::data.bufferSize == 0) {
+    ;     TWDR = 0;
+    ;     TWCR = REPLY_NACK;
+    ;     return;
+    ; }
+    ldd r18, Y + %[bufferSize]
+    tst r18
+    brne 2f
+    std Z + TWCR, __zero_reg__
+    ldi r26, REPLY_NACK
+    std Z + TWCR, r26
+    rjmp pop_reti
+    2:
 
     ; restore Z pointer
     ldi r30, TWPTR
@@ -1125,9 +1145,12 @@ ISR(TWI_vect) {
     case TW_ST_ARB_LOST_SLA_ACK:
         i2c_detail::data.active = true;
         i2c_detail::data.bufferIdx = 0;
-        i2c_detail::data.bufferSize = 1;
+        i2c_detail::data.bufferSize = 0;
         if (i2c_detail::data.onRequestFunction) {
             i2c_detail::data.onRequestFunction();
+        }
+        if (i2c_detail::data.bufferSize == 0) {
+            i2c_detail::data.bufferSize = 1;
         }
         __attribute__((fallthrough));
     case TW_ST_DATA_ACK:
