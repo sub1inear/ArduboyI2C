@@ -436,7 +436,7 @@ public:
      * Checks if an emulator without I2C support is being used to run the code.
      * \return True if an emulator without I2C support has been detected and false if it has not
      */
-    static bool detectEmulator();
+    static bool checkEmulator();
 
     /** \brief
      * Gets the address from a provided id.
@@ -645,7 +645,7 @@ void I2C::checkCableFlipped(void (*function)()) {
 }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
-bool I2C::detectEmulator() {
+bool I2C::checkEmulator() {
     // TWWC is set when TWDR is written to without TWINT being set
     // not done in emulator
     TWDR = 0;

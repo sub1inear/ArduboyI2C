@@ -41,6 +41,8 @@ struct Player {
 Player players[numPlayers];
 
 // stores unique id from 0 to numPlayers - 1
+// our index into the players array (players[id] is us)
+// assigned during handshake
 uint8_t id;
 
 void displayMessage(const __FlashStringHelper *message) {
@@ -54,11 +56,15 @@ void onReceive(const uint8_t *buffer, uint8_t size) {
     // interpret the received data as a player struct
     Player *newPlayer = (Player *)buffer;
 
-    // copy everything except the id (it is only used to identify the message)
+    // with the id field, find the player struct which corresponds to the sender
     Player *curPlayer = &players[newPlayer->id];
+
+    // copy the position data into our local copy of that player's data
+    // no need to copy id, only for identifying the message
     curPlayer->x = newPlayer->x;
     curPlayer->y = newPlayer->y;
 }
+
 // main functions
 void setup() {
     // initialize arduboy hardware
@@ -68,7 +74,7 @@ void setup() {
     I2C::begin();
 
     // if an emulator without I2C support is detected, ...
-    if (I2C::detectEmulator()) {
+    if (I2C::checkEmulator()) {
         // display a message
         displayMessage(F("Emulator does not\nsupport I2C."));
         // wait forever
@@ -77,9 +83,10 @@ void setup() {
 
     // check if the cable is flipped
     // calls function to display message if it is flipped
+    // waits for it to be flipped back
     // only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable
     I2C::checkCableFlipped([]() {
-        // display cable flipped message
+        // cable is flipped, display message
         displayMessage(F("Please flip the cable\non this device."));
     });
 
@@ -97,7 +104,8 @@ void setup() {
     }
     // setup our receive event to be called when we receive a write
     I2C::onReceive(onReceive);
-    // identify our player data packets
+
+    // identify our player data packets so the receiver knows who sent them
     players[id].id = id;
 }
 
@@ -108,13 +116,17 @@ void loop() {
     }
     // clear screen
     arduboy.clear();
+
     // move our player around with the D-Pad
-    players[id].x += arduboy.pressed(RIGHT_BUTTON) - arduboy.pressed(LEFT_BUTTON);
-    players[id].y += arduboy.pressed(DOWN_BUTTON) - arduboy.pressed(UP_BUTTON);
+    if (arduboy.pressed(RIGHT_BUTTON)) { players[id].x++; }
+    if (arduboy.pressed(LEFT_BUTTON))  { players[id].x--; }
+    if (arduboy.pressed(DOWN_BUTTON))  { players[id].y++; }
+    if (arduboy.pressed(UP_BUTTON))    { players[id].y--; }
 
     // send out a general call to give every other device our data
     // false -> will not wait for the write to complete
     I2C::write(I2C_GENERAL_CALL, players[id], false);
+
     // draw all of the players
     for (uint8_t i = 0; i < numPlayers; i++) {
         arduboy.fillRect(players[i].x, players[i].y, 8, 8);
