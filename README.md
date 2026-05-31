@@ -1,3 +1,9 @@
+![Release](https://img.shields.io/github/v/release/sub1inear/ArduboyI2C?label=Release)
+![License](https://img.shields.io/github/license/sub1inear/ArduboyI2C?label=License)
+![Arduino Library](https://img.shields.io/badge/Arduino-Library-00979D?logo=arduino)
+![PlatformIO Registry](https://img.shields.io/badge/PlatformIO-Registry-orange?logo=platformio)
+[![Docs](https://img.shields.io/badge/Docs-Online-blue)](https://sub1inear.github.io/ArduboyI2C/)
+
 # ArduboyI2C Library
 The **ArduboyI2C** library provides I2C support for Arduboy multiplayer games. It includes standard I2C functionality, support for multi-controller (master) setups, and helpers for multiplayer handshakes while keeping PROGMEM and RAM usage low.
 
