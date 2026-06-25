@@ -357,7 +357,7 @@ public:
      * \details
      * This function is intended to be called inside the onRequest callback.
      * It fills the reply buffer with data to then be send one byte at a time.
-     * It may be called multiple times to accumulate data.
+     * If it is called more than once, only the last call will be sent.
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
@@ -631,10 +631,8 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 }
 
 void I2C::reply(const void *buffer, uint8_t size) {
-    // cache to avoid volatile access
-    uint8_t bufferSize = i2c_detail::data.bufferSize;
-    memcpy(i2c_detail::data.twiBuffer + bufferSize, buffer, size);
-    i2c_detail::data.bufferSize = bufferSize + size;
+    memcpy(i2c_detail::data.twiBuffer, buffer, size);
+    i2c_detail::data.bufferSize = size;
 }
 
 void I2C::onRequest(void (*function)()) {
@@ -835,7 +833,7 @@ TW_MT_DATA_ACK:
     inc r26
     std Y + %[bufferIdx], r26
 
-    ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
     ; bufferIdx is already incremented so decrement to compensate
 
     clr r27
@@ -952,7 +950,7 @@ TW_SR_GCALL_DATA_ACK:
     inc r26
     std Y + %[bufferIdx], r26
 
-    ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
     ; bufferIdx is already incremented so decrement to compensate
 
     clr r27
@@ -997,8 +995,10 @@ TW_ST_SLA_ACK:
     std Y + %[active], r18
     ; i2c_detail::data.bufferIdx = 0;
     std Y + %[bufferIdx], __zero_reg__
-    ; i2c_detail::data.bufferSize = 0;
-    std Y + %[bufferSize], __zero_reg__
+    ; default to sending 1 junk byte if the user does not fill buffer
+    ; i2c_detail::data.bufferSize = 1;
+    ldi r26, 1
+    std Y + %[bufferSize], r26
 
     ; if (i2c_detail::data.onRequestFunction) {
     ;     i2c_detail::data.onRequestFunction();
@@ -1012,17 +1012,6 @@ TW_ST_SLA_ACK:
     breq 1f
     icall
 
-    1:
-    ; if (i2c_detail::data.bufferSize == 0) {
-    ;     i2c_detail::data.bufferSize = 1;
-    ; }
-    ldd r18, Y + %[bufferSize]
-    tst r18
-    brne 2f
-    ldi r26, 1
-    std Y + %[bufferSize], r26
-    2:
-
     ; restore Z pointer
     ldi r30, TWPTR
     clr r31
@@ -1033,7 +1022,7 @@ TW_ST_DATA_ACK:
     inc r26
     std Y + %[bufferIdx], r26
 
-    ; Use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
     ; bufferIdx is already incremented so decrement to compensate
 
     clr r27
@@ -1163,12 +1152,9 @@ ISR(TWI_vect) {
     case TW_ST_ARB_LOST_SLA_ACK:
         i2c_detail::data.active = true;
         i2c_detail::data.bufferIdx = 0;
-        i2c_detail::data.bufferSize = 0;
+        i2c_detail::data.bufferSize = 1; // default to sending 1 junk byte if the user does not fill buffer
         if (i2c_detail::data.onRequestFunction) {
             i2c_detail::data.onRequestFunction();
-        }
-        if (i2c_detail::data.bufferSize == 0) {
-            i2c_detail::data.bufferSize = 1;
         }
         __attribute__((fallthrough));
     case TW_ST_DATA_ACK:
