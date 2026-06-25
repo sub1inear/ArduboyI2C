@@ -195,8 +195,6 @@ void setup() {
 	displayTest(F("write"), testWrite(id));
 	displayTest(F("checkEmulator"), testCheckEmulator());
 	displayTest(F("idToAddress"), testIdToAddress());
-
-	while (true) { }
 }
 
 void loop() {
