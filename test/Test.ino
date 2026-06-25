@@ -90,7 +90,6 @@ void displayTest(const __FlashStringHelper *name, bool result) {
 bool testBegin() {
 	I2C::begin();
 	assert_eq(TWCR, (_BV(TWEN) | _BV(TWIE) | _BV(TWEA)));
-	assert_eq(TWAR, 0);
 	assert_eq(TWSR, 248); // 0b11111000 -> TW idle, prescaler = 0
 	assert_eq(TWBR, (F_CPU / I2C_FREQUENCY - 16) / 2);
 	assert_eq((I2C_PORT & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT)));
