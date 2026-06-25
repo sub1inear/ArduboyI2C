@@ -972,16 +972,13 @@ TW_ST_SLA_ACK:
 
     1:
     ; if (i2c_detail::data.bufferSize == 0) {
-    ;     TWDR = 0;
-    ;     TWCR = REPLY_NACK;
-    ;     return;
+    ;     i2c_detail::data.bufferSize = 1;
     ; }
     ldd r18, Y + %[bufferSize]
     tst r18
     brne 2f
-    std Z + TWDR, __zero_reg__
-    ldi r26, REPLY_NACK
-    std Z + TWCR, r26
+    ldi r26, 1
+    std Y + %[bufferSize], r26
     rjmp pop_reti
     2:
 
