@@ -979,7 +979,6 @@ TW_ST_SLA_ACK:
     brne 2f
     ldi r26, 1
     std Y + %[bufferSize], r26
-    rjmp pop_reti
     2:
 
     ; restore Z pointer
