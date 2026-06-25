@@ -246,11 +246,24 @@ SOFTWARE.
 #define I2C_MAX_IDS 112
 
 /** \brief
+ * I2C library major version.
+ */
+#define I2C_VERSION_MAJOR 3
+/** \brief
+ * I2C library minor version.
+ */
+#define I2C_VERSION_MINOR 0
+/** \brief
+ * I2C library patch version.
+ */
+#define I2C_VERSION_PATCH 0
+
+/** \brief
  * I2C library version.
  * \details
- * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
+ * For a given version x.y.z, the library version will be in the form x * 10000 + y * 100 + z.
  */
-#define I2C_LIB_VER 30000
+#define I2C_VERSION (I2C_VERSION_MAJOR * 10000 + I2C_VERSION_MINOR * 100 + I2C_VERSION_PATCH)
 
 /** \brief
  * Not officially part of the library.
