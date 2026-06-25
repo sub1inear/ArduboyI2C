@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['features_0',['Features',['../index.html#autotoc_md2',1,'']]],
-  ['from_20wire_20library_1',['Migrating from Wire Library',['../index.html#autotoc_md9',1,'']]]
+  ['geterror_0',['getError',['../class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41',1,'I2C']]]
 ];

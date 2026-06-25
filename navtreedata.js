@@ -26,7 +26,7 @@ var NAVTREE =
 [
   [ "ArduboyI2C Library", "index.html", [
     [ "ArduboyI2C Library", "index.html#autotoc_md0", [
-      [ "Library Documentation", "index.html#autotoc_md1", null ],
+      [ "Documentation", "index.html#autotoc_md1", null ],
       [ "Features", "index.html#autotoc_md2", null ],
       [ "Why ArduboyI2C over Wire?", "index.html#autotoc_md3", null ],
       [ "Installation", "index.html#autotoc_md4", [
@@ -34,8 +34,15 @@ var NAVTREE =
         [ "PlatformIO", "index.html#autotoc_md6", null ]
       ] ],
       [ "Quick Start", "index.html#autotoc_md7", null ],
-      [ "Configuration", "index.html#autotoc_md8", null ],
-      [ "Migrating from Wire Library", "index.html#autotoc_md9", null ]
+      [ "Configuration", "index.html#autotoc_md8", [
+        [ "Core Settings", "index.html#autotoc_md9", null ],
+        [ "Reliability", "index.html#autotoc_md10", null ],
+        [ "Feature Flags", "index.html#autotoc_md11", null ]
+      ] ],
+      [ "Migrating from Wire Library", "index.html#autotoc_md12", null ]
+    ] ],
+    [ "Namespaces", "namespaces.html", [
+      [ "Namespace List", "namespaces.html", "namespaces_dup" ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],

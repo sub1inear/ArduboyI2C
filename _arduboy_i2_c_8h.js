@@ -1,6 +1,9 @@
 var _arduboy_i2_c_8h =
 [
+    [ "i2c_detail::is_pointer&lt; T &gt;", "structi2c__detail_1_1is__pointer.html", null ],
+    [ "i2c_detail::is_pointer&lt; T * &gt;", "structi2c__detail_1_1is__pointer_3_01_t_01_5_01_4.html", null ],
     [ "I2C", "class_i2_c.html", "class_i2_c" ],
+    [ "I2C_PLATFORM", "_arduboy_i2_c_8h.html#a621319d4e6b913f077d3c8339eb9b93b", null ],
     [ "I2C_FREQUENCY", "_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222", null ],
     [ "I2C_BUFFER_SIZE", "_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd", null ],
     [ "I2C_CHECK_BUS_BUSY_CHECKS", "_arduboy_i2_c_8h.html#aecf378ba83ad4073823cc7c41de5f14c", null ],
@@ -9,6 +12,7 @@ var _arduboy_i2_c_8h =
     [ "I2C_USE_HANDSHAKE", "_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650", null ],
     [ "I2C_USE_CHECK_BUS_BUSY", "_arduboy_i2_c_8h.html#a46613027f9a3fd1acede15144779992e", null ],
     [ "I2C_USE_CHECK_CABLE_FLIPPED", "_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4", null ],
+    [ "I2C_USE_SOFTWARE_PULLUPS", "_arduboy_i2_c_8h.html#ac318e96bb22b8d5710db448875fef550", null ],
     [ "I2C_SDA_BIT", "_arduboy_i2_c_8h.html#ab37c7049d3f4f3dc7d89b5c02e88f7c7", null ],
     [ "I2C_SCL_BIT", "_arduboy_i2_c_8h.html#a5e7834d040f89e2e7fc864785e80f981", null ],
     [ "I2C_PIN", "_arduboy_i2_c_8h.html#ab7540bab4da9f607f5b7f9266837207c", null ],

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['error_0',['error',['../class_i2_c.html#a3f2aa82fad13d5becceb90b7cae8ad18',1,'I2C']]]
+  ['geterror_0',['getError',['../class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41',1,'I2C']]]
 ];
