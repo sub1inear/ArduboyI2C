@@ -161,8 +161,10 @@ SOFTWARE.
  */
 #if I2C_PLATFORM == I2C_PLATFORM_FX_C
 #define I2C_USE_SOFTWARE_PULLUPS 1
-#else
+#elif I2C_PLATFORM == I2C_PLATFORM_MINI
 #define I2C_USE_SOFTWARE_PULLUPS 0
+#else
+#error "I2C_USE_SOFTWARE_PULLUPS must be defined for unknown platforms."
 #endif
 #endif
 
