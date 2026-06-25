@@ -80,6 +80,8 @@ void requestCallback() {
 
 ## Configuration
 Define these before including `ArduboyI2C.h` to customize behavior:
+- `I2C_PLATFORM` (no default, must be defined), set to `I2C_PLATFORM_MINI`, `I2C_PLATFORM_FX_C`, or `I2C_PLATFORM_UNKNOWN` for full manual control.
+    - This sets the default values for other configuration options which may be overridden.
 - `I2C_FREQUENCY` (default 100000), increase for faster communication
 - `I2C_BUFFER_SIZE` (default 32), max bytes per I2C transaction
 - `I2C_CHECK_BUS_BUSY_CHECKS` (default 16), increase if the program freezes during reads/writes
@@ -87,7 +89,8 @@ Define these before including `ArduboyI2C.h` to customize behavior:
 - `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT` (default 1000 ms), increase to allow more time for cable flip debounce
 - `I2C_USE_HANDSHAKE` (default 1), set to 0 to disable the handshake function if using a custom one
 - `I2C_USE_CHECK_BUS_BUSY` (default 1), set to 0 to disable bus busy checks
-- `I2C_USE_CHECK_CABLE_FLIPPED` (default 1), set to 0 to disable cable flip detection for FX-C
+- `I2C_USE_CHECK_CABLE_FLIPPED` (default 1 on the FX-C and 0 on the Mini), set to 0 to disable cable flip detection
+- `I2C_USE_SOFTWARE_PULLUPS` (default 1 on the FX-C and 0 on the Mini), set to 0 if you have external pullups on the SDA and SCL lines
 
 ## Migrating from Wire Library
 - `Wire.begin()`

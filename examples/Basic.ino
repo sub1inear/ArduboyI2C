@@ -24,6 +24,8 @@ SOFTWARE.
 #include <Arduboy2.h>
 // define in one file before including
 #define I2C_IMPLEMENTATION
+// must define the platform being used (FX-C or Mini)
+#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include "ArduboyI2C.h"
 
 constexpr uint8_t numPlayers = 2;

@@ -35,6 +35,24 @@ SOFTWARE.
 #include <stdint.h>
 #include <stddef.h>
 
+#define I2C_PLATFORM_FX_C 0
+#define I2C_PLATFORM_MINI 1
+#define I2C_PLATFORM_UNKNOWN 2
+
+#ifdef __DOXYGEN__
+/** \brief
+ * The Arduboy platform being used (FX-C or Mini).
+ * \details
+ * There is no default; this must be defined before including.
+ */
+#define I2C_PLATFORM
+#else
+#ifndef I2C_PLATFORM
+#error "Must define I2C_PLATFORM before including."
+#endif
+#endif
+
+
 #ifndef I2C_FREQUENCY
 /** \brief
  * The initial I2C frequency in Hz.
@@ -122,10 +140,30 @@ SOFTWARE.
 /** \brief
  * Whether or not to enable flipped cable detection functionality.
  * \details
- * Defaults to 1.
- * Set to 0 if you do not need to detect flipped cables (e.g. you are only targeting the Arduboy Mini) to save memory.
+ * Default is 1 on the FX-C and 0 on the Mini.
+ * Set to 0 if you do not need to detect flipped cables to save memory.
  */
+#if I2C_PLATFORM == I2C_PLATFORM_FX_C
 #define I2C_USE_CHECK_CABLE_FLIPPED 1
+#elif I2C_PLATFORM == I2C_PLATFORM_MINI
+#define I2C_USE_CHECK_CABLE_FLIPPED 0
+#else
+#error "I2C_USE_CHECK_CABLE_FLIPPED must be defined for unknown platforms."
+#endif
+#endif
+
+#ifndef I2C_USE_SOFTWARE_PULLUPS
+/** \brief
+ * Whether or not to enable software pullups on the SDA and SCL lines.
+ * \details
+ * Default is 1 on the FX-C and 0 on the Mini.
+ * Set to 0 if you have external pullups on the SDA and SCL lines to save memory.
+ */
+#if I2C_PLATFORM == I2C_PLATFORM_FX_C
+#define I2C_USE_SOFTWARE_PULLUPS 1
+#else
+#define I2C_USE_SOFTWARE_PULLUPS 0
+#endif
 #endif
 
 #ifndef I2C_SDA_BIT
@@ -548,9 +586,11 @@ void I2C::begin() {
     // so we clear it here to prevent any issues with handshakes.
     TWAR = 0;
 
-    // enable internal pullups
+#if I2C_USE_SOFTWARE_PULLUPS
+    // enable software pullups
     I2C_DDR &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
     I2C_PORT |= _BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT);
+#endif // #if I2C_USE_SOFTWARE_PULLUPS
 }
 
 void I2C::setAddress(uint8_t address, bool generalCall) {
