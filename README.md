@@ -49,7 +49,9 @@ lib_deps =
 2. Initialize the I2C bus in `setup()`:
 ```cpp
 void setup() {
-  I2C::begin();
+    arduboy.begin();
+    I2C::begin();
+    ...
 }
 ```
 3. Use `I2C::handshake(numPlayers)` to perform a multiplayer handshake and get a unique ID for each controller:
@@ -57,14 +59,12 @@ void setup() {
 uint8_t id = I2C::handshake(numPlayers);
 ```
 4. Use `I2C::write(address, data, wait)` and `I2C::read(address, data, wait)` for communication.
-Find addresses from IDs using `I2C::idtoAddress(id)`.
-`I2C::write`s can use the general call address (`I2C_GENERAL_CALL`) to send data to all devices.
-This is simpler than addressing a device individually, even if only using two players.
-If multiple devices are sending/receiving data, this is known as a multi-controller/master setup.
 ```cpp
 I2C::write(I2C_GENERAL_CALL, data, true);
 I2C::read(I2C::idtoAddress(id), data, true);
 ```
+> `I2C::write`s can use the general call address
+> (`I2C_GENERAL_CALL`) to send data to all devices.
 
 5. Register callbacks for when data is received (from an `I2C::write`) or requested (from an `I2C::read`):
 ```cpp
@@ -80,18 +80,18 @@ void requestCallback() {
 
 ## Configuration
 Define these before including `ArduboyI2C.h` to customize behavior:
-- `I2C_PLATFORM` (no default, must be defined), set to `I2C_PLATFORM_MINI`, `I2C_PLATFORM_FX_C`, or `I2C_PLATFORM_UNKNOWN` for full manual control.
-    - This sets the default values for other configuration options which may be overridden.
-- `I2C_FREQUENCY` (default 100000), increase for faster communication
-- `I2C_BUFFER_SIZE` (default 32), max bytes per I2C transaction
-- `I2C_CHECK_BUS_BUSY_CHECKS` (default 16), increase if the program freezes during reads/writes
-- `I2C_CHECK_CABLE_FLIPPED_CHECKS` (default 128), increase for more sensitive cable flip detection
-- `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT` (default 1000 ms), increase to allow more time for cable flip debounce
-- `I2C_USE_HANDSHAKE` (default 1), set to 0 to disable the handshake function if using a custom one
-- `I2C_USE_CHECK_BUS_BUSY` (default 1), set to 0 to disable bus busy checks
-- `I2C_USE_CHECK_CABLE_FLIPPED` (default 1 on the FX-C and 0 on the Mini), set to 0 to disable cable flip detection
-- `I2C_USE_SOFTWARE_PULLUPS` (default 1 on the FX-C and 0 on the Mini), set to 0 if you have external pullups on the SDA and SCL lines
-
+| Macro | Default | Options | Description | Change when... |
+|-------|---------|---------|-------------|----------------|
+| `I2C_PLATFORM` | None | `I2C_PLATFORM_MINI`, `I2C_PLATFORM_FX_C`, `I2C_PLATFORM_UNKNOWN` | Sets the platform-specific default values for other configuration options. | Change per platform. |
+| `I2C_FREQUENCY` | 100000 | 0-400000 | I2C bus frequency in Hz. | Increase for faster communication. |
+| `I2C_BUFFER_SIZE` | 32 | 1-255 | Maximum bytes per I2C transaction. | Increase to send/receive more data, decrease to save RAM. |
+| `I2C_CHECK_BUS_BUSY_CHECKS` | 16 | 1-255 | Number of times to check the bus before continuing with a read/write operation. | Increase if the program freezes during reads/writes, decrease to speed up reads/writes. |
+| `I2C_CHECK_CABLE_FLIPPED_CHECKS` | 128 | 1-255 | Total number of checks to perform when checking for a flipped cable. | Increase for more sensitive cable flip detection, decrease to speed up cable flip detection. |
+| `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT` | 1000 | 1-32767 | Time in milliseconds to debounce cable changes when checking for a flipped cable. | Increase to allow more time for cable flip debounce. |
+| `I2C_USE_HANDSHAKE` | 1 | 0, 1 | Whether to enable handshake functionality. | Disable if using a custom handshake implementation. |
+| `I2C_USE_CHECK_BUS_BUSY` | 1 | 0, 1 | Whether to enable bus busy checking functionality. | Disable if you want to handle bus busy checks manually. |
+| `I2C_USE_CHECK_CABLE_FLIPPED` | 1 (FX-C), 0 (Mini), None (Unknown) | 0, 1 | Whether to enable flipped cable detection functionality. | Disable if you don't need flipped cable detection. |
+| `I2C_USE_SOFTWARE_PULLUPS` | 1 (FX-C), 0 (Mini), None (Unknown) | 0, 1 | Whether to enable software pullups on the SDA and SCL lines. | Disable if you have external pullups on the SDA and SCL lines. |
 ## Migrating from Wire Library
 - `Wire.begin()`
     - `I2C::begin()`
