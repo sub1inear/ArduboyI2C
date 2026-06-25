@@ -39,17 +39,17 @@ SOFTWARE.
 #define I2C_PLATFORM_MINI 1
 #define I2C_PLATFORM_UNKNOWN 2
 
-#ifdef __DOXYGEN__
-/** \brief
- * The Arduboy platform being used (FX-C or Mini).
- * \details
- * There is no default; this must be defined before including.
- */
-#define I2C_PLATFORM
-#else
 #ifndef I2C_PLATFORM
-#error "Must define I2C_PLATFORM before including."
-#endif
+/** \brief
+ * The platform being used.
+ * \details
+ * Defaults to `I2C_PLATFORM_FX_C`.
+ * Options: \n
+ * `I2C_PLATFORM_FX_C` - Arduboy FX-C \n
+ * `I2C_PLATFORM_MINI` - Arduboy Mini \n
+ * `I2C_PLATFORM_UNKNOWN` - Unknown platform (must define all other platform-specific macros)
+ */
+#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #endif
 
 

@@ -44,6 +44,7 @@ lib_deps =
 ## Quick Start
 1. ### Include the library
 ```cpp
+#define I2C_IMPLEMENTATION
 #include <ArduboyI2C.h>
 ```
 2. ### Initialize
@@ -77,10 +78,11 @@ void requestCallback() {
 ```
 
 ## Configuration
+Define before `#include <ArduboyI2C.h>`.
 ### Core Settings
 | Macro | Default | Options | Description |
 |-------|---------|---------|-------------|
-| `I2C_PLATFORM` | None | `I2C_PLATFORM_MINI`, `I2C_PLATFORM_FX_C`, `I2C_PLATFORM_UNKNOWN` | Platform presets |
+| `I2C_PLATFORM` | `I2C_PLATFORM_FX_C` | `I2C_PLATFORM_MINI`, `I2C_PLATFORM_FX_C`, `I2C_PLATFORM_UNKNOWN` | Platform presets |
 | `I2C_FREQUENCY` | 100000 | 0-400000 | Bus frequency (Hz) |
 | `I2C_BUFFER_SIZE` | 32 | 1-255 | Transaction buffer size |
 ### Reliability
