@@ -23,6 +23,7 @@ SOFTWARE.
 */
 #include <Arduboy2.h>
 #define I2C_IMPLEMENTATION
+#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include "ArduboyI2C.h"
 
 #undef assert
@@ -35,7 +36,7 @@ SOFTWARE.
 			return false; \
 		} \
 	} while (0)
-#define asserteq(a, b) do { \
+#define assert_eq(a, b) do { \
 		if ((a) != (b)) { \
 			Serial.print(F("Assertion failed: " #a " == " #b ", ")); \
 			Serial.print(a); \
@@ -44,14 +45,14 @@ SOFTWARE.
 			return false; \
 		} \
 	} while (0)
-#define assertcb(cond, var, assigna, assignb) do { \
+#define assert_cb(cond, var, assigna, assignb) do { \
 		if (!(cond)) { \
 			var = F(#cond); \
 			assigna; \
 			assignb; \
 		} \
 	} while (0)
-#define assertcb_s(var, a, b) do { \
+#define assert_cb_ok(var, a, b) do { \
 	    if (var) { \
 			Serial.print(F("Assertion failed: ")); \
 			Serial.println(var); \
@@ -89,35 +90,35 @@ void displayTest(const __FlashStringHelper *name, bool result) {
 
 bool testBegin() {
 	I2C::begin();
-	asserteq(TWCR, (_BV(TWEN) | _BV(TWIE) | _BV(TWEA)));
-	asserteq(TWAR, 0);
-	asserteq(TWSR, 248); // 0b11111000 -> TW idle, prescaler = 0
-	asserteq(TWBR, (F_CPU / I2C_FREQUENCY - 16) / 2);
-	asserteq((I2C_PORT & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT)));
-	asserteq((I2C_DDR & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), 0);
+	assert_eq(TWCR, (_BV(TWEN) | _BV(TWIE) | _BV(TWEA)));
+	assert_eq(TWAR, 0);
+	assert_eq(TWSR, 248); // 0b11111000 -> TW idle, prescaler = 0
+	assert_eq(TWBR, (F_CPU / I2C_FREQUENCY - 16) / 2);
+	assert_eq((I2C_PORT & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT)));
+	assert_eq((I2C_DDR & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), 0);
 	return true;
 }
 
 bool testSetAddress() {
 	I2C::setAddress(0x12, false);
-	asserteq(TWAR, 0x12 << 1);
+	assert_eq(TWAR, 0x12 << 1);
 	I2C::setAddress(0x12, true);
-	asserteq(TWAR, (0x12 << 1 | 1));
+	assert_eq(TWAR, (0x12 << 1 | 1));
 	return true;
 }
 
 void testWriteCallback(const uint8_t *buffer, uint8_t size) {
 	writeCallbackCalled = true;
-	assertcb(size == 16, writeCallbackError, writeCallbackA = size, writeCallbackB = 16);
+	assert_cb(size == 16, writeCallbackError, writeCallbackA = size, writeCallbackB = 16);
 
 	int memcmpResult = memcmp(buffer, bufferExpected, 16);
-	assertcb(memcmpResult == 0, writeCallbackError, writeCallbackA = memcmpResult, writeCallbackB = 0);
+	assert_cb(memcmpResult == 0, writeCallbackError, writeCallbackA = memcmpResult, writeCallbackB = 0);
 }
 
 bool testWrite(uint8_t id) {
 	if (id == 0) {
 		I2C::write(I2C::idToAddress(1), bufferExpected, 16, true);
-		asserteq(I2C::getError(), TW_SUCCESS);
+		assert_eq(I2C::getError(), TW_SUCCESS);
 	} else {
 		uint32_t start = millis();
 		while (!writeCallbackCalled) {
@@ -125,7 +126,7 @@ bool testWrite(uint8_t id) {
 				return false;
 			}
 		}
-		assertcb_s(writeCallbackError, writeCallbackA, writeCallbackB);
+		assert_cb_ok(writeCallbackError, writeCallbackA, writeCallbackB);
 	}
 	return true;
 }
@@ -140,8 +141,8 @@ bool testRead(uint8_t id) {
 	if (id == 0) {
 		uint8_t buffer[16];
 		I2C::read(I2C::idToAddress(1), buffer);
-		asserteq(I2C::getError(), TW_SUCCESS);
-		asserteq(memcmp(buffer, bufferExpected, 16), 0);
+		assert_eq(I2C::getError(), TW_SUCCESS);
+		assert_eq(memcmp(buffer, bufferExpected, 16), 0);
 	} else {
 		uint32_t start = millis();
 		while (!readCallbackCalled) {
@@ -155,7 +156,7 @@ bool testRead(uint8_t id) {
 
 bool testCheckEmulator() {
 	bool isEmulator = I2C::checkEmulator();
-	asserteq(isEmulator, false);
+	assert_eq(isEmulator, false);
 	return true;
 }
 
@@ -166,7 +167,7 @@ bool testCheckCableFlipped() {
 
 bool testIdToAddress() {
 	for (uint8_t i = 0; i <= I2C_MAX_IDS - 1; i++) {
-		asserteq(I2C::idToAddress(i), 0x8 + i);
+		assert_eq(I2C::idToAddress(i), 0x8 + i);
 	}
 	return true;
 }
