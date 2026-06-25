@@ -1,4 +1,5 @@
 var namespacei2c__detail =
 [
-    [ "i2c_data_t", "structi2c__detail_1_1i2c__data__t.html", null ]
+    [ "is_pointer", "structi2c__detail_1_1is__pointer.html", null ],
+    [ "is_pointer&lt; T * &gt;", "structi2c__detail_1_1is__pointer_3_01_t_01_5_01_4.html", null ]
 ];

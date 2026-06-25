@@ -108,10 +108,25 @@ $(function(){initNavTree('_arduboy_i2_c_8h.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:i2c_5Fdetail_3A_3Ais_5Fpointer_3C_20T_20_3E" id="r_i2c_5Fdetail_3A_3Ais_5Fpointer_3C_20T_20_3E"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structi2c__detail_1_1is__pointer.html">i2c_detail::is_pointer&lt; T &gt;</a></td></tr>
+<tr class="memitem:i2c_5Fdetail_3A_3Ais_5Fpointer_3C_20T_20_2A_20_3E" id="r_i2c_5Fdetail_3A_3Ais_5Fpointer_3C_20T_20_2A_20_3E"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="structi2c__detail_1_1is__pointer_3_01_t_01_5_01_4.html">i2c_detail::is_pointer&lt; T * &gt;</a></td></tr>
 <tr class="memitem:I2C" id="r_I2C"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_i2_c.html">I2C</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-namespaces" class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:i2c_5Fdetail" id="r_i2c_5Fdetail"><td class="memItemLeft">namespace &#160;</td><td class="memItemRight"><a class="el" href="namespacei2c__detail.html">i2c_detail</a></td></tr>
+<tr class="memdesc:namespacei2c__detail"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not officially part of the library. <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a5e9cf5cf07df5ab333b78df30cfc54dd" id="r_a5e9cf5cf07df5ab333b78df30cfc54dd"><td class="memItemLeft"><a id="a5e9cf5cf07df5ab333b78df30cfc54dd" name="a5e9cf5cf07df5ab333b78df30cfc54dd"></a>
+#define&#160;</td><td class="memItemRight"><b>I2C_PLATFORM_FX_C</b>&#160;&#160;&#160;0</td></tr>
+<tr class="memitem:a87c420b46c32c47fd27003f610622f9f" id="r_a87c420b46c32c47fd27003f610622f9f"><td class="memItemLeft"><a id="a87c420b46c32c47fd27003f610622f9f" name="a87c420b46c32c47fd27003f610622f9f"></a>
+#define&#160;</td><td class="memItemRight"><b>I2C_PLATFORM_MINI</b>&#160;&#160;&#160;1</td></tr>
+<tr class="memitem:a7135a08961de38f77d684704bd51b2f3" id="r_a7135a08961de38f77d684704bd51b2f3"><td class="memItemLeft"><a id="a7135a08961de38f77d684704bd51b2f3" name="a7135a08961de38f77d684704bd51b2f3"></a>
+#define&#160;</td><td class="memItemRight"><b>I2C_PLATFORM_UNKNOWN</b>&#160;&#160;&#160;2</td></tr>
+<tr class="memitem:a621319d4e6b913f077d3c8339eb9b93b" id="r_a621319d4e6b913f077d3c8339eb9b93b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a621319d4e6b913f077d3c8339eb9b93b">I2C_PLATFORM</a>&#160;&#160;&#160;I2C_PLATFORM_FX_C</td></tr>
+<tr class="memdesc:a621319d4e6b913f077d3c8339eb9b93b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The platform being used.  <br /></td></tr>
 <tr class="memitem:afd74d0ddc5d78f0d7957c5bbe90eb222" id="r_afd74d0ddc5d78f0d7957c5bbe90eb222"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afd74d0ddc5d78f0d7957c5bbe90eb222">I2C_FREQUENCY</a>&#160;&#160;&#160;100000</td></tr>
 <tr class="memdesc:afd74d0ddc5d78f0d7957c5bbe90eb222"><td class="mdescLeft">&#160;</td><td class="mdescRight">The initial <a class="el" href="class_i2_c.html">I2C</a> frequency in Hz.  <br /></td></tr>
 <tr class="memitem:a6458dbf193a0eef0470fc1b08400bfcd" id="r_a6458dbf193a0eef0470fc1b08400bfcd"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6458dbf193a0eef0470fc1b08400bfcd">I2C_BUFFER_SIZE</a>&#160;&#160;&#160;32</td></tr>
@@ -128,6 +143,8 @@ Macros</h2></td></tr>
 <tr class="memdesc:a46613027f9a3fd1acede15144779992e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to enable bus busy checking functionality.  <br /></td></tr>
 <tr class="memitem:ad9778e6e274898472e7b5fab6efa13c4" id="r_ad9778e6e274898472e7b5fab6efa13c4"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad9778e6e274898472e7b5fab6efa13c4">I2C_USE_CHECK_CABLE_FLIPPED</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:ad9778e6e274898472e7b5fab6efa13c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to enable flipped cable detection functionality.  <br /></td></tr>
+<tr class="memitem:ac318e96bb22b8d5710db448875fef550" id="r_ac318e96bb22b8d5710db448875fef550"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac318e96bb22b8d5710db448875fef550">I2C_USE_SOFTWARE_PULLUPS</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:ac318e96bb22b8d5710db448875fef550"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to enable software pullups on the SDA and SCL lines.  <br /></td></tr>
 <tr class="memitem:ab37c7049d3f4f3dc7d89b5c02e88f7c7" id="r_ab37c7049d3f4f3dc7d89b5c02e88f7c7"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab37c7049d3f4f3dc7d89b5c02e88f7c7">I2C_SDA_BIT</a>&#160;&#160;&#160;PIND1</td></tr>
 <tr class="memdesc:ab37c7049d3f4f3dc7d89b5c02e88f7c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bit of the pin on which the SDA line is connected.  <br /></td></tr>
 <tr class="memitem:a5e7834d040f89e2e7fc864785e80f981" id="r_a5e7834d040f89e2e7fc864785e80f981"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5e7834d040f89e2e7fc864785e80f981">I2C_SCL_BIT</a>&#160;&#160;&#160;PIND0</td></tr>
@@ -142,7 +159,7 @@ Macros</h2></td></tr>
 <tr class="memdesc:aaf677c294437274a106399587fb1d3b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The address used for general calls.  <br /></td></tr>
 <tr class="memitem:aaa8a379ca27da629fb7eb67cacc5d86a" id="r_aaa8a379ca27da629fb7eb67cacc5d86a"><td class="memItemLeft"><a id="aaa8a379ca27da629fb7eb67cacc5d86a" name="aaa8a379ca27da629fb7eb67cacc5d86a"></a>
 #define&#160;</td><td class="memItemRight"><b>TW_SUCCESS</b>&#160;&#160;&#160;0xFF</td></tr>
-<tr class="memdesc:aaa8a379ca27da629fb7eb67cacc5d86a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code returned by <a class="el" href="class_i2_c.html#a3f2aa82fad13d5becceb90b7cae8ad18" title="Gets the hardware error which happened in a previous read or write.">I2C::error()</a>, meaning success. <br /></td></tr>
+<tr class="memdesc:aaa8a379ca27da629fb7eb67cacc5d86a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code returned by <a class="el" href="class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41" title="Gets the hardware error which happened in a previous read or write.">I2C::getError()</a>, meaning success. <br /></td></tr>
 <tr class="memitem:a7de1c5a6ceac4c8213b51a9dd54c9bf6" id="r_a7de1c5a6ceac4c8213b51a9dd54c9bf6"><td class="memItemLeft"><a id="a7de1c5a6ceac4c8213b51a9dd54c9bf6" name="a7de1c5a6ceac4c8213b51a9dd54c9bf6"></a>
 #define&#160;</td><td class="memItemRight"><b>I2C_HANDSHAKE_FULL</b>&#160;&#160;&#160;0xFE</td></tr>
 <tr class="memdesc:a7de1c5a6ceac4c8213b51a9dd54c9bf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code returned by <a class="el" href="class_i2_c.html#a048b60bd3ab9bedaecb295a1eb369e0e" title="Handshakes with other devices and returns a unique id once complete.">I2C::handshake</a>, meaning a handshake has already been completed by the number of players specified. <br /></td></tr>
@@ -154,6 +171,26 @@ Macros</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An <a class="el" href="class_i2_c.html">I2C</a> library for Arduboy multiplayer games. </p>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a621319d4e6b913f077d3c8339eb9b93b" name="a621319d4e6b913f077d3c8339eb9b93b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a621319d4e6b913f077d3c8339eb9b93b">&#9670;&#160;</a></span>I2C_PLATFORM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define I2C_PLATFORM&#160;&#160;&#160;I2C_PLATFORM_FX_C</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The platform being used. </p>
+<p>Defaults to <span class="tt">I2C_PLATFORM_FX_C</span>. Options: <br  />
+<span class="tt">I2C_PLATFORM_FX_C</span> - Arduboy FX-C <br  />
+<span class="tt">I2C_PLATFORM_MINI</span> - Arduboy Mini <br  />
+<span class="tt">I2C_PLATFORM_UNKNOWN</span> - Unknown platform (must define all other platform-specific macros) </p>
+
+</div>
+</div>
 <a id="afd74d0ddc5d78f0d7957c5bbe90eb222" name="afd74d0ddc5d78f0d7957c5bbe90eb222"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afd74d0ddc5d78f0d7957c5bbe90eb222">&#9670;&#160;</a></span>I2C_FREQUENCY</h2>
 
@@ -289,7 +326,24 @@ Standard frequencies: <br  />
 </div><div class="memdoc">
 
 <p>Whether or not to enable flipped cable detection functionality. </p>
-<p>Defaults to 1. Set to 0 if you do not need to detect flipped cables (e.g. you are only targeting the Arduboy Mini) to save memory. </p>
+<p>Default is 1 on the FX-C and 0 on the Mini. Set to 0 if you do not need to detect flipped cables to save memory. </p>
+
+</div>
+</div>
+<a id="ac318e96bb22b8d5710db448875fef550" name="ac318e96bb22b8d5710db448875fef550"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac318e96bb22b8d5710db448875fef550">&#9670;&#160;</a></span>I2C_USE_SOFTWARE_PULLUPS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define I2C_USE_SOFTWARE_PULLUPS&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether or not to enable software pullups on the SDA and SCL lines. </p>
+<p>Default is 1 on the FX-C and 0 on the Mini. Set to 0 if you have external pullups on the SDA and SCL lines to save memory. </p>
 
 </div>
 </div>
