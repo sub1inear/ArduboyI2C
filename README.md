@@ -104,6 +104,6 @@ void requestCallback() {
 | `Wire.begin(addr)`     | `I2C::setAddress(addr)` |
 | `Wire.onReceive()`     | `I2C::onReceive()`      |
 | `Wire.onRequest()`     | `I2C::onRequest()`      |
-| `Wire.beginTransmission(address)` -> `Wire.write(...)` -> `Wire.endTransmission()` | `I2C::write(address, data, wait)` |
+| `Wire.beginTransmission(addr)` -> `Wire.write(...)` -> `Wire.endTransmission()` | `I2C::write(address, data, wait)` |
 | `Wire.requestFrom(address, quantity)` -> `Wire.read()` | `I2C::read(address, data, wait)` |
 | `Wire.setClock()`      | `I2C_FREQUENCY`         |
