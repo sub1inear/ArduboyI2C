@@ -7,8 +7,8 @@
 # ArduboyI2C Library
 The **ArduboyI2C** library provides I2C support for Arduboy multiplayer games. It includes standard I2C functionality, support for multi-controller (master) setups, and helpers for multiplayer handshakes while keeping PROGMEM and RAM usage low.
 
-## Library Documentation
-Full API documentation: https://sub1inear.github.io/ArduboyI2C/
+## Documentation
+See the [online documentation](https://sub1inear.github.io/ArduboyI2C/) for more information.
 
 ## Features
 - Controller (master) and target (slave) I2C support.
