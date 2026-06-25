@@ -187,7 +187,7 @@ SOFTWARE.
 #define I2C_GENERAL_CALL 0x00
 
 /** \brief
- * Error code returned by I2C::error(), meaning success.
+ * Error code returned by I2C::getError(), meaning success.
  */
 #define TW_SUCCESS 0xFF
 
@@ -211,6 +211,15 @@ SOFTWARE.
  * For a given version x.y.z, the library version will be in the form xxxyyzz with no leading zeros on x.
  */
 #define I2C_LIB_VER 30000
+
+/** \brief
+ * Not officially part of the library.
+ */
+namespace i2c_detail {
+// minimal <type_traits> implementation (non-existant on avr-gcc)
+template <typename T> struct is_pointer { static const bool value = false; };
+template <typename T> struct is_pointer<T *> { static const bool value = true;  };
+}
 
 /**
  * Provides all I2C functionality.
@@ -255,32 +264,22 @@ public:
      */
     static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
 
-    /** \brief
-     * Attempts to become the bus controller (master) and sends an object over I2C to the specified address.
-     * \tparam T The type of the object to write.
-     * \param address The 7-bit address which to send the data. To send a general call, use address I2C_GENERAL_CALL.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+    /** \overload
+     * \tparam T The type of the object to send. To prevent bugs, T cannot be a pointer.
+     * \param address The 7-bit address which to receive the data from.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
-     * \note
-     * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on every other device.
-     * \note
-     * Interally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
-     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
-     * must be defined before including to be larger.
-     * \see transmit() read()
+     * \details
+     * This function will automatically deduce the size of the object.
+     * Objects with sizes greater than or equal to 255 should not be used with this function.
      */
     template<typename T>
     static void write(uint8_t address, const T &object, bool wait) {
+        static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
         static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
         I2C::write(address, (const void *)&object, sizeof(T), wait);
     }
-
-    /*
-     * This function is deleted to prevent accidental use with pointers.
-     */
-    template <typename T>
-    static void write(uint8_t address, T *object, bool wait) = delete;
 
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
@@ -295,29 +294,21 @@ public:
      */
     static void read(uint8_t address, void *buffer, uint8_t size);
 
-    /** \brief
-     * Attempts to become the bus controller (master) and reads an object over I2C from the specified address.
-     * \tparam T The type of the object to read.
+    /** \overload
+     * \tparam T The type of the object to read. To prevent bugs, T cannot be a pointer.
      * \param address The 7-bit address which to receive the data from.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object in which to store the data.
      * \details
-     * Types with sizes greater than or equal to 255 should not be used with this function.
-     * \note
-     * Unlike the `write` function, this function is bufferless and is not limited to 32 bytes.
-     * \see write()
+     * This function will automatically deduce the size of the object.
+     * Objects with sizes greater than or equal to 255 should not be used with this function.
      */
     template<typename T>
     static void read(uint8_t address, T &object) {
+        static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
         static_assert(sizeof(T) < 255, "Size of T must be less than 255.");
         I2C::read(address, (void *)&object, sizeof(T));
     }
-
-    /*
-     * This function is deleted to prevent accidental use with pointers.
-     */
-    template <typename T>
-    static void read(uint8_t address, T *object) = delete;
 
     /** \brief
      * Replies back to the controller (master).
@@ -335,35 +326,23 @@ public:
      */
     static void reply(const void *buffer, uint8_t size);
 
-    /** \brief
-     * Replies back to the controller (master).
-     * \tparam T The type of the object to reply with.
+    /** \overload
+     * \tparam T The type of the object to reply with. To prevent bugs, T cannot be a pointer.
      * \param object A reference to the object to reply with.
      * \details
-     * This function is intended to be called inside the onRequest callback.
-     * It fills the reply buffer with data to then be send one byte at a time.
-     * It may be called multiple times to accumulate data.
-     * \note
-     * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
-     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
-     * must be defined before including to be larger.
-     * \see write() onRequest()
+     * This function will automatically deduce the size of the object.
+     * Objects with sizes greater than or equal to 255 should not be used with this function.
      */
     template <typename T>
     static void reply(const T &object) {
+        static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
         static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
         I2C::reply((const void *)&object, sizeof(T));
     }
 
-    /*
-     * This function is deleted to prevent accidental use with pointers.
-     */
-    template <typename T>
-    static void reply(T *object) = delete;
-
     /** \brief
      * Sets up/disables the callback to be called when data is requested from the device's address (a read).
-     * \param function The function to be called when data is requested, or `nullptr` to disable.
+     * \param function The function to be called when data is requested, or nullptr to disable.
      * \details
      * Example Callback and Usage:
      * \code{.cpp}
@@ -386,7 +365,7 @@ public:
 
     /** \brief
      * Sets up/disables the callback to be called when data is sent to the device's address (a write)
-     * \param function The function to be called when data is received, or `nullptr` to disable.
+     * \param function The function to be called when data is received, or nullptr to disable.
      * \details
      * Example Callback and Usage:
      * \code{.cpp}
@@ -410,13 +389,14 @@ public:
      * \return A byte indicating the error. TW_SUCCESS means no error has occurred.
      * The full list of error codes are available in the avr utils\twi.h.
      */
-    static uint8_t error();
+    static uint8_t getError();
 
     /** \brief
      * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
      * \param function The function to be called if the cable is flipped.
      * \details
      * This function works by seeing which line behaves more like a clock (equal high and low) over a sampling period.
+     * The callback \p function will be called with interrupts disabled (i.e. no `Serial`, `delay`, `millis`, etc.).
      * It is by no means perfect, but it should suffice.
      * This is only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable.
      * This method must be used with I2C::handshake.
@@ -434,6 +414,7 @@ public:
      * Sending 0b00000000 is recommended as it will increase the chance of detection.
      */
     static void checkCableFlipped(void (*function)());
+
     /** \brief
      * Checks if an emulator without I2C support is being used to run the code.
      * \return True if an emulator without I2C support has been detected and false if it has not
@@ -622,7 +603,7 @@ void I2C::onReceive(void (*function)(const uint8_t *buffer, uint8_t size)) {
     i2c_detail::data.onReceiveFunction = function;
 }
 
-uint8_t I2C::error() {
+uint8_t I2C::getError() {
     return i2c_detail::data.error;
 }
 
@@ -671,7 +652,7 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
 
         I2C::read(address, dummy);
 
-        switch (I2C::error()) {
+        switch (I2C::getError()) {
         case TW_MR_SLA_NACK:
             I2C::onRequest(i2c_detail::handshakeOnRequest);
             I2C::setAddress(address);
@@ -804,7 +785,7 @@ TW_MT_DATA_ACK:
     ldd r27, Y + %[bufferSize]
     cp r26, r27
 
-    brlt 1f ; 64 instruction limit on branches
+    brlo 1f ; 64 instruction limit on branches
     rjmp stop_reti
     1:
 
@@ -875,7 +856,7 @@ TW_MR_SLA_ACK:
     ldd r27, Y + %[bufferSize]
     cp r26, r27
     ldi r26, REPLY_ACK
-    brlt 1f
+    brlo 1f
     ldi r26, REPLY_NACK
     1:
     std Z + TWCR, r26
@@ -999,7 +980,7 @@ TW_ST_SLA_ACK:
     ldd r18, Y + %[bufferSize]
     tst r18
     brne 2f
-    std Z + TWCR, __zero_reg__
+    std Z + TWDR, __zero_reg__
     ldi r26, REPLY_NACK
     std Z + TWCR, r26
     rjmp pop_reti
