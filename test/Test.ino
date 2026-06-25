@@ -197,5 +197,4 @@ void setup() {
 	displayTest(F("idToAddress"), testIdToAddress());
 }
 
-void loop() {
-}
+void loop() { }
