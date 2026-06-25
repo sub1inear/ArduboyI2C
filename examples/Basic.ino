@@ -25,6 +25,7 @@ SOFTWARE.
 // define in one file before including
 #define I2C_IMPLEMENTATION
 // must define the platform being used (FX-C or Mini)
+// this will set the correct default values for each platform
 #define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include "ArduboyI2C.h"
 
