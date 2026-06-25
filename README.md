@@ -60,7 +60,7 @@ uint8_t id = I2C::handshake(numPlayers);
 ```
 4. ### Read/Write
 ```cpp
-I2C::write(I2C_GENERAL_CALL, data, true);
+I2C::write(I2C_GENERAL_CALL, data, /* wait = */true);
 I2C::read(I2C::idtoAddress(id), data);
 ```
 > Write data to every device with the `I2C_GENERAL_CALL` address.
