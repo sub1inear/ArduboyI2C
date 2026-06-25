@@ -1,7 +1,7 @@
-![Release](https://img.shields.io/github/v/release/sub1inear/ArduboyI2C?label=Release)
-![License](https://img.shields.io/github/license/sub1inear/ArduboyI2C?label=License)
-![Arduino Library](https://img.shields.io/badge/Arduino-Library-00979D?logo=arduino)
-![PlatformIO Registry](https://img.shields.io/badge/PlatformIO-Registry-orange?logo=platformio)
+[![Release](https://img.shields.io/github/v/release/sub1inear/ArduboyI2C?label=Release)](https://github.com/sub1inear/ArduboyI2C/releases/latest)
+[![License](https://img.shields.io/github/license/sub1inear/ArduboyI2C?label=License)](https://github.com/sub1inear/ArduboyI2C/blob/main/LICENSE)
+[![Arduino Library](https://img.shields.io/badge/Arduino-Library-00979D?logo=arduino)](https://www.arduinolibraries.info/libraries/arduboy-i2-c)
+[![PlatformIO Registry](https://img.shields.io/badge/PlatformIO-Registry-orange?logo=platformio)](https://registry.platformio.org/libraries/sub1inear/ArduboyI2C)
 [![Docs](https://img.shields.io/badge/Docs-Online-blue)](https://sub1inear.github.io/ArduboyI2C/)
 
 # ArduboyI2C Library
