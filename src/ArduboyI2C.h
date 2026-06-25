@@ -584,10 +584,6 @@ void I2C::begin() {
     // clear prescaler bits
     TWSR = 0;
 
-    // exit to bootloader/restart will not clear TWAR,
-    // so we clear it here to prevent any issues with handshakes.
-    TWAR = 0;
-
 #if I2C_USE_SOFTWARE_PULLUPS
     // enable software pullups
     I2C_DDR &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
