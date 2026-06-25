@@ -122,6 +122,7 @@ bool testWrite(uint8_t id) {
 		uint32_t start = millis();
 		while (!writeCallbackCalled) {
 			if (millis() - start > 1000) {
+				Serial.println(F("Write callback timeout"));
 				return false;
 			}
 		}
@@ -131,8 +132,7 @@ bool testWrite(uint8_t id) {
 }
 
 void testReadCallback() {
-	I2C::reply(bufferExpected, 8);
-	I2C::reply(bufferExpected + 8, 8);
+	I2C::reply(bufferExpected);
 	readCallbackCalled = true;
 }
 
@@ -146,6 +146,7 @@ bool testRead(uint8_t id) {
 		uint32_t start = millis();
 		while (!readCallbackCalled) {
 			if (millis() - start > 1000) {
+				Serial.println(F("Read callback timeout"));
 				return false;
 			}
 		}
