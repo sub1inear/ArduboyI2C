@@ -813,8 +813,7 @@ TW_MT_ARB_LOST:
     ldi r26, REPLY_ACK
     std Z + TWCR, r26
     ; i2c_detail::data.error = TW_MT_ARB_LOST;
-    ldi r26, 0x38
-    std Y + %[error], r26
+    std Y + %[error], r18
     ; active = false;
     ; return;
     rjmp active_false_reti
