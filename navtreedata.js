@@ -33,13 +33,19 @@ var NAVTREE =
         [ "Arduino IDE", "index.html#autotoc_md5", null ],
         [ "PlatformIO", "index.html#autotoc_md6", null ]
       ] ],
-      [ "Quick Start", "index.html#autotoc_md7", null ],
-      [ "Configuration", "index.html#autotoc_md8", [
-        [ "Core Settings", "index.html#autotoc_md9", null ],
-        [ "Reliability", "index.html#autotoc_md10", null ],
-        [ "Feature Flags", "index.html#autotoc_md11", null ]
+      [ "Quick Start", "index.html#autotoc_md7", [
+        [ "1. Include the library", "index.html#autotoc_md8", null ],
+        [ "2. Initialize", "index.html#autotoc_md9", null ],
+        [ "3. Handshake", "index.html#autotoc_md10", null ],
+        [ "4. Read/Write", "index.html#autotoc_md11", null ],
+        [ "5. Callbacks", "index.html#autotoc_md12", null ]
       ] ],
-      [ "Migrating from Wire Library", "index.html#autotoc_md12", null ]
+      [ "Configuration", "index.html#autotoc_md13", [
+        [ "Core Settings", "index.html#autotoc_md14", null ],
+        [ "Reliability", "index.html#autotoc_md15", null ],
+        [ "Feature Flags", "index.html#autotoc_md16", null ]
+      ] ],
+      [ "Migrating from Wire Library", "index.html#autotoc_md17", null ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],

@@ -1,4 +1,31 @@
 var searchData=
 [
-  ['quick_20start_0',['Quick Start',['../index.html#autotoc_md7',1,'']]]
+  ['i2c_0',['I2C',['../class_i2_c.html',1,'']]],
+  ['i2c_5fbuffer_5fsize_1',['I2C_BUFFER_SIZE',['../_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd',1,'ArduboyI2C.h']]],
+  ['i2c_5fcheck_5fbus_5fbusy_5fchecks_2',['I2C_CHECK_BUS_BUSY_CHECKS',['../_arduboy_i2_c_8h.html#aecf378ba83ad4073823cc7c41de5f14c',1,'ArduboyI2C.h']]],
+  ['i2c_5fcheck_5fcable_5fflipped_5fchecks_3',['I2C_CHECK_CABLE_FLIPPED_CHECKS',['../_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57',1,'ArduboyI2C.h']]],
+  ['i2c_5fcheck_5fcable_5fflipped_5fdebounce_5ftimeout_4',['I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT',['../_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0',1,'ArduboyI2C.h']]],
+  ['i2c_5fddr_5',['I2C_DDR',['../_arduboy_i2_c_8h.html#ab4386d053f69f39963bebf5f03b6eeee',1,'ArduboyI2C.h']]],
+  ['i2c_5ffrequency_6',['I2C_FREQUENCY',['../_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222',1,'ArduboyI2C.h']]],
+  ['i2c_5fgeneral_5fcall_7',['I2C_GENERAL_CALL',['../_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4',1,'ArduboyI2C.h']]],
+  ['i2c_5fhandshake_5ffull_8',['I2C_HANDSHAKE_FULL',['../_arduboy_i2_c_8h.html#a7de1c5a6ceac4c8213b51a9dd54c9bf6',1,'ArduboyI2C.h']]],
+  ['i2c_5fmax_5fids_9',['I2C_MAX_IDS',['../_arduboy_i2_c_8h.html#aeddb4fb18bc6bd7822797a2029c5fff6',1,'ArduboyI2C.h']]],
+  ['i2c_5fpin_10',['I2C_PIN',['../_arduboy_i2_c_8h.html#ab7540bab4da9f607f5b7f9266837207c',1,'ArduboyI2C.h']]],
+  ['i2c_5fplatform_11',['I2C_PLATFORM',['../_arduboy_i2_c_8h.html#a621319d4e6b913f077d3c8339eb9b93b',1,'ArduboyI2C.h']]],
+  ['i2c_5fport_12',['I2C_PORT',['../_arduboy_i2_c_8h.html#ad9ecf80e1eac083d16ec47f9d3aeb39f',1,'ArduboyI2C.h']]],
+  ['i2c_5fscl_5fbit_13',['I2C_SCL_BIT',['../_arduboy_i2_c_8h.html#a5e7834d040f89e2e7fc864785e80f981',1,'ArduboyI2C.h']]],
+  ['i2c_5fsda_5fbit_14',['I2C_SDA_BIT',['../_arduboy_i2_c_8h.html#ab37c7049d3f4f3dc7d89b5c02e88f7c7',1,'ArduboyI2C.h']]],
+  ['i2c_5fuse_5fcheck_5fbus_5fbusy_15',['I2C_USE_CHECK_BUS_BUSY',['../_arduboy_i2_c_8h.html#a46613027f9a3fd1acede15144779992e',1,'ArduboyI2C.h']]],
+  ['i2c_5fuse_5fcheck_5fcable_5fflipped_16',['I2C_USE_CHECK_CABLE_FLIPPED',['../_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4',1,'ArduboyI2C.h']]],
+  ['i2c_5fuse_5fhandshake_17',['I2C_USE_HANDSHAKE',['../_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650',1,'ArduboyI2C.h']]],
+  ['i2c_5fuse_5fsoftware_5fpullups_18',['I2C_USE_SOFTWARE_PULLUPS',['../_arduboy_i2_c_8h.html#ac318e96bb22b8d5710db448875fef550',1,'ArduboyI2C.h']]],
+  ['i2c_5fversion_19',['I2C_VERSION',['../_arduboy_i2_c_8h.html#ab189a471c5d2d027960b4f8f9982cfd1',1,'ArduboyI2C.h']]],
+  ['i2c_5fversion_5fmajor_20',['I2C_VERSION_MAJOR',['../_arduboy_i2_c_8h.html#af39e2a48363339e93f433abab9d97a1f',1,'ArduboyI2C.h']]],
+  ['i2c_5fversion_5fminor_21',['I2C_VERSION_MINOR',['../_arduboy_i2_c_8h.html#a5ef5e0d416b6cfbe37215ec6637231c7',1,'ArduboyI2C.h']]],
+  ['i2c_5fversion_5fpatch_22',['I2C_VERSION_PATCH',['../_arduboy_i2_c_8h.html#a4426736c37915ba0186e18fc4c7b4c13',1,'ArduboyI2C.h']]],
+  ['ide_23',['Arduino IDE',['../index.html#autotoc_md5',1,'']]],
+  ['idtoaddress_24',['idToAddress',['../class_i2_c.html#a4f4062dba835e29f49d99aac3c3c3984',1,'I2C']]],
+  ['include_20the_20library_25',['1. Include the library',['../index.html#autotoc_md8',1,'']]],
+  ['initialize_26',['2. Initialize',['../index.html#autotoc_md9',1,'']]],
+  ['installation_27',['Installation',['../index.html#autotoc_md4',1,'']]]
 ];
