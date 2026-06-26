@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['handshake_0',['handshake',['../class_i2_c.html#a048b60bd3ab9bedaecb295a1eb369e0e',1,'I2C']]]
+  ['begin_0',['begin',['../class_i2_c.html#a700dc7d79a25b042b59846c0068a773a',1,'I2C']]]
 ];

@@ -42,12 +42,12 @@ lib_deps =
 ```
 
 ## Quick Start
-1. ### Include the library
+### 1. Include the library
 ```cpp
 #define I2C_IMPLEMENTATION
 #include <ArduboyI2C.h>
 ```
-2. ### Initialize
+### 2. Initialize
 ```cpp
 void setup() {
     arduboy.begin();
@@ -55,17 +55,17 @@ void setup() {
     ...
 }
 ```
-3. ### Handshake
+### 3. Handshake
 ```cpp
 uint8_t id = I2C::handshake(numPlayers);
 ```
-4. ### Read/Write
+### 4. Read/Write
 ```cpp
 I2C::write(I2C_GENERAL_CALL, data, /* wait = */true);
 I2C::read(I2C::idtoAddress(id), data);
 ```
 > Write data to every device with the `I2C_GENERAL_CALL` address.
-5. ### Callbacks
+### 5. Callbacks
 ```cpp
 I2C::onReceive(receiveCallback);
 I2C::onRequest(requestCallback);

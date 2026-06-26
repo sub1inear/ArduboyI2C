@@ -136,22 +136,26 @@ PlatformIO</h3>
 <div class="line">    sub1inear/ArduboyI2C</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
 Quick Start</h2>
-<ol type="1">
-<li>### Include the library <div class="fragment"><div class="line"><span class="preprocessor">#define I2C_IMPLEMENTATION</span></div>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
+1. Include the library</h3>
+<div class="fragment"><div class="line"><span class="preprocessor">#define I2C_IMPLEMENTATION</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="_arduboy_i2_c_8h.html">ArduboyI2C.h</a>&gt;</span></div>
 <div class="ttc" id="a_arduboy_i2_c_8h_html"><div class="ttname"><a href="_arduboy_i2_c_8h.html">ArduboyI2C.h</a></div><div class="ttdoc">An I2C library for Arduboy multiplayer games.</div></div>
-</div><!-- fragment --></li>
-<li>### Initialize <div class="fragment"><div class="line"><span class="keywordtype">void</span> setup() {</div>
+</div><!-- fragment --> <h3 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
+2. Initialize</h3>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> setup() {</div>
 <div class="line">    arduboy.begin();</div>
 <div class="line">    <a class="code hl_function" href="class_i2_c.html#a700dc7d79a25b042b59846c0068a773a">I2C::begin</a>();</div>
 <div class="line">    ...</div>
 <div class="line">}</div>
 <div class="ttc" id="aclass_i2_c_html_a700dc7d79a25b042b59846c0068a773a"><div class="ttname"><a href="class_i2_c.html#a700dc7d79a25b042b59846c0068a773a">I2C::begin</a></div><div class="ttdeci">static void begin()</div><div class="ttdoc">Initializes I2C hardware.</div></div>
-</div><!-- fragment --></li>
-<li>### Handshake <div class="fragment"><div class="line">uint8_t <span class="keywordtype">id</span> = <a class="code hl_function" href="class_i2_c.html#a048b60bd3ab9bedaecb295a1eb369e0e">I2C::handshake</a>(numPlayers);</div>
+</div><!-- fragment --> <h3 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
+3. Handshake</h3>
+<div class="fragment"><div class="line">uint8_t <span class="keywordtype">id</span> = <a class="code hl_function" href="class_i2_c.html#a048b60bd3ab9bedaecb295a1eb369e0e">I2C::handshake</a>(numPlayers);</div>
 <div class="ttc" id="aclass_i2_c_html_a048b60bd3ab9bedaecb295a1eb369e0e"><div class="ttname"><a href="class_i2_c.html#a048b60bd3ab9bedaecb295a1eb369e0e">I2C::handshake</a></div><div class="ttdeci">static uint8_t handshake(uint8_t numPlayers)</div><div class="ttdoc">Handshakes with other devices and returns a unique id once complete.</div></div>
-</div><!-- fragment --></li>
-<li>### Read/Write <div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a>(<a class="code hl_define" href="_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4">I2C_GENERAL_CALL</a>, data, <span class="comment">/* wait = */</span><span class="keyword">true</span>);</div>
+</div><!-- fragment --> <h3 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
+4. Read/Write</h3>
+<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a>(<a class="code hl_define" href="_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4">I2C_GENERAL_CALL</a>, data, <span class="comment">/* wait = */</span><span class="keyword">true</span>);</div>
 <div class="line"><a class="code hl_function" href="class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0">I2C::read</a>(I2C::idtoAddress(<span class="keywordtype">id</span>), data);</div>
 <div class="ttc" id="a_arduboy_i2_c_8h_html_aaf677c294437274a106399587fb1d3b4"><div class="ttname"><a href="_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4">I2C_GENERAL_CALL</a></div><div class="ttdeci">#define I2C_GENERAL_CALL</div><div class="ttdoc">The address used for general calls.</div><div class="ttdef"><b>Definition</b> ArduboyI2C.h:227</div></div>
 <div class="ttc" id="aclass_i2_c_html_a7fa12af5a3f24c3db496672a4d5c3fe0"><div class="ttname"><a href="class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0">I2C::read</a></div><div class="ttdeci">static void read(uint8_t address, void *buffer, uint8_t size)</div><div class="ttdoc">Attempts to become the bus controller (master) and reads data over I2C from the specified address.</div></div>
@@ -159,21 +163,20 @@ Quick Start</h2>
 </div><!-- fragment --> <blockquote class="doxtable">
 <p>Write data to every device with the <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4" title="The address used for general calls.">I2C_GENERAL_CALL</a></span> address. </p>
 </blockquote>
-</li>
-<li>### Callbacks <div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#ad2f0a1a57e640663c1ad386dc505054a">I2C::onReceive</a>(receiveCallback);</div>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
+5. Callbacks</h3>
+<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#ad2f0a1a57e640663c1ad386dc505054a">I2C::onReceive</a>(receiveCallback);</div>
 <div class="line"><a class="code hl_function" href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a>(requestCallback);</div>
 <div class="ttc" id="aclass_i2_c_html_a026eaad0ba8bb6a698d3eaca9dd9887d"><div class="ttname"><a href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a></div><div class="ttdeci">static void onRequest(void(*function)())</div><div class="ttdoc">Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).</div></div>
 <div class="ttc" id="aclass_i2_c_html_ad2f0a1a57e640663c1ad386dc505054a"><div class="ttname"><a href="class_i2_c.html#ad2f0a1a57e640663c1ad386dc505054a">I2C::onReceive</a></div><div class="ttdeci">static void onReceive(void(*function)(const uint8_t *buffer, uint8_t size))</div><div class="ttdoc">Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).</div></div>
-</div><!-- fragment --></li>
-</ol>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> requestCallback() {</div>
+</div><!-- fragment --> <div class="fragment"><div class="line"><span class="keywordtype">void</span> requestCallback() {</div>
 <div class="line">  <a class="code hl_function" href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1">I2C::reply</a>(data);</div>
 <div class="line">}</div>
 <div class="ttc" id="aclass_i2_c_html_a0039ed613883e9203aa3ebac7b467aa1"><div class="ttname"><a href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1">I2C::reply</a></div><div class="ttdeci">static void reply(const void *buffer, uint8_t size)</div><div class="ttdoc">Replies back to the controller (master).</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
 Configuration</h2>
 <p>Define before <span class="tt">#include &lt;<a class="el" href="_arduboy_i2_c_8h.html" title="An I2C library for Arduboy multiplayer games.">ArduboyI2C.h</a>&gt;</span>. </p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
 Core Settings</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -185,7 +188,7 @@ Core Settings</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd" title="The size of the buffer used for writes/target (slave) operations.">I2C_BUFFER_SIZE</a></span>  </td><td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone">1-255  </td><td class="markdownTableBodyNone">Transaction buffer size  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
 Reliability</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -197,7 +200,7 @@ Reliability</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0" title="The duration in milliseconds to debounce cable changes when checking for a flipped cable.">I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT</a></span>  </td><td class="markdownTableBodyNone">1000  </td><td class="markdownTableBodyNone">1-32767  </td><td class="markdownTableBodyNone">Debounce time (ms) for cable flip detection  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
 Feature Flags</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -211,7 +214,7 @@ Feature Flags</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac318e96bb22b8d5710db448875fef550" title="Whether or not to enable software pullups on the SDA and SCL lines.">I2C_USE_SOFTWARE_PULLUPS</a></span>  </td><td class="markdownTableBodyNone">1 (FX-C), 0 (Mini), None (Unknown)  </td><td class="markdownTableBodyNone">0, 1  </td><td class="markdownTableBodyNone">Enable software pullups on SDA/SCL lines  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
 Migrating from Wire Library</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

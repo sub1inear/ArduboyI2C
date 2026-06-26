@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['settings_0',['Core Settings',['../index.html#autotoc_md9',1,'']]],
-  ['start_1',['Quick Start',['../index.html#autotoc_md7',1,'']]]
+  ['library_0',['Library',['../index.html',1,'ArduboyI2C Library'],['../index.html#autotoc_md0',1,'ArduboyI2C Library'],['../index.html#autotoc_md17',1,'Migrating from Wire Library']]],
+  ['library_1',['1. Include the library',['../index.html#autotoc_md8',1,'']]]
 ];
