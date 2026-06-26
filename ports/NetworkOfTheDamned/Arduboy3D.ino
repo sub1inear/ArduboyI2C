@@ -1,7 +1,7 @@
 #include <Arduboy2.h>
 #include <ArduboyTones.h>
 #define I2C_IMPLEMENTATION
-#include "ArduboyI2C.h"
+#include <ArduboyI2C.h>
 #include "Game.h"
 #include "Draw.h"
 #include "Font.h"

@@ -25,7 +25,7 @@ SOFTWARE.
 // define in one file before including
 #define I2C_IMPLEMENTATION
 // disable cable flipping and software pullups for the Arduboy Mini
-// #define I2C_PLATFORM I2C_PLATFORM MINI
+// #define I2C_PLATFORM I2C_PLATFORM_MINI
 #include <ArduboyI2C.h>
 
 constexpr uint8_t numPlayers = 2;
