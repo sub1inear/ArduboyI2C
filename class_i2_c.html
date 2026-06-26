@@ -429,7 +429,7 @@ template&lt;typename T&gt; </div>
   </table>
   </dd>
 </dl>
-<p>This function is intended to be called inside the onRequest callback. It fills the reply buffer with data to then be send one byte at a time. If it is called more than once, only the last call will be sent. </p><dl class="section note"><dt>Note</dt><dd>Internally, this function uses a buffer. The buffer size is controlled by the macro <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd" title="The size of the buffer used for writes/target (slave) operations.">I2C_BUFFER_SIZE</a></span> and defaults to 32. If the program needs to send more than 32 bytes at a time, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd" title="The size of the buffer used for writes/target (slave) operations.">I2C_BUFFER_SIZE</a></span> must be defined before including to be larger. </dd></dl>
+<p>This function is intended to be called inside the onRequest callback. It fills the reply buffer with data to then be sent one byte at a time. If it is called more than once, only the last call will be sent. </p><dl class="section note"><dt>Note</dt><dd>Internally, this function uses a buffer. The buffer size is controlled by the macro <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd" title="The size of the buffer used for writes/target (slave) operations.">I2C_BUFFER_SIZE</a></span> and defaults to 32. If the program needs to send more than 32 bytes at a time, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd" title="The size of the buffer used for writes/target (slave) operations.">I2C_BUFFER_SIZE</a></span> must be defined before including to be larger. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#afb38ec006200442dbdca3fecc9af0d03" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">write()</a> <a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">onRequest()</a> </dd></dl>
 
 </div>
@@ -588,7 +588,7 @@ template&lt;typename T&gt; </div>
 </div><div class="memdoc">
 
 <p>Gets the hardware error which happened in a previous read or write. </p>
-<dl class="section return"><dt>Returns</dt><dd>A byte indicating the error. TW_SUCCESS means no error has occurred. The full list of error codes are available in the avr utils\twi.h. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A byte indicating the error. TW_SUCCESS means no error has occurred. The full list of error codes are available in <span class="tt">util/twi.h</span>. </dd></dl>
 
 </div>
 </div>
@@ -723,12 +723,12 @@ template&lt;typename T&gt; </div>
 <p>Handshakes with other devices and returns a unique id once complete. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">numPlayers</td><td>The amount of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS. </td></tr>
+    <tr><td class="paramname">numPlayers</td><td>The number of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A unique id for this device.</dd></dl>
-<p>This function may be called only once; further calls will not work. This function will wait until every single player has joined. </p><dl class="section note"><dt>Note</dt><dd>The <a class="el" href="#ad2f0a1a57e640663c1ad386dc505054a" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">onReceive()</a> callback will be overriden by this function. </dd></dl>
+<p>This function may be called only once; further calls will not work. This function will wait until every single player has joined. </p><dl class="section note"><dt>Note</dt><dd>The <a class="el" href="#ad2f0a1a57e640663c1ad386dc505054a" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">onReceive()</a> callback will be overridden by this function. </dd></dl>
 
 </div>
 </div>

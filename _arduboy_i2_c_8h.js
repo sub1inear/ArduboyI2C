@@ -22,5 +22,8 @@ var _arduboy_i2_c_8h =
     [ "TW_SUCCESS", "_arduboy_i2_c_8h.html#aaa8a379ca27da629fb7eb67cacc5d86a", null ],
     [ "I2C_HANDSHAKE_FULL", "_arduboy_i2_c_8h.html#a7de1c5a6ceac4c8213b51a9dd54c9bf6", null ],
     [ "I2C_MAX_IDS", "_arduboy_i2_c_8h.html#aeddb4fb18bc6bd7822797a2029c5fff6", null ],
-    [ "I2C_LIB_VER", "_arduboy_i2_c_8h.html#a89cb379c38e2b4b8e1a1c00df7d6ab45", null ]
+    [ "I2C_VERSION_MAJOR", "_arduboy_i2_c_8h.html#af39e2a48363339e93f433abab9d97a1f", null ],
+    [ "I2C_VERSION_MINOR", "_arduboy_i2_c_8h.html#a5ef5e0d416b6cfbe37215ec6637231c7", null ],
+    [ "I2C_VERSION_PATCH", "_arduboy_i2_c_8h.html#a4426736c37915ba0186e18fc4c7b4c13", null ],
+    [ "I2C_VERSION", "_arduboy_i2_c_8h.html#ab189a471c5d2d027960b4f8f9982cfd1", null ]
 ];
