@@ -756,6 +756,8 @@ R"(
 ; -------------------- registers ---------------------- ;
 ; r18     - TWSR (never used after function call)
 ; r19     - general use
+; r20     - REPLY_ACK
+; r21     - REPLY_NACK
 ; r26 (X) - general use
 ; r27 (X) - general use
 ; r28 (Y) - data pointer
@@ -794,6 +796,10 @@ ldi r29, hi8(%[data])
 ldi r30, TWPTR
 clr r31
 
+; set up r20 and r21 (REPLY_ACK and REPLY_NACK)
+ldi r20, REPLY_ACK
+ldi r21, REPLY_NACK
+
 ; switch (TWSR)
 ldd r18, Z + TWSR ; no mask needed because prescaler bits are cleared
 
@@ -822,8 +828,7 @@ TW_START:
     ldd r26, Y + %[slaRW]
     std Z + TWDR, r26
     ; TWCR = REPLY_NACK;
-    ldi r26, REPLY_NACK
-    std Z + TWCR, r26
+    std Z + TWCR, r21
     ; return;
     rjmp pop_reti
 
@@ -852,15 +857,13 @@ TW_MT_DATA_ACK:
     std Z + TWDR, r26
 
     ; TWCR = REPLY_NACK;
-    ldi r26, REPLY_NACK
-    std Z + TWCR, r26
+    std Z + TWCR, r21
     ; return;
     rjmp pop_reti
 
 TW_MT_ARB_LOST:
     ; TWCR = REPLY_ACK;
-    ldi r26, REPLY_ACK
-    std Z + TWCR, r26
+    std Z + TWCR, r20
     ; i2c_detail::data.error = TW_MT_ARB_LOST;
     std Y + %[error], r18
     ; active = false;
@@ -899,6 +902,8 @@ TW_MR_SLA_ACK:
     ;    TWCR = REPLY_NACK;
     ; }
     ; return;
+
+    ; r20 and r21 may be clobbered, do not use
 
     ldd r26, Y + %[bufferIdx]
     ldd r27, Y + %[bufferSize]
@@ -947,8 +952,7 @@ TW_SR_ARB_LOST_GCALL_ACK:
     ; i2c_detail::data.bufferIdx = 0;
     std Y + %[bufferIdx], __zero_reg__
     ; TWCR = REPLY_ACK;
-    ldi r26, REPLY_ACK
-    std Z + TWCR, r26
+    std Z + TWCR, r20
     ; return;
     rjmp pop_reti
 
@@ -969,14 +973,12 @@ TW_SR_GCALL_DATA_ACK:
     st X, r19
 
     ; TWCR = REPLY_ACK;
-    ldi r26, REPLY_ACK
-    std Z + TWCR, r26
+    std Z + TWCR, r20
     ; return;
     rjmp pop_reti
 TW_SR_STOP:
     ; TWCR = REPLY_ACK;
-    ldi r26, REPLY_ACK
-    std Z + TWCR, r26
+    std Z + TWCR, r20
 
     ; if (i2c_detail::data.onReceiveFunction) {
     ;     i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
@@ -993,10 +995,12 @@ TW_SR_STOP:
     breq active_false_reti
 
     icall
+    ; TW register pointer may be clobbered, do not use
+    ; r20 and r21 may be clobbered, do not use
+
     ; i2c_detail::data.active = false;
     ; return;
     rjmp active_false_reti;
-
 ; ----------------------------------------------------- ;
 TW_ST_ARB_LOST_SLA_ACK:
 TW_ST_SLA_ACK:
@@ -1020,10 +1024,12 @@ TW_ST_SLA_ACK:
     cpc r31, __zero_reg__
     breq 1f
     icall
+    1:
 
     ; restore Z pointer
     ldi r30, TWPTR
     clr r31
+    ; r20 and r21 may be clobbered, do not use
 ; ------------------ fallthrough ---------------------- ;
 TW_ST_DATA_ACK:
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
@@ -1074,6 +1080,9 @@ default:
     rjmp 1b
 
     active_false_reti:
+    ; Z pointer may be clobbered, do not use
+    ; r20 and r21 may be clobbered, do not use
+
     ; i2c_detail::data.active = false;
     std Y + %[active], __zero_reg__
 
