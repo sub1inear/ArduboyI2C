@@ -188,7 +188,7 @@ static void PlatformNet::Init()
     arduboy.display(CLEAR_BUFFER);
   });
 
-  Game::menu.DrawHandshaking(PSTR("Connect to I2C"), 4, 35);
+  Game::menu.DrawHandshaking(PSTR("Waiting..."), 4, 45);
   arduboy.display(CLEAR_BUFFER);
 
   uint8_t id = I2C::handshake(2);

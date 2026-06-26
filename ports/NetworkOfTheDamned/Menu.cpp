@@ -246,9 +246,9 @@ void Menu::FadeOut()
 
 		if (fizzleFade == startValue)
 		{
-			//Game::SwitchState(Game::State::GameOver);
-			//Game::Respawn();
-			Game::StartGame();
+			Game::SwitchState(Game::State::GameOver);
+			Game::Respawn();
+			//Game::StartGame();
 			return;
 		}
 	}
