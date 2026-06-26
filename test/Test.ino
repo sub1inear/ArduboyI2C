@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #include <Arduboy2.h>
 #define I2C_IMPLEMENTATION
-#include "ArduboyI2C.h"
+#include <ArduboyI2C.h>
 
 #undef assert
 #define assert(cond, a, b) do { \
