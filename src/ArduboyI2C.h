@@ -265,6 +265,7 @@ SOFTWARE.
  */
 #define I2C_VERSION (I2C_VERSION_MAJOR * 10000 + I2C_VERSION_MINOR * 100 + I2C_VERSION_PATCH)
 
+/// \cond
 /** \brief
  * Not officially part of the library.
  */
@@ -273,6 +274,7 @@ namespace i2c_detail {
 template <typename T> struct is_pointer { static const bool value = false; };
 template <typename T> struct is_pointer<T *> { static const bool value = true;  };
 }
+/// \endcond
 
 /**
  * Provides all I2C functionality.
@@ -497,6 +499,7 @@ public:
 };
 
 #ifdef I2C_IMPLEMENTATION
+/// \cond
 /** \brief
  * Not officially part of the library.
  */
@@ -587,6 +590,7 @@ void readWriteStart(uint8_t address, bool readWrite) {
     i2c_detail::data.bufferIdx = 0;
 }
 }
+/// \endcond
 
 void I2C::begin() {
     power_twi_enable();
