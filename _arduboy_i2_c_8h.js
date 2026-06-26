@@ -1,7 +1,5 @@
 var _arduboy_i2_c_8h =
 [
-    [ "i2c_detail::is_pointer&lt; T &gt;", "structi2c__detail_1_1is__pointer.html", null ],
-    [ "i2c_detail::is_pointer&lt; T * &gt;", "structi2c__detail_1_1is__pointer_3_01_t_01_5_01_4.html", null ],
     [ "I2C", "class_i2_c.html", "class_i2_c" ],
     [ "I2C_PLATFORM", "_arduboy_i2_c_8h.html#a621319d4e6b913f077d3c8339eb9b93b", null ],
     [ "I2C_FREQUENCY", "_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222", null ],
