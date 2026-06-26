@@ -844,15 +844,7 @@ TW_MT_DATA_ACK:
     1:
 
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
-    inc r26
-    std Y + %[bufferIdx], r26
-
-    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
-    ; bufferIdx is already incremented so decrement to compensate
-
-    clr r27
-    subi r26, lo8(-(%[twiBuffer] - 1))
-    sbci r27, hi8(-(%[twiBuffer] - 1))
+    call get_buffer_addr
     ld r26, X
     std Z + TWDR, r26
 
@@ -875,15 +867,14 @@ TW_MR_DATA_NACK:
 TW_MR_DATA_ACK:
     ; i2c_detail::data.rxBuffer[i2c_detail::data.bufferIdx++] = TWDR;
     ldd r19, Y + %[bufferIdx]
-    inc r19
-    std Y + %[bufferIdx], r19
-    dec r19
-
     ldd r26, Y + %[rxBuffer]
     ldd r27, Y + %[rxBuffer] + 1
 
     add r26, r19
     adc r27, __zero_reg__
+
+    inc r19
+    std Y + %[bufferIdx], r19
 
     ldd r19, Z + TWDR
     st X, r19
@@ -959,16 +950,7 @@ TW_SR_ARB_LOST_GCALL_ACK:
 TW_SR_DATA_ACK:
 TW_SR_GCALL_DATA_ACK:
     ; i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++] = TWDR;
-    ldd r26, Y + %[bufferIdx]
-    inc r26
-    std Y + %[bufferIdx], r26
-
-    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
-    ; bufferIdx is already incremented so decrement to compensate
-
-    clr r27
-    subi r26, lo8(-(%[twiBuffer] - 1))
-    sbci r27, hi8(-(%[twiBuffer] - 1))
+    call get_buffer_addr
     ldd r19, Z + TWDR
     st X, r19
 
@@ -1024,25 +1006,17 @@ TW_ST_SLA_ACK:
     cpc r31, __zero_reg__
     breq 1f
     icall
-    1:
 
     ; restore Z pointer
     ldi r30, TWPTR
     clr r31
     ; r20 and r21 may be clobbered, do not use
-; ------------------ fallthrough ---------------------- ;
+    1:
+
+    ; ------------------ fallthrough ---------------------- ;
 TW_ST_DATA_ACK:
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
-    ldd r26, Y + %[bufferIdx]
-    inc r26
-    std Y + %[bufferIdx], r26
-
-    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
-    ; bufferIdx is already incremented so decrement to compensate
-
-    clr r27
-    subi r26, lo8(-(%[twiBuffer] - 1))
-    sbci r27, hi8(-(%[twiBuffer] - 1))
+    call get_buffer_addr
     ld r26, X
     std Z + TWDR, r26
 
@@ -1107,6 +1081,21 @@ default:
     out __SREG__, r18
     pop r18
     reti
+; -------------------- subroutines --------------------- ;
+; output: X = &twiBuffer[bufferIdx++]
+get_buffer_addr:
+    ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
+    ldd r26, Y + %[bufferIdx]
+    inc r26
+    std Y + %[bufferIdx], r26
+
+    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; bufferIdx is already incremented so decrement to compensate
+
+    clr r27
+    subi r26, lo8(-(%[twiBuffer] - 1))
+    sbci r27, hi8(-(%[twiBuffer] - 1))
+    ret
 )"
         : // Output Operands
         [data]             "=m" (i2c_detail::data),
