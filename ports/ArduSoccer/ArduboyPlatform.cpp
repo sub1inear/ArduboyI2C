@@ -87,7 +87,7 @@ bool ArduboyPlatform::connectMultiplayer()
 		arduboy.display(CLEAR_BUFFER);
 	});
 
-	engine.renderer.drawText(smallFont, PSTR("CONNECT VIA I2C"), 20, 30, 1);
+	engine.renderer.drawText(smallFont, PSTR("WAITING FOR PLAYERS"), 8, 30, 1);
 	arduboy.display(CLEAR_BUFFER);
 	deviceId = I2C::handshake(2);
 	if (deviceId == I2C_HANDSHAKE_FULL)
