@@ -107,7 +107,7 @@ SOFTWARE.
 
 #ifndef I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT
 /** \brief
- * The amount of time in milliseconds to debounce cable changes when checking for a flipped cable.
+ * The duration in milliseconds to debounce cable changes when checking for a flipped cable.
  * \details
  * Defaults to 1000 ms, with a maximum of 32767 ms. Increase for more stable detection at the cost of a longer wait time when flipping the cable.
  */
@@ -188,7 +188,7 @@ SOFTWARE.
 
 #ifndef I2C_PIN
 /** \brief
- * The pin on which the SDA and SCL lines is connected.
+ * The pin on which the SDA and SCL lines are connected.
  * \details
  * Defaults to PIND.
  * \note
@@ -199,7 +199,7 @@ SOFTWARE.
 
 #ifndef I2C_PORT
 /** \brief
- * The port on which the SDA and SCL lines is connected.
+ * The port on which the SDA and SCL lines are connected.
  * \details
  * Defaults to PORTD.
  * \note
@@ -269,7 +269,7 @@ SOFTWARE.
  * Not officially part of the library.
  */
 namespace i2c_detail {
-// minimal <type_traits> implementation (non-existant on avr-gcc)
+// minimal <type_traits> implementation (non-existent on avr-gcc)
 template <typename T> struct is_pointer { static const bool value = false; };
 template <typename T> struct is_pointer<T *> { static const bool value = true;  };
 }
@@ -369,7 +369,7 @@ public:
      * \param size The amount of the data in bytes to reply with.
      * \details
      * This function is intended to be called inside the onRequest callback.
-     * It fills the reply buffer with data to then be send one byte at a time.
+     * It fills the reply buffer with data to then be sent one byte at a time.
      * If it is called more than once, only the last call will be sent.
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
@@ -440,7 +440,7 @@ public:
     /** \brief
      * Gets the hardware error which happened in a previous read or write.
      * \return A byte indicating the error. TW_SUCCESS means no error has occurred.
-     * The full list of error codes are available in the avr utils\twi.h.
+     * The full list of error codes are available in `util/twi.h`.
      */
     static uint8_t getError();
 
@@ -485,13 +485,13 @@ public:
 
     /** \brief
      * Handshakes with other devices and returns a unique id once complete.
-     * \param numPlayers The amount of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS.
+     * \param numPlayers The number of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS.
      * \return A unique id for this device.
      * \details
      * This function may be called only once; further calls will not work.
      * This function will wait until every single player has joined.
      * \note
-     * The onReceive() callback will be overriden by this function.
+     * The onReceive() callback will be overridden by this function.
      */
     static uint8_t handshake(uint8_t numPlayers);
 };
@@ -1089,7 +1089,7 @@ get_buffer_addr:
     inc r26
     std Y + %[bufferIdx], r26
 
-    ; use SUBI and SBCI as (non-existant) ADDI and (non-existant) ADCI
+    ; use SUBI and SBCI as (non-existent) ADDI and (non-existent) ADCI
     ; bufferIdx is already incremented so decrement to compensate
 
     clr r27
