@@ -14,5 +14,5 @@ var class_i2_c =
     [ "checkCableFlipped", "class_i2_c.html#a2146f1685988390f3674df95868e88e3", null ],
     [ "checkEmulator", "class_i2_c.html#aa128e788ab8606c6d815e041151da71d", null ],
     [ "idToAddress", "class_i2_c.html#a4f4062dba835e29f49d99aac3c3c3984", null ],
-    [ "handshake", "class_i2_c.html#a048b60bd3ab9bedaecb295a1eb369e0e", null ]
+    [ "handshake", "class_i2_c.html#a7f3455d4864527408a933da138f9756c", null ]
 ];
