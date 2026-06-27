@@ -281,7 +281,7 @@ arduboy.setCursor(35, 25);
 arduboy.print(F("Waiting..."));
 arduboy.display(CLEAR_BUFFER);
 
-playerRole = I2C::handshake(2);
+playerRole = I2C::handshake();
 if (playerRole == I2C_HANDSHAKE_FULL) {
     arduboy.exitToBootloader();
 }
@@ -728,58 +728,59 @@ void sendAttackNotification(Player &attacker, Player &defender) {
 }
 
 // Function to receive data
-void receiveData(const uint8_t *buffer, uint8_t size) {
-    uint8_t commandType = buffer[0];
-    if (commandType == CMD_UPDATE) {
-      // Receive regular update
-      Player &remotePlayer = (playerRole == PLAYER_1) ? player2 : player1;
-      remotePlayer.x = (buffer[1] << 8) | buffer[2];
-      remotePlayer.y = (buffer[3] << 8) | buffer[4];
-      remotePlayer.velX = (int8_t)buffer[5];
-      remotePlayer.velY = (int8_t)buffer[6];
-      remotePlayer.attacking = buffer[7];
-      remotePlayer.chargedAttack = buffer[8];
-      remotePlayer.health = buffer[9];
-      remotePlayer.idle = buffer[10];
-    } else if (commandType == CMD_ATTACK) {
-      // Receive attack notification
-      bool chargedAttack = buffer[1];
-      int8_t velX = (int8_t)buffer[2];
-      int8_t velY = (int8_t)buffer[3];
-      int health = buffer[4];
+void receiveData() {
+  const uint8_t *buffer = I2C::getBuffer();
+  uint8_t commandType = buffer[0];
+  if (commandType == CMD_UPDATE) {
+    // Receive regular update
+    Player &remotePlayer = (playerRole == PLAYER_1) ? player2 : player1;
+    remotePlayer.x = (buffer[1] << 8) | buffer[2];
+    remotePlayer.y = (buffer[3] << 8) | buffer[4];
+    remotePlayer.velX = (int8_t)buffer[5];
+    remotePlayer.velY = (int8_t)buffer[6];
+    remotePlayer.attacking = buffer[7];
+    remotePlayer.chargedAttack = buffer[8];
+    remotePlayer.health = buffer[9];
+    remotePlayer.idle = buffer[10];
+  } else if (commandType == CMD_ATTACK) {
+    // Receive attack notification
+    bool chargedAttack = buffer[1];
+    int8_t velX = (int8_t)buffer[2];
+    int8_t velY = (int8_t)buffer[3];
+    int health = buffer[4];
 
-      // Apply attack to local defender
-      Player &defender = (playerRole == PLAYER_1) ? player1 : player2;
-      defender.velX = velX;
-      defender.velY = velY;
-      defender.health = health;
-      Player &attacker = (playerRole == PLAYER_2) ? player1 : player2;
-      attacker.attackDisplay = 5;
+    // Apply attack to local defender
+    Player &defender = (playerRole == PLAYER_1) ? player1 : player2;
+    defender.velX = velX;
+    defender.velY = velY;
+    defender.health = health;
+    Player &attacker = (playerRole == PLAYER_2) ? player1 : player2;
+    attacker.attackDisplay = 5;
 
 
-    } else if (commandType == CMD_PLATFORM_UPDATE) {
-      // Receive platform updates
-      uint8_t idx = 1;
-      for (int i = 0; i < PLATFORM_COUNT; i++) {
-        Platform &platform = platforms[i];
-        int prevX = platform.x;  // Save previous x position
-        uint8_t hiX = buffer[idx++];
-        uint8_t loX = buffer[idx++];
-        platform.x = (hiX << 8) | loX;
-        uint8_t hiY = buffer[idx++];
-        uint8_t loY = buffer[idx++];
-        platform.y = (hiY << 8) | loY;
-        platform.width = buffer[idx++];
-        platform.moving = buffer[idx++];
-        platform.direction = (int8_t)buffer[idx++];
-        if (platformsInitialized) {
-          platform.deltaX = platform.x - prevX;  // Calculate movement delta
-        } else {
-          platform.deltaX = 0;  // Initial frame
-        }
+  } else if (commandType == CMD_PLATFORM_UPDATE) {
+    // Receive platform updates
+    uint8_t idx = 1;
+    for (int i = 0; i < PLATFORM_COUNT; i++) {
+      Platform &platform = platforms[i];
+      int prevX = platform.x;  // Save previous x position
+      uint8_t hiX = buffer[idx++];
+      uint8_t loX = buffer[idx++];
+      platform.x = (hiX << 8) | loX;
+      uint8_t hiY = buffer[idx++];
+      uint8_t loY = buffer[idx++];
+      platform.y = (hiY << 8) | loY;
+      platform.width = buffer[idx++];
+      platform.moving = buffer[idx++];
+      platform.direction = (int8_t)buffer[idx++];
+      if (platformsInitialized) {
+        platform.deltaX = platform.x - prevX;  // Calculate movement delta
+      } else {
+        platform.deltaX = 0;  // Initial frame
       }
-      platformsInitialized = true;
     }
+    platformsInitialized = true;
+  }
 }
 
 // Function to draw platforms

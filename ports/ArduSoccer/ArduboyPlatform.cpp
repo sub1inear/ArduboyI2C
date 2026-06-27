@@ -8,8 +8,9 @@
 
 ArduboyPlatform Platform;
 
-void onReceive(const uint8_t *buffer, uint8_t size)
+void onReceive()
 {
+	const uint8_t *buffer = I2C::getBuffer();
 	Platform.data = buffer[0];
 	Platform.dataAvailable = true;
 }
@@ -95,7 +96,7 @@ bool ArduboyPlatform::connectMultiplayer()
 
 	engine.renderer.drawText(smallFont, PSTR("WAITING FOR PLAYERS"), 8, 30, 1);
 	arduboy.display(CLEAR_BUFFER);
-	deviceId = I2C::handshake(2);
+	deviceId = I2C::handshake();
 	if (deviceId == I2C_HANDSHAKE_FULL)
 	{
 		arduboy.exitToBootloader();

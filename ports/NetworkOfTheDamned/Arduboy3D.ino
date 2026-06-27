@@ -173,6 +173,13 @@ void Platform::ExpectLoadDelay()
 volatile uint8_t PlatformNet::data = 0;
 volatile bool PlatformNet::dataAvailable = false;
 
+static void onReceive()
+{
+  const uint8_t *buffer = I2C::getBuffer();
+  PlatformNet::data = buffer[0];
+  PlatformNet::dataAvailable = true;
+}
+
 static void PlatformNet::Init()
 {
   I2C::begin();
@@ -192,15 +199,12 @@ static void PlatformNet::Init()
   Game::menu.DrawHandshaking(PSTR("Waiting..."), 4, 45);
   arduboy.display(CLEAR_BUFFER);
 
-  uint8_t id = I2C::handshake(2);
+  uint8_t id = I2C::handshake();
   if (id == I2C_HANDSHAKE_FULL)
   {
     arduboy.exitToBootloader();
   }
-  I2C::onReceive([](const uint8_t *buffer, uint8_t size) {
-    data = buffer[0];
-    dataAvailable = true;
-  });
+  I2C::onReceive(onReceive);
   Game::localPlayerId = id;
 }
 

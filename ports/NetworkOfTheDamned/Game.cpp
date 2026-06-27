@@ -128,10 +128,7 @@ void Game::TickInGame()
 	uint8_t localInput = Platform::GetInput();
 	PlatformNet::Write(localInput);
 
-	while (!PlatformNet::ReadAvailable())
-	{
-
-	}
+	while (!PlatformNet::ReadAvailable()) { }
 	uint8_t remoteInput = PlatformNet::Read();
 
 

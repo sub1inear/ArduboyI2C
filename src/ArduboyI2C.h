@@ -83,15 +83,15 @@ SOFTWARE.
 #error "I2C_FREQUENCY is too high."
 #endif
 
-#ifndef I2C_BUFFER_SIZE
+#ifndef I2C_BUFFER_CAPACITY
 /** \brief
- * The size of the buffer used for writes/target (slave) operations.
+ * The capacity of the buffer used for writes/target (slave) operations.
  * \details
  * Defaults to 32. If more than 32 bytes are needed for writes/target (slave) operations, increase. If more RAM is needed, decrease.
  * Maximum is 255.
  */
-#define I2C_BUFFER_SIZE 32
-#elif I2C_BUFFER_SIZE > 255
+#define I2C_BUFFER_CAPACITY 32
+#elif I2C_BUFFER_CAPACITY > 255
 #error "I2C_BUFFER_SIZE is too big."
 #endif
 
@@ -332,8 +332,8 @@ public:
      * \note
      * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on every other device.
      * \note
-     * Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
-     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
+     * Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
+     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
      * must be defined before including to be larger.
      * \see transmit() read()
      */
@@ -352,7 +352,7 @@ public:
     template<typename T>
     static void write(uint8_t address, const T &object, bool wait) {
         static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
-        static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
+        static_assert(sizeof(T) <= I2C_BUFFER_CAPACITY, "Size of T must be less than or equal to I2C_BUFFER_CAPACITY.");
         I2C::write(address, (const void *)&object, sizeof(T), wait);
     }
 
@@ -394,8 +394,8 @@ public:
      * It fills the reply buffer with data to then be sent one byte at a time.
      * If it is called more than once, only the last call will be sent.
      * \note
-     * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_SIZE`
-     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_SIZE`
+     * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
+     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
      * must be defined before including to be larger.
      * \see write() onRequest()
      */
@@ -411,7 +411,7 @@ public:
     template <typename T>
     static void reply(const T &object) {
         static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
-        static_assert(sizeof(T) <= I2C_BUFFER_SIZE, "Size of T must be less than or equal to I2C_BUFFER_SIZE.");
+        static_assert(sizeof(T) <= I2C_BUFFER_CAPACITY, "Size of T must be less than or equal to I2C_BUFFER_CAPACITY.");
         I2C::reply((const void *)&object, sizeof(T));
     }
 
@@ -439,15 +439,13 @@ public:
     static void onRequest(void (*function)());
 
     /** \brief
-     * Sets up/disables the callback to be called when data is sent to the device's address (a write)
+     * Sets up/disables the callback to be called when data is sent to the device's address (a write).
      * \param function The function to be called when data is received, or nullptr to disable.
      * \details
      * Example Callback and Usage:
      * \code{.cpp}
-     * void dataReceive(const uint8_t *buffer, uint8_t size) {
-     *   uint8_t newId = buffer[0];
-     *   players[newId].x = buffer[1];
-     *   players[newId].y = buffer[2];
+     * void dataReceive() {
+     *     const uint8_t *buffer = I2C::getBuffer();
      * }
      * ...
      * void setup() {
@@ -457,7 +455,7 @@ public:
      * \endcode
      * \see onRequest() reply() read()
      */
-    static void onReceive(void (*function)(const uint8_t *buffer, uint8_t size));
+    static void onReceive(void (*function)());
 
     /** \brief
      * Gets the hardware error which happened in a previous read or write.
@@ -465,6 +463,24 @@ public:
      * The full list of error codes are available in `util/twi.h`.
      */
     static uint8_t getError();
+
+    /** \brief
+     * Gets a pointer to the internal buffer used for I2C communication.
+     * \return A pointer to the internal buffer.
+     * \details
+     * This function is intended to be used in the onReceive callback to get the data sent by the controller (master).
+     * \see onReceive()
+     */
+    static const uint8_t *getBuffer();
+
+    /** \brief
+     * Gets the size of the data in the internal buffer.
+     * \return The size of the data in the internal buffer.
+     * \details
+     * This function is intended to be used in the onReceive callback to get the size of the data sent by the controller (master).
+     * \see onReceive()
+     */
+    static uint8_t getBufferSize();
 
     /** \brief
      * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
@@ -534,10 +550,10 @@ void handshakeOnRequest() {
 
 struct i2c_data_t {
     void (*onRequestFunction)() = nullptr;
-    void (*onReceiveFunction)(const uint8_t *buffer, uint8_t size) = nullptr;
+    void (*onReceiveFunction)() = nullptr;
 
     volatile uint8_t *rxBuffer;
-    uint8_t twiBuffer[I2C_BUFFER_SIZE];
+    uint8_t twiBuffer[I2C_BUFFER_CAPACITY];
     volatile uint8_t bufferIdx;
     volatile uint8_t bufferSize;
 
@@ -683,12 +699,20 @@ void I2C::onRequest(void (*function)()) {
     i2c_detail::data.onRequestFunction = function;
 }
 
-void I2C::onReceive(void (*function)(const uint8_t *buffer, uint8_t size)) {
+void I2C::onReceive(void (*function)()) {
     i2c_detail::data.onReceiveFunction = function;
 }
 
 uint8_t I2C::getError() {
     return i2c_detail::data.error;
+}
+
+const uint8_t *I2C::getBuffer() {
+    return i2c_detail::data.twiBuffer;
+}
+
+uint8_t I2C::getBufferSize() {
+    return i2c_detail::data.bufferSize;
 }
 
 #if I2C_USE_CHECK_CABLE_FLIPPED
@@ -998,11 +1022,8 @@ TW_SR_STOP:
     std Z + TWCR, r20
 
     ; if (i2c_detail::data.onReceiveFunction) {
-    ;     i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+    ;     i2c_detail::data.onReceiveFunction();
     ; }
-    ldd r22, Y + %[bufferIdx]
-    ldi r24, lo8(%[twiBuffer])
-    ldi r25, hi8(%[twiBuffer])
 
     ldd r30, Y + %[onReceiveFunction]
     ldd r31, Y + %[onReceiveFunction] + 1
@@ -1229,7 +1250,7 @@ ISR(TWI_vect) {
     case TW_SR_STOP:
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         if (i2c_detail::data.onReceiveFunction) {
-            i2c_detail::data.onReceiveFunction(i2c_detail::data.twiBuffer, i2c_detail::data.bufferIdx);
+            i2c_detail::data.onReceiveFunction();
         }
         i2c_detail::data.active = false;
         break;

@@ -54,7 +54,7 @@ SOFTWARE.
 #define assert_cb_ok(var, a, b) do { \
 	    if (var) { \
 			Serial.print(F("Assertion failed: ")); \
-			Serial.println(var); \
+			Serial.print(var); \
 			Serial.print(F(", ")); \
 			Serial.print(a); \
 			Serial.print(F(", ")); \
@@ -105,11 +105,11 @@ bool testSetAddress() {
 	return true;
 }
 
-void testWriteCallback(const uint8_t *buffer, uint8_t size) {
+void testWriteCallback() {
 	writeCallbackCalled = true;
-	assert_cb(size == 16, writeCallbackError, writeCallbackA = size, writeCallbackB = 16);
+	assert_cb(I2C::getBufferSize() == 16, writeCallbackError, writeCallbackA = I2C::getBufferSize(), writeCallbackB = 16);
 
-	int memcmpResult = memcmp(buffer, bufferExpected, 16);
+	int memcmpResult = memcmp(I2C::getBuffer(), bufferExpected, 16);
 	assert_cb(memcmpResult == 0, writeCallbackError, writeCallbackA = memcmpResult, writeCallbackB = 0);
 }
 

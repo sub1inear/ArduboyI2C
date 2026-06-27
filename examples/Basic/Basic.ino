@@ -49,7 +49,8 @@ void displayMessage(const __FlashStringHelper *message) {
     arduboy.display();
 }
 
-void onReceive(const uint8_t *buffer, uint8_t size) {
+void onReceive() {
+    const uint8_t *buffer = I2C::getBuffer();
     // interpret the received data as a player struct
     const Player *newPlayer = reinterpret_cast<const Player *>(buffer);
     // update remote player data
