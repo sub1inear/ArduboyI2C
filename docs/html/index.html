@@ -165,10 +165,10 @@ Quick Start</h2>
 </blockquote>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
 5. Callbacks</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#ad2f0a1a57e640663c1ad386dc505054a">I2C::onReceive</a>(receiveCallback);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a>(receiveCallback);</div>
 <div class="line"><a class="code hl_function" href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a>(requestCallback);</div>
 <div class="ttc" id="aclass_i2_c_html_a026eaad0ba8bb6a698d3eaca9dd9887d"><div class="ttname"><a href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a></div><div class="ttdeci">static void onRequest(void(*function)())</div><div class="ttdoc">Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).</div></div>
-<div class="ttc" id="aclass_i2_c_html_ad2f0a1a57e640663c1ad386dc505054a"><div class="ttname"><a href="class_i2_c.html#ad2f0a1a57e640663c1ad386dc505054a">I2C::onReceive</a></div><div class="ttdeci">static void onReceive(void(*function)(const uint8_t *buffer, uint8_t size))</div><div class="ttdoc">Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).</div></div>
+<div class="ttc" id="aclass_i2_c_html_aba82f80b86f08e2caf0f6cab4860728d"><div class="ttname"><a href="class_i2_c.html#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a></div><div class="ttdeci">static void onReceive(void(*function)())</div><div class="ttdoc">Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).</div></div>
 </div><!-- fragment --> <div class="fragment"><div class="line"><span class="keywordtype">void</span> requestCallback() {</div>
 <div class="line">  <a class="code hl_function" href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1">I2C::reply</a>(data);</div>
 <div class="line">}</div>
@@ -186,7 +186,7 @@ Core Settings</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222" title="The initial I2C frequency in Hz.">I2C_FREQUENCY</a></span>  </td><td class="markdownTableBodyNone">100000  </td><td class="markdownTableBodyNone">0-400000  </td><td class="markdownTableBodyNone">Bus frequency (Hz)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd" title="The size of the buffer used for writes/target (slave) operations.">I2C_BUFFER_SIZE</a></span>  </td><td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone">1-255  </td><td class="markdownTableBodyNone">Transaction buffer size  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">I2C_BUFFER_SIZE</span>  </td><td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone">1-255  </td><td class="markdownTableBodyNone">Transaction buffer size  </td></tr>
 </table>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
 Reliability</h3>
@@ -224,7 +224,7 @@ Migrating from Wire Library</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Wire.begin(addr)</span>  </td><td class="markdownTableBodyNone"><span class="tt">I2C::setAddress(addr)</span>  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">Wire.onReceive()</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="class_i2_c.html#ad2f0a1a57e640663c1ad386dc505054a" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">I2C::onReceive()</a></span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">Wire.onReceive()</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="class_i2_c.html#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">I2C::onReceive()</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Wire.onRequest()</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">I2C::onRequest()</a></span>  </td></tr>
 <tr class="markdownTableRowOdd">

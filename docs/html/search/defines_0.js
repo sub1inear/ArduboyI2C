@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['i2c_5fbuffer_5fsize_0',['I2C_BUFFER_SIZE',['../_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd',1,'ArduboyI2C.h']]],
+  ['i2c_5fbuffer_5fcapacity_0',['I2C_BUFFER_CAPACITY',['../_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3',1,'ArduboyI2C.h']]],
   ['i2c_5fcheck_5fcable_5fflipped_5fchecks_1',['I2C_CHECK_CABLE_FLIPPED_CHECKS',['../_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57',1,'ArduboyI2C.h']]],
   ['i2c_5fcheck_5fcable_5fflipped_5fdebounce_5ftimeout_2',['I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT',['../_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0',1,'ArduboyI2C.h']]],
   ['i2c_5fddr_3',['I2C_DDR',['../_arduboy_i2_c_8h.html#ab4386d053f69f39963bebf5f03b6eeee',1,'ArduboyI2C.h']]],
