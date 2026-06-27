@@ -35,8 +35,24 @@ SOFTWARE.
 #include <stdint.h>
 #include <stddef.h>
 
+/** \brief
+ * Constant for the Arduboy FX-C platform.
+ * \details
+ * Set `I2C_PLATFORM` to this value to use the Arduboy FX-C platform.
+ * This is the default platform if `I2C_PLATFORM` is not defined.
+ */
 #define I2C_PLATFORM_FX_C 0
+/** \brief
+ * Constant for the Arduboy Mini platform.
+ * \details
+ * Set `I2C_PLATFORM` to this value to use the Arduboy Mini platform.
+ */
 #define I2C_PLATFORM_MINI 1
+/** \brief
+ * Constant for an unknown platform.
+ * \details
+ * Set `I2C_PLATFORM` to this value to use an unknown platform.
+ */
 #define I2C_PLATFORM_UNKNOWN 2
 
 #ifndef I2C_PLATFORM
