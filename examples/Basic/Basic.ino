@@ -28,27 +28,22 @@ SOFTWARE.
 // #define I2C_PLATFORM I2C_PLATFORM_MINI
 #include <ArduboyI2C.h>
 
-constexpr uint8_t numPlayers = 2;
-
 Arduboy2 arduboy;
 
 struct Player {
-    // used to identify our message as belonging to us
-    uint8_t id;
-    // general data
-    uint8_t x;
-    uint8_t y;
+    int8_t x;
+    int8_t y;
 };
-// player data array
-Player players[numPlayers];
 
-// stores unique id from 0 to numPlayers - 1
-// our index into the players array (players[id] is us)
-// assigned during handshake
-uint8_t id;
+Player localPlayer = { 0, 0 };
+Player remotePlayer = { 0, 0 };
+
+// unique id for this device
+uint8_t id = 0;
 
 void displayMessage(const __FlashStringHelper *message) {
     // __FlashStringHelper ensures message is stored in flash memory (with the F() macro)
+    // otherwise the exactly the same as `char`
     arduboy.clear();
     arduboy.print(message);
     arduboy.display();
@@ -56,18 +51,11 @@ void displayMessage(const __FlashStringHelper *message) {
 
 void onReceive(const uint8_t *buffer, uint8_t size) {
     // interpret the received data as a player struct
-    Player *newPlayer = (Player *)buffer;
-
-    // with the id field, find the player struct which corresponds to the sender
-    Player *curPlayer = &players[newPlayer->id];
-
-    // copy the position data into our local copy of that player's data
-    // no need to copy id, only for identifying the message
-    curPlayer->x = newPlayer->x;
-    curPlayer->y = newPlayer->y;
+    const Player *newPlayer = reinterpret_cast<const Player *>(buffer);
+    // update remote player data
+    remotePlayer = *newPlayer;
 }
 
-// main functions
 void setup() {
     // initialize arduboy hardware
     arduboy.begin();
@@ -92,23 +80,20 @@ void setup() {
         displayMessage(F("Please flip the cable\non this device."));
     });
 
-    // display handshaking message,
-    // I2C::handshake blocks
+    // display handshaking message, I2C::handshake blocks
     displayMessage(F("Waiting for other\nplayer..."));
 
-    // get unique id and wait for other players to join
+    // handshake with other devices and get a unique id for this device
     // note: I2C::handshake enables general calls by default
-    id = I2C::handshake(numPlayers);
+    id = I2C::handshake();
 
-    // if the handshaking is full (numPlayers has been reached already), exit
+    // if the handshaking is full (two players have joined already), exit
     if (id == I2C_HANDSHAKE_FULL) {
         arduboy.exitToBootloader();
     }
+
     // setup our receive event to be called when we receive a write
     I2C::onReceive(onReceive);
-
-    // identify our player data packets so the receiver knows who sent them
-    players[id].id = id;
 }
 
 void loop() {
@@ -116,23 +101,29 @@ void loop() {
     if (!arduboy.nextFrame()) {
         return;
     }
-    // clear screen
     arduboy.clear();
 
     // move our player around with the D-Pad
-    if (arduboy.pressed(RIGHT_BUTTON)) { players[id].x++; }
-    if (arduboy.pressed(LEFT_BUTTON))  { players[id].x--; }
-    if (arduboy.pressed(DOWN_BUTTON))  { players[id].y++; }
-    if (arduboy.pressed(UP_BUTTON))    { players[id].y--; }
+    if (arduboy.pressed(RIGHT_BUTTON)) { localPlayer.x++; }
+    if (arduboy.pressed(LEFT_BUTTON))  { localPlayer.x--; }
+    if (arduboy.pressed(DOWN_BUTTON))  { localPlayer.y++; }
+    if (arduboy.pressed(UP_BUTTON))    { localPlayer.y--; }
 
-    // send out a general call to give every other device our data
+    localPlayer.x = constrain(localPlayer.x, 0, WIDTH - 8);
+    localPlayer.y = constrain(localPlayer.y, 0, HEIGHT - 8);
+
+    // send out a general call to give the other device our data
     // false -> will not wait for the write to complete
-    I2C::write(I2C_GENERAL_CALL, players[id], false);
+    I2C::write(I2C_GENERAL_CALL, localPlayer, false);
 
-    // draw all of the players
-    for (uint8_t i = 0; i < numPlayers; i++) {
-        arduboy.fillRect(players[i].x, players[i].y, 8, 8);
-    }
+    // draw the players
+    // id 0 -> filled, id 1 -> outlined
+    Player &filledPlayer = (id == 0) ? localPlayer : remotePlayer;
+    Player &outlinedPlayer = (id == 0) ? remotePlayer : localPlayer;
+
+    arduboy.fillRect(filledPlayer.x, filledPlayer.y, 8, 8, WHITE);
+    arduboy.drawRect(outlinedPlayer.x, outlinedPlayer.y, 8, 8, WHITE);
+
     // display
     arduboy.display();
 }
