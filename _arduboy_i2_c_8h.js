@@ -1,10 +1,13 @@
 var _arduboy_i2_c_8h =
 [
     [ "I2C", "class_i2_c.html", "class_i2_c" ],
+    [ "I2C_PLATFORM_FX_C", "_arduboy_i2_c_8h.html#a5e9cf5cf07df5ab333b78df30cfc54dd", null ],
+    [ "I2C_PLATFORM_MINI", "_arduboy_i2_c_8h.html#a87c420b46c32c47fd27003f610622f9f", null ],
+    [ "I2C_PLATFORM_UNKNOWN", "_arduboy_i2_c_8h.html#a7135a08961de38f77d684704bd51b2f3", null ],
     [ "I2C_PLATFORM", "_arduboy_i2_c_8h.html#a621319d4e6b913f077d3c8339eb9b93b", null ],
     [ "I2C_FREQUENCY", "_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222", null ],
     [ "I2C_BUFFER_SIZE", "_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd", null ],
-    [ "I2C_CHECK_BUS_BUSY_CHECKS", "_arduboy_i2_c_8h.html#aecf378ba83ad4073823cc7c41de5f14c", null ],
+    [ "I2C_MULTI_CONTROLLER_BUSY_CHECKS", "_arduboy_i2_c_8h.html#a19f4a62ac3e2dfb317f31cac267b8490", null ],
     [ "I2C_CHECK_CABLE_FLIPPED_CHECKS", "_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57", null ],
     [ "I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT", "_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0", null ],
     [ "I2C_USE_HANDSHAKE", "_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650", null ],
