@@ -1,6 +1,7 @@
 #include <Arduboy2.h>
 #include <ArduboyTones.h>
 #define I2C_IMPLEMENTATION
+#define I2C_FREQUENCY 400000
 #include <ArduboyI2C.h>
 #include "Game.h"
 #include "Draw.h"
@@ -205,11 +206,14 @@ static void PlatformNet::Init()
 
 static void PlatformNet::Write(uint8_t data)
 {
-  I2C::write(I2C_GENERAL_CALL, data, true);
+  do {
+    I2C::write(I2C_GENERAL_CALL, data, true);
+  } while (I2C::getError() != TW_SUCCESS);
 }
 
 static uint8_t PlatformNet::Read()
 {
+  dataAvailable = false;
   return data;
 }
 
@@ -223,6 +227,7 @@ void setup()
   arduboy.boot();
   arduboy.flashlight();
   arduboy.systemButtons();
+  arduboy.waitNoButtons();
   //arduboy.bootLogo();
   arduboy.setFrameRate(TARGET_FRAMERATE);
 
@@ -239,44 +244,15 @@ void setup()
 
 void loop()
 {
-  static int16_t tickAccum = 0;
-  unsigned long timingSample = millis();
-  tickAccum += (timingSample - lastTimingSample);
-  lastTimingSample = timingSample;
-
 #if DEV_MODE
   if(arduboy.nextFrameDEV())
 #else
   if(arduboy.nextFrame())
 #endif
   {
-	constexpr int16_t frameDuration = 1000 / TARGET_FRAMERATE;
-	bool needsDraw = false;
-
-	while(tickAccum > frameDuration)
-	{
-		if(Game::Tick())
-		{
-			needsDraw = true;
-			tickAccum -= frameDuration;
-			lastGoodTickTime = timingSample;
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	if(needsDraw)
-	{
-		Game::Draw();
-	    arduboy.display(false);
-	}
-	else if((timingSample - lastGoodTickTime) > 5000)
-	{
-		void(* resetFunc) (void) = 0;
-		resetFunc();
-	}
+	Game::Tick();
+	Game::Draw();
+  arduboy.display(false);
 
     //Serial.write(arduboy.getBuffer(), 128 * 64 / 8);
 

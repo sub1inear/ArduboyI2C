@@ -123,31 +123,16 @@ void Game::Draw()
 	}
 }
 
-bool Game::TickInGame()
+void Game::TickInGame()
 {
-	static bool waitingForRead = false;
-	static uint8_t localInput = 0;
+	uint8_t localInput = Platform::GetInput();
+	PlatformNet::Write(localInput);
 
-
-	if (!waitingForRead)
+	while (!PlatformNet::ReadAvailable())
 	{
-		localInput = Platform::GetInput();
 
-		PlatformNet::Write(localInput);
 	}
-
-	uint8_t remoteInput;
-
-	if (PlatformNet::ReadAvailable())
-	{
-		remoteInput = PlatformNet::Read();
-		waitingForRead = false;
-	}
-	else
-	{
-		waitingForRead = true;
-		return false;
-	}
+	uint8_t remoteInput = PlatformNet::Read();
 
 
 	if (displayMessageTime > 0)
@@ -178,19 +163,15 @@ bool Game::TickInGame()
 			break;
 		}
 	}
-
-	return true;
 }
 
-bool Game::Tick()
+void Game::Tick()
 {
-	bool success = true;
-
 	switch(state)
 	{
 		case State::InGame:
 		case State::FadeOut:
-			success = TickInGame();
+			TickInGame();
 			break;
 		case State::EnteringLevel:
 			menu.TickEnteringLevel();
@@ -203,11 +184,7 @@ bool Game::Tick()
 			break;
 	}
 
-	if (success)
-	{
-		globalTickFrame++;
-	}
-	return success;
+	globalTickFrame++;
 }
 
 void Game::GameOver()

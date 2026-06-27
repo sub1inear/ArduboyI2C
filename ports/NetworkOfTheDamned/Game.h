@@ -35,7 +35,7 @@ public:
 	};
 
 	static void Init();
-	static bool Tick();
+	static void Tick();
 	static void Draw();
 
 	static void StartGame();
@@ -62,7 +62,7 @@ public:
 	static Menu menu;
 
 private:
-	static bool TickInGame();
+	static void TickInGame();
 
 	static State state;
 };
