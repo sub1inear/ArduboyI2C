@@ -6,7 +6,7 @@ var _arduboy_i2_c_8h =
     [ "I2C_PLATFORM_UNKNOWN", "_arduboy_i2_c_8h.html#a7135a08961de38f77d684704bd51b2f3", null ],
     [ "I2C_PLATFORM", "_arduboy_i2_c_8h.html#a621319d4e6b913f077d3c8339eb9b93b", null ],
     [ "I2C_FREQUENCY", "_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222", null ],
-    [ "I2C_BUFFER_SIZE", "_arduboy_i2_c_8h.html#a6458dbf193a0eef0470fc1b08400bfcd", null ],
+    [ "I2C_BUFFER_CAPACITY", "_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3", null ],
     [ "I2C_MULTI_CONTROLLER_BUSY_CHECKS", "_arduboy_i2_c_8h.html#a19f4a62ac3e2dfb317f31cac267b8490", null ],
     [ "I2C_CHECK_CABLE_FLIPPED_CHECKS", "_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57", null ],
     [ "I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT", "_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0", null ],
