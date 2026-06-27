@@ -1,4 +1,5 @@
 #define I2C_IMPLEMENTATION
+// #define I2C_CHECK_BUS_BUSY_CHECKS 255
 #include <ArduboyI2C.h>
 #include "ArduboyPlatform.h"
 #include "Engine.h"
@@ -9,8 +10,8 @@ ArduboyPlatform Platform;
 
 void onReceive(const uint8_t *buffer, uint8_t size)
 {
-	Platform.lastInputState[REMOTE_PLAYER] = Platform.inputState[REMOTE_PLAYER];
-    Platform.inputState[REMOTE_PLAYER] = buffer[0];
+	Platform.data = buffer[0];
+	Platform.dataAvailable = true;
 }
 
 void ArduboyPlatform::updateInput()
@@ -46,22 +47,27 @@ void ArduboyPlatform::updateInput()
 
 void ArduboyPlatform::update()
 {
-	if(arduboy.audio.enabled() != !m_isMuted)
-	{
+    if(arduboy.audio.enabled() != !m_isMuted)
+    {
 		if(m_isMuted)
 		{
-			arduboy.audio.off();
+				arduboy.audio.off();
 		}
 		else
 		{
-			arduboy.audio.on();
+				arduboy.audio.on();
 		}
-	}
-
+    }
 	updateInput();
 	if (deviceId != deviceIdNull)
 	{
-		I2C::write(I2C_GENERAL_CALL, inputState[LOCAL_PLAYER], false);
+		do {
+        	I2C::write(I2C_GENERAL_CALL, inputState[LOCAL_PLAYER], true);
+		} while (I2C::getError() != TW_SUCCESS);
+		while (!dataAvailable) { }
+		dataAvailable = false;
+		lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
+		inputState[REMOTE_PLAYER] = data;
 	}
 }
 

@@ -132,8 +132,8 @@ Macros</h2></td></tr>
 <tr class="memdesc:a196ccf6b40cc40bef1769ec2835ca6d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The duration in milliseconds to debounce cable changes when checking for a flipped cable.  <br /></td></tr>
 <tr class="memitem:af78725d267e97bdc10ee21e78c798650" id="r_af78725d267e97bdc10ee21e78c798650"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af78725d267e97bdc10ee21e78c798650">I2C_USE_HANDSHAKE</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:af78725d267e97bdc10ee21e78c798650"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to enable handshake functionality.  <br /></td></tr>
-<tr class="memitem:a46613027f9a3fd1acede15144779992e" id="r_a46613027f9a3fd1acede15144779992e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a46613027f9a3fd1acede15144779992e">I2C_USE_CHECK_BUS_BUSY</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memdesc:a46613027f9a3fd1acede15144779992e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to enable bus busy checking functionality.  <br /></td></tr>
+<tr class="memitem:a78f76a3fafb4f758fa43d7a9b0782914" id="r_a78f76a3fafb4f758fa43d7a9b0782914"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a78f76a3fafb4f758fa43d7a9b0782914">I2C_USE_MULTI_CONTROLLER</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:a78f76a3fafb4f758fa43d7a9b0782914"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to enable multi-controller (master) safety checks.  <br /></td></tr>
 <tr class="memitem:ad9778e6e274898472e7b5fab6efa13c4" id="r_ad9778e6e274898472e7b5fab6efa13c4"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad9778e6e274898472e7b5fab6efa13c4">I2C_USE_CHECK_CABLE_FLIPPED</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:ad9778e6e274898472e7b5fab6efa13c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to enable flipped cable detection functionality.  <br /></td></tr>
 <tr class="memitem:ac318e96bb22b8d5710db448875fef550" id="r_ac318e96bb22b8d5710db448875fef550"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac318e96bb22b8d5710db448875fef550">I2C_USE_SOFTWARE_PULLUPS</a>&#160;&#160;&#160;1</td></tr>
@@ -298,20 +298,20 @@ Standard frequencies: <br  />
 
 </div>
 </div>
-<a id="a46613027f9a3fd1acede15144779992e" name="a46613027f9a3fd1acede15144779992e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46613027f9a3fd1acede15144779992e">&#9670;&#160;</a></span>I2C_USE_CHECK_BUS_BUSY</h2>
+<a id="a78f76a3fafb4f758fa43d7a9b0782914" name="a78f76a3fafb4f758fa43d7a9b0782914"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78f76a3fafb4f758fa43d7a9b0782914">&#9670;&#160;</a></span>I2C_USE_MULTI_CONTROLLER</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define I2C_USE_CHECK_BUS_BUSY&#160;&#160;&#160;1</td>
+          <td class="memname">#define I2C_USE_MULTI_CONTROLLER&#160;&#160;&#160;1</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Whether or not to enable bus busy checking functionality. </p>
-<p>Defaults to 1. Set to 0 if you do not need to check if the bus is busy (e.g. you only have one controller (master)). </p>
+<p>Whether or not to enable multi-controller (master) safety checks. </p>
+<p>Defaults to 1. Set to 0 if there is only one controller (master) on the bus to save memory. </p>
 
 </div>
 </div>

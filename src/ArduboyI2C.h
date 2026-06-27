@@ -126,14 +126,14 @@ SOFTWARE.
 #define I2C_USE_HANDSHAKE 1
 #endif
 
-#ifndef I2C_USE_CHECK_BUS_BUSY
+#ifndef I2C_USE_MULTI_CONTROLLER
 /** \brief
- * Whether or not to enable bus busy checking functionality.
+ * Whether or not to enable multi-controller (master) safety checks.
  * \details
  * Defaults to 1.
- * Set to 0 if you do not need to check if the bus is busy (e.g. you only have one controller (master)).
+ * Set to 0 if there is only one controller (master) on the bus to save memory.
  */
-#define I2C_USE_CHECK_BUS_BUSY 1
+#define I2C_USE_MULTI_CONTROLLER 1
 #endif
 
 #ifndef I2C_USE_CHECK_CABLE_FLIPPED
@@ -527,7 +527,7 @@ struct i2c_data_t {
 
 } data;
 
-#if I2C_USE_CHECK_BUS_BUSY
+#if I2C_USE_MULTI_CONTROLLER
 bool checkBusBusy() {
     uint8_t busyChecks = I2C_CHECK_BUS_BUSY_CHECKS;
     while (busyChecks) {
@@ -541,7 +541,7 @@ bool checkBusBusy() {
     }
     return false;
 }
-#endif // #if I2C_USE_CHECK_BUS_BUSY
+#endif // #if I2C_USE_MULTI_CONTROLLER
 
 #if I2C_USE_CHECK_CABLE_FLIPPED
 bool checkCableFlippedCore(bool disconnectFlip = false) {
@@ -581,9 +581,8 @@ uint16_t millisShort() {
 }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
-void readWriteStart(uint8_t address, bool readWrite) {
+void startReadWrite(uint8_t address, bool readWrite) {
     while (i2c_detail::data.active) {}
-    i2c_detail::data.active = true;
 
     i2c_detail::data.error = TW_SUCCESS;
     i2c_detail::data.slaRW = address << 1 | readWrite;
@@ -613,33 +612,45 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
 }
 
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
-    i2c_detail::readWriteStart(address, TW_WRITE);
+    i2c_detail::startReadWrite(address, TW_WRITE);
 
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
 
     i2c_detail::data.bufferSize = size;
 
-#if I2C_USE_CHECK_BUS_BUSY
+#if I2C_USE_MULTI_CONTROLLER
     if (i2c_detail::checkBusBusy()) { return; }
-#endif // #if I2C_USE_CHECK_BUS_BUSY
-
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
+    // note: TOCTOU race condition here, but it's unavoidable
+    // no way to fix while prioritizing target (slave) interrupts so handshaking is solid
+    if (i2c_detail::data.active) {
+        i2c_detail::data.error = TW_MT_ARB_LOST; // same as TW_MR_ARB_LOST
+        return;
+    }
+#endif // #if I2C_USE_MULTI_CONTROLLER
+    i2c_detail::data.active = true;
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA) | _BV(TWINT);
     if (wait) {
         while (i2c_detail::data.active) {}
     }
 }
 
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
-    i2c_detail::readWriteStart(address, TW_READ);
+    i2c_detail::startReadWrite(address, TW_READ);
 
     i2c_detail::data.rxBuffer = (uint8_t *)buffer;
     i2c_detail::data.bufferSize = size - 1;
 
-#if I2C_USE_CHECK_BUS_BUSY
+#if I2C_USE_MULTI_CONTROLLER
     if (i2c_detail::checkBusBusy()) { return; }
-#endif // #if I2C_USE_CHECK_BUS_BUSY
-
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA);
+    // note: TOCTOU race condition here, but it's unavoidable
+    // no way to fix while prioritizing target (slave) interrupts so handshaking is solid
+    if (i2c_detail::data.active) {
+        i2c_detail::data.error = TW_MT_ARB_LOST; // same as TW_MR_ARB_LOST
+        return;
+    }
+#endif // #if I2C_USE_MULTI_CONTROLLER
+    i2c_detail::data.active = true;
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA) | _BV(TWINT);
     while (i2c_detail::data.active) {}
 }
 

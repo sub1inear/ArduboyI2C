@@ -29,8 +29,10 @@ public:
 
 	void update();
 	void updateInput();
-private:
+
 	uint8_t deviceId = deviceIdNull;
+	uint8_t data;
+	volatile bool dataAvailable = false;
 };
 
 void ERROR(const char* msg);

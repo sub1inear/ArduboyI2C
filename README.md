@@ -95,7 +95,7 @@ Define before `#include <ArduboyI2C.h>`.
 | Macro | Default | Options | Description |
 |-------|---------|---------|-------------|
 | `I2C_USE_HANDSHAKE` | 1 | 0, 1 | Enable handshake functionality |
-| `I2C_USE_CHECK_BUS_BUSY` | 1 | 0, 1 | Enable bus busy checking functionality |
+| `I2C_USE_MULTI_CONTROLLER` | 1 | 0, 1 | Enable multi-controller safety checks |
 | `I2C_USE_CHECK_CABLE_FLIPPED` | 1 (FX-C), 0 (Mini), None (Unknown) | 0, 1 | Enable flipped cable detection functionality |
 | `I2C_USE_SOFTWARE_PULLUPS` | 1 (FX-C), 0 (Mini), None (Unknown) | 0, 1 | Enable software pullups on SDA/SCL lines |
 
