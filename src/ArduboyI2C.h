@@ -152,6 +152,10 @@ SOFTWARE.
 #endif
 #endif
 
+#if !I2C_USE_MULTI_CONTROLLER && I2C_USE_CHECK_CABLE_FLIPPED
+#error "I2C_USE_CHECK_CABLE_FLIPPED cannot be enabled without I2C_USE_MULTI_CONTROLLER."
+#endif
+
 #ifndef I2C_USE_SOFTWARE_PULLUPS
 /** \brief
  * Whether or not to enable software pullups on the SDA and SCL lines.
