@@ -8,7 +8,7 @@ var _arduboy_i2_c_8h =
     [ "I2C_CHECK_CABLE_FLIPPED_CHECKS", "_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57", null ],
     [ "I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT", "_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0", null ],
     [ "I2C_USE_HANDSHAKE", "_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650", null ],
-    [ "I2C_USE_CHECK_BUS_BUSY", "_arduboy_i2_c_8h.html#a46613027f9a3fd1acede15144779992e", null ],
+    [ "I2C_USE_MULTI_CONTROLLER", "_arduboy_i2_c_8h.html#a78f76a3fafb4f758fa43d7a9b0782914", null ],
     [ "I2C_USE_CHECK_CABLE_FLIPPED", "_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4", null ],
     [ "I2C_USE_SOFTWARE_PULLUPS", "_arduboy_i2_c_8h.html#ac318e96bb22b8d5710db448875fef550", null ],
     [ "I2C_SDA_BIT", "_arduboy_i2_c_8h.html#ab37c7049d3f4f3dc7d89b5c02e88f7c7", null ],
