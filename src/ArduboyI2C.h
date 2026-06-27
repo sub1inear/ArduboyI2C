@@ -79,7 +79,7 @@ SOFTWARE.
 #error "I2C_BUFFER_SIZE is too big."
 #endif
 
-#ifndef I2C_CHECK_BUS_BUSY_CHECKS
+#ifndef I2C_MULTI_CONTROLLER_BUSY_CHECKS
 /** \brief
  * The amount of times the bus is checked before continuing with a read/write operation.
  * \details
@@ -89,9 +89,9 @@ SOFTWARE.
  * Increase if the game ever freezes.
  * More information: https://www.robotroom.com/Atmel-AVR-TWI-I2C-Multi-Master-Problem.html
  */
-#define I2C_CHECK_BUS_BUSY_CHECKS 16
-#elif I2C_CHECK_BUS_BUSY_CHECKS > 255
-#error "I2C_CHECK_BUS_BUSY_CHECKS is too big."
+#define I2C_MULTI_CONTROLLER_BUSY_CHECKS 16
+#elif I2C_MULTI_CONTROLLER_BUSY_CHECKS > 255
+#error "I2C_MULTI_CONTROLLER_BUSY_CHECKS is too big."
 #endif
 
 #ifndef I2C_CHECK_CABLE_FLIPPED_CHECKS
@@ -466,7 +466,7 @@ public:
      *     arduboy.print(F("Please flip the cable\non this device."));
      *     arduboy.display();
      * });
-     * uint8_t id = I2C::handshake(2);
+     * uint8_t id = I2C::handshake();
      * \endcode
      * \note
      * In order to work with this function, custom handshaking functions must send data at a regular interval.
@@ -491,7 +491,7 @@ public:
 
     /** \brief
      * Handshakes with other devices and returns a unique id once complete.
-     * \param numPlayers The number of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS.
+     * \param numPlayers The number of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS. Defaults to 2.
      * \return A unique id for this device.
      * \details
      * This function may be called only once; further calls will not work.
@@ -499,7 +499,7 @@ public:
      * \note
      * The onReceive() callback will be overridden by this function.
      */
-    static uint8_t handshake(uint8_t numPlayers);
+    static uint8_t handshake(uint8_t numPlayers = 2);
 };
 
 #ifdef I2C_IMPLEMENTATION
@@ -533,7 +533,7 @@ struct i2c_data_t {
 
 #if I2C_USE_MULTI_CONTROLLER
 bool checkBusBusy() {
-    uint8_t busyChecks = I2C_CHECK_BUS_BUSY_CHECKS;
+    uint8_t busyChecks = I2C_MULTI_CONTROLLER_BUSY_CHECKS;
     while (busyChecks) {
         if ((I2C_PIN & _BV(I2C_SDA_BIT)) && (I2C_PIN & _BV(I2C_SCL_BIT))) {
             busyChecks--;
