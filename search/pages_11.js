@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['settings_0',['Core Settings',['../index.html#autotoc_md14',1,'']]],
-  ['start_1',['Quick Start',['../index.html#autotoc_md7',1,'']]]
+  ['platformio_0',['PlatformIO',['../index.html#autotoc_md6',1,'']]]
 ];
