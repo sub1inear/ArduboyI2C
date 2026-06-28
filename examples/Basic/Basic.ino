@@ -115,7 +115,7 @@ void loop() {
 
     // send out a general call to give the other device our data
     // false -> will not wait for the write to complete
-    I2C::write(I2C_GENERAL_CALL, localPlayer, false);
+    I2C::write(I2C_GENERAL_CALL_ADDR, localPlayer, false);
 
     // draw the players
     // id 0 -> filled, id 1 -> outlined

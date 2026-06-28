@@ -4,7 +4,7 @@ var indexSectionsWithContent =
   1: "i",
   2: "a",
   3: "bcghiorsw",
-  4: "it",
+  4: "i",
   5: "12345acdfhilmopqrstw"
 };
 

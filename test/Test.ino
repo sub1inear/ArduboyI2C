@@ -116,7 +116,7 @@ void testWriteCallback() {
 bool testWrite(uint8_t id) {
 	if (id == 0) {
 		I2C::write(I2C::idToAddress(1), bufferExpected, 16, true);
-		assert_eq(I2C::getError(), TW_SUCCESS);
+		assert_eq(I2C::getError(), I2C_ERROR_NONE);
 	} else {
 		uint32_t start = millis();
 		while (!writeCallbackCalled) {
@@ -139,7 +139,7 @@ bool testRead(uint8_t id) {
 	if (id == 0) {
 		uint8_t buffer[16];
 		I2C::read(I2C::idToAddress(1), buffer);
-		assert_eq(I2C::getError(), TW_SUCCESS);
+		assert_eq(I2C::getError(), I2C_ERROR_NONE);
 		assert_eq(memcmp(buffer, bufferExpected, 16), 0);
 	} else {
 		uint32_t start = millis();

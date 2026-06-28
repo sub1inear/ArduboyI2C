@@ -155,13 +155,12 @@ Quick Start</h2>
 <div class="ttc" id="aclass_i2_c_html_a7f3455d4864527408a933da138f9756c"><div class="ttname"><a href="class_i2_c.html#a7f3455d4864527408a933da138f9756c">I2C::handshake</a></div><div class="ttdeci">static uint8_t handshake(uint8_t numPlayers=2)</div><div class="ttdoc">Handshakes with other devices and returns a unique id once complete.</div></div>
 </div><!-- fragment --> <h3 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
 4. Read/Write</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a>(<a class="code hl_define" href="_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4">I2C_GENERAL_CALL</a>, data, <span class="comment">/* wait = */</span><span class="keyword">true</span>);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a>(I2C_GENERAL_CALL, data, <span class="comment">/* wait = */</span><span class="keyword">true</span>);</div>
 <div class="line"><a class="code hl_function" href="class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0">I2C::read</a>(I2C::idtoAddress(<span class="keywordtype">id</span>), data);</div>
-<div class="ttc" id="a_arduboy_i2_c_8h_html_aaf677c294437274a106399587fb1d3b4"><div class="ttname"><a href="_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4">I2C_GENERAL_CALL</a></div><div class="ttdeci">#define I2C_GENERAL_CALL</div><div class="ttdoc">The address used for general calls.</div><div class="ttdef"><b>Definition</b> ArduboyI2C.h:247</div></div>
 <div class="ttc" id="aclass_i2_c_html_a7fa12af5a3f24c3db496672a4d5c3fe0"><div class="ttname"><a href="class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0">I2C::read</a></div><div class="ttdeci">static void read(uint8_t address, void *buffer, uint8_t size)</div><div class="ttdoc">Attempts to become the bus controller (master) and reads data over I2C from the specified address.</div></div>
 <div class="ttc" id="aclass_i2_c_html_afb38ec006200442dbdca3fecc9af0d03"><div class="ttname"><a href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a></div><div class="ttdeci">static void write(uint8_t address, const void *buffer, uint8_t size, bool wait)</div><div class="ttdoc">Attempts to become the bus controller (master) and sends data over I2C to the specified address.</div></div>
 </div><!-- fragment --> <blockquote class="doxtable">
-<p>Write data to every device with the <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#aaf677c294437274a106399587fb1d3b4" title="The address used for general calls.">I2C_GENERAL_CALL</a></span> address. </p>
+<p>Write data to every device with the <span class="tt">I2C_GENERAL_CALL</span> address. </p>
 </blockquote>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
 5. Callbacks</h3>

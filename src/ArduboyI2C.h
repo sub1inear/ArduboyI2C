@@ -61,9 +61,9 @@ SOFTWARE.
  * \details
  * Defaults to `I2C_PLATFORM_FX_C`.
  * Options: \n
- * `I2C_PLATFORM_FX_C` - Arduboy FX-C \n
- * `I2C_PLATFORM_MINI` - Arduboy Mini \n
- * `I2C_PLATFORM_UNKNOWN` - Unknown platform (must define all other platform-specific macros)
+ * - `I2C_PLATFORM_FX_C`: Arduboy FX-C \n
+ * - `I2C_PLATFORM_MINI`: Arduboy Mini \n
+ * - `I2C_PLATFORM_UNKNOWN`: Unknown platform (must define all other platform-specific macros)
  */
 #define I2C_PLATFORM I2C_PLATFORM_FX_C
 #endif
@@ -244,12 +244,48 @@ SOFTWARE.
  * \details
  * General calls are sent to this address and are received by every device on the bus.
  */
-#define I2C_GENERAL_CALL 0x00
+#define I2C_GENERAL_CALL_ADDR 0x00
 
 /** \brief
- * Error code returned by I2C::getError(), meaning success.
+ * Target (slave) did not acknowledge its address during a write; it is not connected or is not responding.
+ * \details
+ * Error code returned by I2C::getError().
  */
-#define TW_SUCCESS 0xFF
+#define I2C_ERROR_WRITE_ADDR_NACK TW_MT_SLA_NACK
+
+/** \brief
+ * Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving.
+ * \details
+ * Error code returned by I2C::getError().
+ */
+#define I2C_ERROR_WRITE_DATA_NACK TW_MT_DATA_NACK
+
+/** \brief
+ * Target (slave) did not acknowledge its address during a read; it is not connected or is not responding.
+ * \details
+ * Error code returned by I2C::getError().
+ */
+#define I2C_ERROR_READ_ADDR_NACK TW_MR_SLA_NACK
+
+/** \brief
+ * This device lost arbitration while trying to become the controller (master); another device is already the controller (master).
+ * There code has no distinction between reads and writes (hardware constraint).
+ * \details
+ * Error code returned by I2C::getError().
+ */
+#define I2C_ERROR_ARB_LOST TW_MT_ARB_LOST
+
+/** \brief
+ * An illegal start or stop condition was detected on the bus.
+ * \details
+ * Error code returned by I2C::getError().
+ */
+#define I2C_ERROR_BUS TW_BUS_ERROR
+
+/** \brief
+ * No error has occurred.
+ */
+#define I2C_ERROR_NONE 0xFF
 
 /** \brief
  * Error code returned by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
@@ -269,10 +305,12 @@ SOFTWARE.
  * I2C library major version.
  */
 #define I2C_VERSION_MAJOR 3
+
 /** \brief
  * I2C library minor version.
  */
 #define I2C_VERSION_MINOR 0
+
 /** \brief
  * I2C library patch version.
  */
@@ -305,7 +343,7 @@ public:
      * Initializes I2C hardware.
      * \details
      * This function powers on, initializes, and sets up the clock on the TWI hardware.
-     * Must be called after the arduboy hardware is initialized as `arduboy.boot()` disables the I2C (TWI) hardware.
+     * Must be called after Arduboy hardware is initialized as `arduboy.boot()` (inside `arduboy.begin()`) disables the I2C (TWI) hardware.
      */
     static void begin();
 
@@ -316,21 +354,21 @@ public:
      * \param generalCall Whether to enable or disable general calls. Defaults to true.
      * \note
      * General calls are a way for a device to broadcast data to every other device without addressing them individually.
-     * They are sent by sending a write to address I2C_GENERAL_CALL. If they are disabled, the device will not respond to them.
+     * They are sent by sending a write to address `I2C_GENERAL_CALL_ADDR`. If they are disabled, the device will not respond to them.
      * These two functionalities are combined for efficiency, as together they make up the TWAR register.
      */
     static void setAddress(uint8_t address, bool generalCall = true);
 
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
-     * \param address The 7-bit address which to send the data. To send a general call, use address I2C_GENERAL_CALL.
+     * \param address The 7-bit address which to send the data. To send a general call, use `I2C_GENERAL_CALL_ADDR`.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param size The amount of data in bytes to send. This cannot be zero.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \details
      * \note
-     * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on every other device.
+     * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on other devices.
      * \note
      * Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
@@ -342,7 +380,7 @@ public:
     /** \overload
      * \tparam T The type of the object to send. To prevent bugs, T cannot be a pointer.
      * \param address The 7-bit address which to receive the data from.
-     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \details
@@ -359,7 +397,7 @@ public:
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
      * \param address The 7-bit address which to receive the data from.
-     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the buffer in which to store the data.
      * \param size The maximum amount of bytes to receive. This cannot be 0 or 255.
      * \details
@@ -372,7 +410,7 @@ public:
     /** \overload
      * \tparam T The type of the object to read. To prevent bugs, T cannot be a pointer.
      * \param address The 7-bit address which to receive the data from.
-     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object in which to store the data.
      * \details
      * This function will automatically deduce the size of the object.
@@ -390,8 +428,8 @@ public:
      * \param buffer A pointer to the data to reply with.
      * \param size The amount of the data in bytes to reply with.
      * \details
-     * This function is intended to be called inside the onRequest callback.
-     * It fills the reply buffer with data to then be sent one byte at a time.
+     * This function is intended to be called inside the `onRequest` callback.
+     * It fills the I2C buffer with data to then be sent one byte at a time.
      * If it is called more than once, only the last call will be sent.
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
@@ -402,7 +440,7 @@ public:
     static void reply(const void *buffer, uint8_t size);
 
     /** \overload
-     * \tparam T The type of the object to reply with. To prevent bugs, T cannot be a pointer.
+     * \tparam T The type of the object to reply with. To prevent bugs, `T` cannot be a pointer.
      * \param object A reference to the object to reply with.
      * \details
      * This function will automatically deduce the size of the object.
@@ -459,8 +497,14 @@ public:
 
     /** \brief
      * Gets the hardware error which happened in a previous read or write.
-     * \return A byte indicating the error. TW_SUCCESS means no error has occurred.
-     * The full list of error codes are available in `util/twi.h`.
+     * \return A byte indicating the error. \n
+     * Options:
+     * - `I2C_ERROR_WRITE_ADDR_NACK`: Target (slave) did not acknowledge its address during a write; it is not connected or is not responding. \n
+     * - `I2C_ERROR_WRITE_DATA_NACK`: Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving. \n
+     * - `I2C_ERROR_READ_ADDR_NACK`: Target (slave) did not acknowledge its address during a read; it is not connected or is not responding. \n
+     * - `I2C_ERROR_ARB_LOST`: This device lost arbitration while trying to become the controller (master); another device is already the controller (master). \n
+     * - `I2C_ERROR_BUS`: An illegal start or stop condition was detected on the bus. \n
+     * - `I2C_ERROR_NONE`: No error has occurred. \n
      */
     static uint8_t getError();
 
@@ -570,7 +614,7 @@ bool checkBusBusy() {
         if ((I2C_PIN & _BV(I2C_SDA_BIT)) && (I2C_PIN & _BV(I2C_SCL_BIT))) {
             busyChecks--;
         } else {
-            i2c_detail::data.error = TW_MT_ARB_LOST; // same as TW_MR_ARB_LOST
+            i2c_detail::data.error = I2C_ERROR_ARB_LOST;
             i2c_detail::data.active = false;
             return true;
         }
@@ -620,7 +664,7 @@ uint16_t millisShort() {
 void startReadWrite(uint8_t address, bool readWrite) {
     while (i2c_detail::data.active) {}
 
-    i2c_detail::data.error = TW_SUCCESS;
+    i2c_detail::data.error = I2C_ERROR_NONE;
     i2c_detail::data.slaRW = address << 1 | readWrite;
     i2c_detail::data.bufferIdx = 0;
 }
@@ -664,7 +708,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     }
 #endif // #if I2C_USE_MULTI_CONTROLLER
     i2c_detail::data.active = true;
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA) | _BV(TWINT);
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
     if (wait) {
         while (i2c_detail::data.active) {}
     }
@@ -686,7 +730,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     }
 #endif // #if I2C_USE_MULTI_CONTROLLER
     i2c_detail::data.active = true;
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA) | _BV(TWINT);
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
     while (i2c_detail::data.active) {}
 }
 
@@ -737,7 +781,7 @@ void I2C::checkCableFlipped(void (*function)()) {
         }
     }
 
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT); // re-enable TWI
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) |  _BV(TWINT); // re-enable TWI
 }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
@@ -754,6 +798,7 @@ uint8_t I2C::idToAddress(uint8_t id) {
 
 #if I2C_USE_HANDSHAKE
 uint8_t I2C::handshake(uint8_t numPlayers) {
+    I2C::onRequest(i2c_detail::handshakeOnRequest);
     for (int8_t i = numPlayers - 1; i >= 0; ) {
         uint8_t dummy;
         uint8_t address = I2C::idToAddress(i);
@@ -761,34 +806,35 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
         I2C::read(address, dummy);
 
         switch (I2C::getError()) {
-        case TW_MR_SLA_NACK:
-            I2C::onRequest(i2c_detail::handshakeOnRequest);
+        case I2C_ERROR_READ_ADDR_NACK:
             I2C::setAddress(address);
 
             // handshakeState is the number of times the callback has been called.
             // when the callback has been called i times, the final Arduboy has joined.
             // cable flipped detection relies on clock detection,
-            // so we send 0b00000000 to have SDA never change
+            // so we send 0b00000000 to have SDA change as little as possible
             // while detecting it.
-
 #if I2C_USE_CHECK_CABLE_FLIPPED
             dummy = 0b00000000;
             while (i2c_detail::handshakeState < i) {
-                I2C::write(I2C_GENERAL_CALL, dummy, true);
+                I2C::write(I2C_GENERAL_CALL_ADDR, dummy, true);
             }
 #else
             while (i2c_detail::handshakeState < i) { }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
             return i;
-        case TW_SUCCESS:
+        case I2C_ERROR_NONE:
             i--;
+            break;
+        default: // case I2C_ERROR_ARB_LOST:
+            // we lost arbitration, need to try again
+            // so we don't decrement i
             break;
         }
     }
     return I2C_HANDSHAKE_FULL;
 }
-
 #endif // #if I2C_USE_HANDSHAKE
 
 ISR(TWI_vect, ISR_NAKED) {
