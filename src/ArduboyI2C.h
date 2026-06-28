@@ -846,9 +846,13 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
         case I2C_ERROR_NONE:
             i--;
             break;
-        default: // case I2C_ERROR_ARB_LOST:
-            // we lost arbitration, need to try again
-            // so we don't decrement i
+        case I2C_ERROR_ARB_LOST:
+            // we lost arbitration
+            // break without decrementing i to try again
+            break;
+        default:
+            // unknown error happened
+            // break without decrementing i to try again
             break;
         }
     }
