@@ -45,7 +45,20 @@ var NAVTREE =
         [ "Reliability", "index.html#autotoc_md15", null ],
         [ "Feature Flags", "index.html#autotoc_md16", null ]
       ] ],
-      [ "Migrating from Wire Library", "index.html#autotoc_md17", null ]
+      [ "Migrating from Wire Library", "index.html#autotoc_md17", null ],
+      [ "FAQ", "index.html#autotoc_md18", [
+        [ "Why am I getting linker errors about ArduboyI2C functions?", "index.html#autotoc_md19", null ],
+        [ "Why can't I use <span class=\"tt\">delay()</span>, <span class=\"tt\">Serial</span>, <span class=\"tt\">millis()</span>, etc. inside <span class=\"tt\">onReceive</span>/<span class=\"tt\">onRequest</span> callbacks?", "index.html#autotoc_md20", null ],
+        [ "My game sometimes freezes, what causes this?", "index.html#autotoc_md21", null ],
+        [ "Can I use ArduboyI2C in Ardens?", "index.html#autotoc_md22", null ],
+        [ "What does <span class=\"tt\">I2C_HANDSHAKE_FULL</span> mean?", "index.html#autotoc_md23", null ],
+        [ "When should I use <span class=\"tt\">I2C::write()</span> vs <span class=\"tt\">I2C::reply()</span>?", "index.html#autotoc_md24", null ],
+        [ "How do I send/receive more than 32 bytes at once?", "index.html#autotoc_md25", null ],
+        [ "Why must <span class=\"tt\">I2C::begin()</span> be called after <span class=\"tt\">arduboy.begin()</span>?", "index.html#autotoc_md26", null ],
+        [ "Why can't I use certain I2C addresses for my own address?", "index.html#autotoc_md27", null ],
+        [ "Is <span class=\"tt\">checkCableFlipped()</span> 100% reliable?", "index.html#autotoc_md28", null ],
+        [ "How do I minimize memory usage?", "index.html#autotoc_md29", null ]
+      ] ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],

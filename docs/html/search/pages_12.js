@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['the_20library_0',['1. Include the library',['../index.html#autotoc_md8',1,'']]]
+  ['quick_20start_0',['Quick Start',['../index.html#autotoc_md7',1,'']]]
 ];
