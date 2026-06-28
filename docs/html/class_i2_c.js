@@ -1,6 +1,7 @@
 var class_i2_c =
 [
     [ "begin", "class_i2_c.html#a700dc7d79a25b042b59846c0068a773a", null ],
+    [ "end", "class_i2_c.html#a7977b9ae901f988109d03fafd8e96493", null ],
     [ "setAddress", "class_i2_c.html#af348cda2e2eb1062da894fe45584f28c", null ],
     [ "write", "class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03", null ],
     [ "write", "class_i2_c.html#aa0054f1d24c4bab77b2a8c37700f56cc", null ],

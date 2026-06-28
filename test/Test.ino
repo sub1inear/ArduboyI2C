@@ -87,13 +87,19 @@ void displayTest(const __FlashStringHelper *name, bool result) {
 	arduboy.display();
 }
 
-bool testBegin() {
+bool testBeginEnd() {
 	I2C::begin();
+	assert_eq(PRR0 & _BV(PRTWI), 0);
 	assert_eq(TWCR, (_BV(TWEN) | _BV(TWIE) | _BV(TWEA)));
 	assert_eq(TWSR, 248); // 0b11111000 -> TW idle, prescaler = 0
 	assert_eq(TWBR, (F_CPU / I2C_FREQUENCY - 16) / 2);
 	assert_eq((I2C_PORT & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT)));
 	assert_eq((I2C_DDR & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), 0);
+	I2C::end();
+	assert_eq(TWCR, 0);
+	assert_eq(PRR0 & _BV(PRTWI), _BV(PRTWI));
+	assert_eq((I2C_PORT & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))), 0);
+	I2C::begin();
 	return true;
 }
 
@@ -181,7 +187,7 @@ void setup() {
     arduboy.begin();
 	arduboy.clear();
 
-	displayTest(F("begin"), testBegin());
+	displayTest(F("beginEnd"), testBeginEnd());
 	displayTest(F("setAddress"), testSetAddress());
 	displayTest(F("ccFlipped"), testCheckCableFlipped());
 

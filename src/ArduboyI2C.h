@@ -344,8 +344,18 @@ public:
      * \details
      * This function powers on, initializes, and sets up the clock on the TWI hardware.
      * Must be called after Arduboy hardware is initialized as `arduboy.boot()` (inside `arduboy.begin()`) disables the I2C (TWI) hardware.
+     * \see end()
      */
     static void begin();
+
+    /** \brief
+     * Deinitializes I2C hardware.
+     * \details
+     * This function powers off and deinitializes the TWI hardware.
+     * It may be reinitialized by calling `I2C::begin()` again.
+     * \see begin()
+     */
+    static void end();
 
     /** \brief
      * Set the address of the device and whether to enable or disable general calls for it.
@@ -675,15 +685,24 @@ void I2C::begin() {
     power_twi_enable();
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 
-    TWBR = (F_CPU / I2C_FREQUENCY - 16) / 2;
-
     // clear prescaler bits
     TWSR = 0;
+
+    TWBR = (F_CPU / I2C_FREQUENCY - 16) / 2;
 
 #if I2C_USE_SOFTWARE_PULLUPS
     // enable software pullups
     I2C_DDR &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
     I2C_PORT |= _BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT);
+#endif // #if I2C_USE_SOFTWARE_PULLUPS
+}
+
+void I2C::end() {
+    TWCR = 0;
+    power_twi_disable();
+#if I2C_USE_SOFTWARE_PULLUPS
+    // disable software pullups
+    I2C_PORT &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
 #endif // #if I2C_USE_SOFTWARE_PULLUPS
 }
 
