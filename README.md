@@ -144,3 +144,18 @@ No, it works by sampling which line looks more like a clock signal. Edge cases (
 
 ### How do I minimize memory usage?
 Disable unused features (`I2C_USE_HANDSHAKE` and `I2C_USE_CHECK_CABLE_FLIPPED`) and reduce `I2C_BUFFER_CAPACITY` to the smallest value that meets your needs. Always use `I2C_GENERAL_CALL_ADDR` and have every device be a controller/master. The [Configuration](#configuration) table lists all available toggles.
+
+## Types of Multiplayer
+### State Sync Multiplayer
+State sync multiplayer is where every peer runs its own game logic and sends its state to the other peers.
+It is the **easiest** type of multiplayer to get working because each game does not have to be perfectly syncronized.
+Additionally, it is the most robust and can handle cable disconnects, but it is less efficient and requires more bandwidth.
+
+For a minimal implementation, see the [Basic Example](./examples/Basic/Basic.ino).
+
+### Lockstep Multiplayer
+Lockstep multiplayer is where every device runs the same game logic and only sends inputs to each other.
+It is **harder** to get working because every device must be perfectly syncronized, but it is more efficient and requires less bandwidth.
+Care must be taken to ensure that every device runs the same logic and that no random numbers are generated without a shared seed.
+
+For a minimal implementation, see the [Pong Example](./examples/Pong/Pong.ino).
