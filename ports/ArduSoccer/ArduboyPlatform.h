@@ -31,7 +31,7 @@ public:
 	void updateInput();
 
 	uint8_t deviceId = deviceIdNull;
-	uint8_t data;
+	volatile uint8_t data;
 	volatile bool dataAvailable = false;
 };
 
