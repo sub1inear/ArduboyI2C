@@ -159,7 +159,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initializes <a class="el" href="class_i2_c.html">I2C</a> hardware. </p>
-<p>This function powers on, initializes, and sets up the clock on the TWI hardware. Must be called after the arduboy hardware is initialized as <span class="tt">arduboy.boot()</span> disables the <a class="el" href="class_i2_c.html">I2C</a> (TWI) hardware. </p>
+<p>This function powers on, initializes, and sets up the clock on the TWI hardware. Must be called after Arduboy hardware is initialized as <span class="tt">arduboy.boot()</span> (inside <span class="tt">arduboy.begin()</span>) disables the <a class="el" href="class_i2_c.html">I2C</a> (TWI) hardware. </p>
 
 </div>
 </div>
@@ -198,7 +198,7 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>General calls are a way for a device to broadcast data to every other device without addressing them individually. They are sent by sending a write to address I2C_GENERAL_CALL. If they are disabled, the device will not respond to them. These two functionalities are combined for efficiency, as together they make up the TWAR register. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>General calls are a way for a device to broadcast data to every other device without addressing them individually. They are sent by sending a write to address <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac637ca58cc3535ed0e85eb8878718815" title="The address used for general calls.">I2C_GENERAL_CALL_ADDR</a></span>. If they are disabled, the device will not respond to them. These two functionalities are combined for efficiency, as together they make up the TWAR register. </dd></dl>
 
 </div>
 </div>
@@ -242,14 +242,14 @@ Static Public Member Functions</h2></td></tr>
 <p>Attempts to become the bus controller (master) and sends data over <a class="el" href="class_i2_c.html">I2C</a> to the specified address. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to send the data. To send a general call, use address I2C_GENERAL_CALL. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address which to send the data. To send a general call, use <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac637ca58cc3535ed0e85eb8878718815" title="The address used for general calls.">I2C_GENERAL_CALL_ADDR</a></span>. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A pointer to the data to send. </td></tr>
     <tr><td class="paramname">size</td><td>The amount of data in bytes to send. This cannot be zero. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Sending general calls will only function if the <span class="tt">generalCall</span> argument of <span class="tt"><a class="el" href="#af348cda2e2eb1062da894fe45584f28c" title="Set the address of the device and whether to enable or disable general calls for it.">setAddress</a></span> is true on every other device. </dd>
+<dl class="section note"><dt>Note</dt><dd>Sending general calls will only function if the <span class="tt">generalCall</span> argument of <span class="tt"><a class="el" href="#af348cda2e2eb1062da894fe45584f28c" title="Set the address of the device and whether to enable or disable general calls for it.">setAddress</a></span> is true on other devices. </dd>
 <dd>
 Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> and defaults to 32. If the program needs to send more than 32 bytes at a time, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> must be defined before including to be larger. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd>transmit() <a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">read()</a> </dd></dl>
@@ -297,7 +297,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object to send. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
   </table>
@@ -342,7 +342,7 @@ template&lt;typename T&gt; </div>
 <p>Attempts to become the bus controller (master) and reads data over <a class="el" href="class_i2_c.html">I2C</a> from the specified address. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A pointer to the buffer in which to store the data. </td></tr>
     <tr><td class="paramname">size</td><td>The maximum amount of bytes to receive. This cannot be 0 or 255.</td></tr>
   </table>
@@ -389,7 +389,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object in which to store the data.</td></tr>
   </table>
   </dd>
@@ -433,7 +433,7 @@ template&lt;typename T&gt; </div>
   </table>
   </dd>
 </dl>
-<p>This function is intended to be called inside the onRequest callback. It fills the reply buffer with data to then be sent one byte at a time. If it is called more than once, only the last call will be sent. </p><dl class="section note"><dt>Note</dt><dd>Internally, this function uses a buffer. The buffer size is controlled by the macro <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> and defaults to 32. If the program needs to send more than 32 bytes at a time, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> must be defined before including to be larger. </dd></dl>
+<p>This function is intended to be called inside the <span class="tt"><a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">onRequest</a></span> callback. It fills the <a class="el" href="class_i2_c.html">I2C</a> buffer with data to then be sent one byte at a time. If it is called more than once, only the last call will be sent. </p><dl class="section note"><dt>Note</dt><dd>Internally, this function uses a buffer. The buffer size is controlled by the macro <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> and defaults to 32. If the program needs to send more than 32 bytes at a time, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> must be defined before including to be larger. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#afb38ec006200442dbdca3fecc9af0d03" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">write()</a> <a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">onRequest()</a> </dd></dl>
 
 </div>
@@ -464,7 +464,7 @@ template&lt;typename T&gt; </div>
 </div><div class="memdoc">
 <p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T</td><td>The type of the object to reply with. To prevent bugs, T cannot be a pointer. </td></tr>
+    <tr><td class="paramname">T</td><td>The type of the object to reply with. To prevent bugs, <span class="tt">T</span> cannot be a pointer. </td></tr>
   </table>
   </dd>
 </dl>
@@ -591,7 +591,22 @@ template&lt;typename T&gt; </div>
 </div><div class="memdoc">
 
 <p>Gets the hardware error which happened in a previous read or write. </p>
-<dl class="section return"><dt>Returns</dt><dd>A byte indicating the error. TW_SUCCESS means no error has occurred. The full list of error codes are available in <span class="tt">util/twi.h</span>. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A byte indicating the error. <br  />
+Options:<ul>
+<li><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a30ba63d11f50aa3c0cbc36f0ee1bab1e" title="Target (slave) did not acknowledge its address during a write; it is not connected or is not respondi...">I2C_ERROR_WRITE_ADDR_NACK</a></span>: Target (slave) did not acknowledge its address during a write; it is not connected or is not responding. <br  />
+</li>
+<li><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a542726c381aaa517a3c1a2a624ef0952" title="Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the...">I2C_ERROR_WRITE_DATA_NACK</a></span>: Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving. <br  />
+</li>
+<li><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ade8812a776582b1ad88a48084a687bf3" title="Target (slave) did not acknowledge its address during a read; it is not connected or is not respondin...">I2C_ERROR_READ_ADDR_NACK</a></span>: Target (slave) did not acknowledge its address during a read; it is not connected or is not responding. <br  />
+</li>
+<li><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#aef7eb8156a252e04e0f1fb9dd52d5f12" title="This device lost arbitration while trying to become the controller (master); another device is alread...">I2C_ERROR_ARB_LOST</a></span>: This device lost arbitration while trying to become the controller (master); another device is already the controller (master). <br  />
+</li>
+<li><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a5fde78ef00c458e3bdd93879e0dc2980" title="An illegal start or stop condition was detected on the bus.">I2C_ERROR_BUS</a></span>: An illegal start or stop condition was detected on the bus. <br  />
+</li>
+<li><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a3b85237fbd089b6ea90cf512d8e3c9df" title="No error has occurred.">I2C_ERROR_NONE</a></span>: No error has occurred. <br  />
+</li>
+</ul>
+</dd></dl>
 
 </div>
 </div>
