@@ -606,7 +606,7 @@ struct i2c_data_t {
     void (*onRequestFunction)() = nullptr;
     void (*onReceiveFunction)() = nullptr;
 
-    volatile uint8_t *rxBuffer;
+    volatile uint8_t *readBuffer;
     uint8_t twiBuffer[I2C_BUFFER_CAPACITY];
     volatile uint8_t bufferIdx;
     volatile uint8_t bufferSize;
@@ -736,7 +736,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::startReadWrite(address, TW_READ);
 
-    i2c_detail::data.rxBuffer = (uint8_t *)buffer;
+    i2c_detail::data.readBuffer = (uint8_t *)buffer;
     i2c_detail::data.bufferSize = size - 1;
 
 #if I2C_USE_MULTI_CONTROLLER
@@ -989,10 +989,10 @@ TW_MT_ARB_LOST:
 
 TW_MR_DATA_NACK:
 TW_MR_DATA_ACK:
-    ; i2c_detail::data.rxBuffer[i2c_detail::data.bufferIdx++] = TWDR;
+    ; i2c_detail::data.readBuffer[i2c_detail::data.bufferIdx++] = TWDR;
     ldd r19, Y + %[bufferIdx]
-    ldd r26, Y + %[rxBuffer]
-    ldd r27, Y + %[rxBuffer] + 1
+    ldd r26, Y + %[readBuffer]
+    ldd r27, Y + %[readBuffer] + 1
 
     add r26, r19
     adc r27, __zero_reg__
@@ -1225,7 +1225,7 @@ get_buffer_addr:
         [error]             "i" (offsetof(i2c_detail::i2c_data_t, error)),
         [active]            "i" (offsetof(i2c_detail::i2c_data_t, active)),
         [bufferIdx]         "i" (offsetof(i2c_detail::i2c_data_t, bufferIdx)),
-        [rxBuffer]          "i" (offsetof(i2c_detail::i2c_data_t, rxBuffer)),
+        [readBuffer]          "i" (offsetof(i2c_detail::i2c_data_t, readBuffer)),
         [onRequestFunction] "i" (offsetof(i2c_detail::i2c_data_t, onRequestFunction)),
         [onReceiveFunction] "i" (offsetof(i2c_detail::i2c_data_t, onReceiveFunction)),
         [bufferSize]        "i" (offsetof(i2c_detail::i2c_data_t, bufferSize)),
@@ -1260,7 +1260,7 @@ ISR(TWI_vect) {
         break;
     // MR
     case TW_MR_DATA_ACK:
-        i2c_detail::data.rxBuffer[i2c_detail::data.bufferIdx++] = TWDR;
+        i2c_detail::data.readBuffer[i2c_detail::data.bufferIdx++] = TWDR;
         __attribute__((fallthrough));
     case TW_MR_SLA_ACK:
         if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
@@ -1270,7 +1270,7 @@ ISR(TWI_vect) {
         }
         break;
     case TW_MR_DATA_NACK:
-        i2c_detail::data.rxBuffer[i2c_detail::data.bufferIdx++] = TWDR;
+        i2c_detail::data.readBuffer[i2c_detail::data.bufferIdx++] = TWDR;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
         while (TWCR & _BV(TWSTO)) {  }
         i2c_detail::data.active = false;
