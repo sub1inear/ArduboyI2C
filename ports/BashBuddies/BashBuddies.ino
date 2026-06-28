@@ -618,7 +618,7 @@ void sendPlatformUpdate() {
     buffer[idx++] = (int8_t)platform.direction;
   }
 
-  I2C::write(I2C_GENERAL_CALL, buffer, true);
+  I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
 }
 
 
@@ -713,7 +713,7 @@ void sendPlayerUpdate() {
   buffer[8] = player.chargedAttack;  // chargedAttack
   buffer[9] = player.health;  // health
   buffer[10] = player.idle;  // idle
-  I2C::write(I2C_GENERAL_CALL, buffer, true);
+  I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
 }
 
 // Function to send attack notification
@@ -724,7 +724,7 @@ void sendAttackNotification(Player &attacker, Player &defender) {
   buffer[2] = (int8_t)defender.velX;
   buffer[3] = (int8_t)defender.velY;
   buffer[4] = defender.health;
-  I2C::write(I2C_GENERAL_CALL, buffer, true);
+  I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
 }
 
 // Function to receive data

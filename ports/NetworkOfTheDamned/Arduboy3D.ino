@@ -211,8 +211,8 @@ static void PlatformNet::Init()
 static void PlatformNet::Write(uint8_t data)
 {
   do {
-    I2C::write(I2C_GENERAL_CALL, data, true);
-  } while (I2C::getError() != TW_SUCCESS);
+    I2C::write(I2C_GENERAL_CALL_ADDR, data, true);
+  } while (I2C::getError() != I2C_ERROR_NONE);
 }
 
 static uint8_t PlatformNet::Read()

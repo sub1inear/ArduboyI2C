@@ -62,10 +62,17 @@ void ArduboyPlatform::update()
 	updateInput();
 	if (deviceId != deviceIdNull)
 	{
-		do {
-        	I2C::write(I2C_GENERAL_CALL, inputState[LOCAL_PLAYER], true);
-		} while (I2C::getError() != TW_SUCCESS);
-		while (!dataAvailable) { }
+		do
+		{
+        	I2C::write(I2C_GENERAL_CALL_ADDR, inputState[LOCAL_PLAYER], true);
+		}
+		while (I2C::getError() != I2C_ERROR_NONE);
+
+		while (!dataAvailable)
+		{
+			// Wait for data to be received
+		}
+
 		dataAvailable = false;
 		lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
 		inputState[REMOTE_PLAYER] = data;

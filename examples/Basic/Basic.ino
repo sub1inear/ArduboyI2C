@@ -41,7 +41,7 @@ Player remotePlayer = { 0, 0 };
 // unique id for this device
 uint8_t id = 0;
 
-void displayMessage(const __FlashStringHelper *message) {
+void drawMessage(const __FlashStringHelper *message) {
     // __FlashStringHelper ensures message is stored in flash memory (with the F() macro)
     // otherwise the exactly the same as `char`
     arduboy.clear();
@@ -67,7 +67,7 @@ void setup() {
     // if an emulator without I2C support is detected, ...
     if (I2C::checkEmulator()) {
         // display a message
-        displayMessage(F("Emulator does not\nsupport I2C."));
+        drawMessage(F("Emulator does not\nsupport I2C."));
         // wait forever
         while (true) { }
     }
@@ -78,11 +78,11 @@ void setup() {
     // only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable
     I2C::checkCableFlipped([]() {
         // cable is flipped, display message
-        displayMessage(F("Please flip the cable\non this device."));
+        drawMessage(F("Please flip the cable\non this device."));
     });
 
     // display handshaking message, I2C::handshake blocks
-    displayMessage(F("Waiting for other\nplayer..."));
+    drawMessage(F("Waiting for other\nplayer..."));
 
     // handshake with other devices and get a unique id for this device
     // note: I2C::handshake enables general calls by default
