@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['idtoaddress_0',['idToAddress',['../class_i2_c.html#a4f4062dba835e29f49d99aac3c3c3984',1,'I2C']]]
+  ['handshake_0',['handshake',['../class_i2_c.html#a7f3455d4864527408a933da138f9756c',1,'I2C']]]
 ];

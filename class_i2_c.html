@@ -99,6 +99,8 @@ $(function(){initNavTree('class_i2_c.html','','class_i2_c-members'); });
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a700dc7d79a25b042b59846c0068a773a" id="r_a700dc7d79a25b042b59846c0068a773a"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a700dc7d79a25b042b59846c0068a773a">begin</a> ()</td></tr>
 <tr class="memdesc:a700dc7d79a25b042b59846c0068a773a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes <a class="el" href="class_i2_c.html">I2C</a> hardware.  <br /></td></tr>
+<tr class="memitem:a7977b9ae901f988109d03fafd8e96493" id="r_a7977b9ae901f988109d03fafd8e96493"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a7977b9ae901f988109d03fafd8e96493">end</a> ()</td></tr>
+<tr class="memdesc:a7977b9ae901f988109d03fafd8e96493"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deinitializes <a class="el" href="class_i2_c.html">I2C</a> hardware.  <br /></td></tr>
 <tr class="memitem:af348cda2e2eb1062da894fe45584f28c" id="r_af348cda2e2eb1062da894fe45584f28c"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#af348cda2e2eb1062da894fe45584f28c">setAddress</a> (uint8_t address, bool generalCall=true)</td></tr>
 <tr class="memdesc:af348cda2e2eb1062da894fe45584f28c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the address of the device and whether to enable or disable general calls for it.  <br /></td></tr>
 <tr class="memitem:afb38ec006200442dbdca3fecc9af0d03" id="r_afb38ec006200442dbdca3fecc9af0d03"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#afb38ec006200442dbdca3fecc9af0d03">write</a> (uint8_t address, const void *buffer, uint8_t size, bool wait)</td></tr>
@@ -159,7 +161,35 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initializes <a class="el" href="class_i2_c.html">I2C</a> hardware. </p>
-<p>This function powers on, initializes, and sets up the clock on the TWI hardware. Must be called after Arduboy hardware is initialized as <span class="tt">arduboy.boot()</span> (inside <span class="tt">arduboy.begin()</span>) disables the <a class="el" href="class_i2_c.html">I2C</a> (TWI) hardware. </p>
+<p>This function powers on, initializes, and sets up the clock on the TWI hardware. Must be called after Arduboy hardware is initialized as <span class="tt">arduboy.boot()</span> (inside <span class="tt">arduboy.begin()</span>) disables the <a class="el" href="class_i2_c.html">I2C</a> (TWI) hardware. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#a7977b9ae901f988109d03fafd8e96493" title="Deinitializes I2C hardware.">end()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a7977b9ae901f988109d03fafd8e96493" name="a7977b9ae901f988109d03fafd8e96493"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7977b9ae901f988109d03fafd8e96493">&#9670;&#160;</a></span>end()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void I2C::end </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Deinitializes <a class="el" href="class_i2_c.html">I2C</a> hardware. </p>
+<p>This function powers off and deinitializes the TWI hardware. It may be reinitialized by calling <span class="tt"><a class="el" href="#a700dc7d79a25b042b59846c0068a773a" title="Initializes I2C hardware.">I2C::begin()</a></span> again. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#a700dc7d79a25b042b59846c0068a773a" title="Initializes I2C hardware.">begin()</a> </dd></dl>
 
 </div>
 </div>
