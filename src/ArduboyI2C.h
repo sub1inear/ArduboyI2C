@@ -671,12 +671,13 @@ uint16_t millisShort() {
 }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
-void startReadWrite(uint8_t address, bool readWrite) {
+void startReadWrite(uint8_t address, bool readWrite, uint8_t bufferSize) {
     while (i2c_detail::data.active) {}
 
     i2c_detail::data.error = I2C_ERROR_NONE;
     i2c_detail::data.slaRW = address << 1 | readWrite;
     i2c_detail::data.bufferIdx = 0;
+    i2c_detail::data.bufferSize = bufferSize;
 }
 }
 /// \endcond
@@ -711,11 +712,9 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
 }
 
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
-    i2c_detail::startReadWrite(address, TW_WRITE);
+    i2c_detail::startReadWrite(address, TW_WRITE, size);
 
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
-
-    i2c_detail::data.bufferSize = size;
 
 #if I2C_USE_MULTI_CONTROLLER
     if (i2c_detail::checkBusBusy()) { return; }
@@ -734,10 +733,9 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 }
 
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
-    i2c_detail::startReadWrite(address, TW_READ);
+    i2c_detail::startReadWrite(address, TW_READ, size - 1);
 
     i2c_detail::data.readBuffer = (uint8_t *)buffer;
-    i2c_detail::data.bufferSize = size - 1;
 
 #if I2C_USE_MULTI_CONTROLLER
     if (i2c_detail::checkBusBusy()) { return; }
