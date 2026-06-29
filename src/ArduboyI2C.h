@@ -102,7 +102,7 @@ SOFTWARE.
 /** \brief
  * The amount of times the bus is checked before continuing with a read/write operation.
  * \details
- * Defaults to 16, with a maximum of 255. Fixes design flaw where TWI hardware does not check if the bus has become busy during a stop interrupt,
+ * Defaults to 8, with a maximum of 255. Fixes design flaw where TWI hardware does not check if the bus has become busy during a stop interrupt,
  * so if multiple targets (slaves) receive the stop interrupt right before
  * they become the controller (master) and send a start, they all will think the bus is free and clobber each other.
  * Increase if the game ever freezes.
@@ -680,7 +680,6 @@ void checkBusBusy() {
         }
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
-    return false;
 }
 #endif // #if I2C_USE_MULTI_CONTROLLER
 
@@ -865,7 +864,8 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             while (i2c_detail::handshakeState < i) {
                 I2C::write(I2C_GENERAL_CALL_ADDR, dummy, true);
                 // avoid hogging the bus
-                _delay_us(1000000.0 / I2C_FREQUENCY);
+                // delay required is inversely correlated to the frequency and number of bus busy checks
+                _delay_us(1000000.0 / I2C_FREQUENCY / I2C_MULTI_CONTROLLER_BUSY_CHECKS);
             }
 #else
             while (i2c_detail::handshakeState < i) { }

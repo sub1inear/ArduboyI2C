@@ -89,7 +89,7 @@ Define before `#include <ArduboyI2C.h>`.
 ### Reliability
 | Macro | Default | Options | Description |
 |-------|---------|---------|-------------|
-| `I2C_CHECK_BUS_BUSY_CHECKS` | 16 | 1-255 | Number of bus busy checks before read/write |
+| `I2C_CHECK_BUS_BUSY_CHECKS` | 8 | 1-255 | Number of bus busy checks before read/write |
 | `I2C_CHECK_CABLE_FLIPPED_CHECKS` | 128 | 1-255 | Number of checks for flipped cable detection |
 | `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT` | 1000 | 1-32767 | Debounce time (ms) for cable flip detection |
 ### Feature Flags

@@ -125,12 +125,23 @@ void Game::Draw()
 
 void Game::TickInGame()
 {
-	uint8_t localInput = Platform::GetInput();
-	PlatformNet::Write(localInput);
+	uint8_t localInput, remoteInput;
+	if (Game::localPlayerId == 0)
+	{
+		localInput = Platform::GetInput();
+		PlatformNet::Write(localInput);
 
-	while (!PlatformNet::ReadAvailable()) { }
-	uint8_t remoteInput = PlatformNet::Read();
+		while (!PlatformNet::ReadAvailable()) { }
+		remoteInput = PlatformNet::Read();
+	}
+	else
+	{
+		while (!PlatformNet::ReadAvailable()) { }
+		remoteInput = PlatformNet::Read();
 
+		localInput = Platform::GetInput();
+		PlatformNet::Write(localInput);
+	}
 
 	if (displayMessageTime > 0)
 	{
