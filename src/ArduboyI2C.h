@@ -57,9 +57,6 @@ SOFTWARE.
  */
 #define I2C_PLATFORM_UNKNOWN 2
 
-#ifndef I2C_PLATFORM
-#endif
-
 #ifdef __DOXYGEN__
 /** \brief
  * The platform being used.
@@ -98,7 +95,7 @@ SOFTWARE.
  */
 #define I2C_BUFFER_CAPACITY 32
 #elif I2C_BUFFER_CAPACITY > 255
-#error "I2C_BUFFER_SIZE is too big."
+#error "I2C_BUFFER_CAPACITY is too big."
 #endif
 
 #ifndef I2C_MULTI_CONTROLLER_BUSY_CHECKS
@@ -365,7 +362,7 @@ public:
 
     /** \brief
      * Set the address of the device and whether to enable or disable general calls for it.
-     * \param address The 7-bit address which to respond to.
+     * \param address The 7-bit address to respond to.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param generalCall Whether to enable or disable general calls. Defaults to true.
      * \note
@@ -377,7 +374,7 @@ public:
 
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
-     * \param address The 7-bit address which to send the data. To send a general call, use `I2C_GENERAL_CALL_ADDR`.
+     * \param address The 7-bit address to send the data to. To send a general call, use `I2C_GENERAL_CALL_ADDR`.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param size The amount of data in bytes to send. This cannot be zero.
@@ -395,7 +392,7 @@ public:
 
     /** \overload
      * \tparam T The type of the object to send. To prevent bugs, T cannot be a pointer.
-     * \param address The 7-bit address which to receive the data from.
+     * \param address The 7-bit address to receive the data from.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
@@ -412,7 +409,7 @@ public:
 
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
-     * \param address The 7-bit address which to receive the data from.
+     * \param address The 7-bit address to receive the data from.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the buffer in which to store the data.
      * \param size The maximum amount of bytes to receive. This cannot be 0 or 255.
@@ -425,7 +422,7 @@ public:
 
     /** \overload
      * \tparam T The type of the object to read. To prevent bugs, T cannot be a pointer.
-     * \param address The 7-bit address which to receive the data from.
+     * \param address The 7-bit address to receive the data from.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object in which to store the data.
      * \details
@@ -797,7 +794,6 @@ bool I2C::checkEmulator() {
 uint8_t I2C::idToAddress(uint8_t id) {
     return 0x8 + id;
 }
-extern Arduboy2 arduboy;
 
 #if I2C_USE_HANDSHAKE
 uint8_t I2C::handshake(uint8_t numPlayers) {
@@ -818,13 +814,11 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             // so we send 0b00000000 to have SDA change as little as possible
             // while detecting it.
 #if I2C_USE_CHECK_CABLE_FLIPPED
-            {
-                uint8_t buffer[4] = { 0b00000000, 0b00000000, 0b00000000, 0b00000000 };
-                while (i2c_detail::handshakeState < i) {
-                    I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
-                    // avoid hogging the bus
-                    _delay_us(1000000.0 / I2C_FREQUENCY);
-                }
+            dummy = 0b00000000;
+            while (i2c_detail::handshakeState < i) {
+                I2C::write(I2C_GENERAL_CALL_ADDR, dummy, true);
+                // avoid hogging the bus
+                _delay_us(1000000.0 / I2C_FREQUENCY);
             }
 #else
             while (i2c_detail::handshakeState < i) { }
@@ -835,7 +829,6 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             i--;
             break;
         case I2C_ERROR_ARB_LOST:
-            arduboy.digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
             // we lost arbitration
             // break without decrementing i to try again
             break;
