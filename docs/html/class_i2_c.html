@@ -728,7 +728,7 @@ Options:<ul>
   </table>
   </dd>
 </dl>
-<p>This function works by seeing which line behaves more like a clock (equal high and low) over a sampling period. The callback <code class="param">function</code> will be called with interrupts disabled (i.e. no <span class="tt">Serial</span>, <span class="tt">delay</span>, <span class="tt">millis</span>, etc.). It is by no means perfect, but it should suffice. This is only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable. This method must be used with <a class="el" href="#a7f3455d4864527408a933da138f9756c" title="Handshakes with other devices and returns a unique id once complete.">I2C::handshake</a>. Example Usage: </p><div class="fragment"><div class="line"><a class="code hl_function" href="#a2146f1685988390f3674df95868e88e3">I2C::checkCableFlipped</a>([] {</div>
+<p>This function works by seeing which line behaves more like a clock (equal high and low) over a sampling period. It is by no means perfect, but it should suffice. This is only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable. This method must be used with <a class="el" href="#a7f3455d4864527408a933da138f9756c" title="Handshakes with other devices and returns a unique id once complete.">I2C::handshake</a>. Example Usage: </p><div class="fragment"><div class="line"><a class="code hl_function" href="#a2146f1685988390f3674df95868e88e3">I2C::checkCableFlipped</a>([] {</div>
 <div class="line">    arduboy.clear();</div>
 <div class="line">    arduboy.print(F(<span class="stringliteral">&quot;Please flip the cable\non this device.&quot;</span>));</div>
 <div class="line">    arduboy.display();</div>

@@ -118,13 +118,13 @@ Macros</h2></td></tr>
 <tr class="memdesc:a87c420b46c32c47fd27003f610622f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant for the Arduboy Mini platform.  <br /></td></tr>
 <tr class="memitem:a7135a08961de38f77d684704bd51b2f3" id="r_a7135a08961de38f77d684704bd51b2f3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7135a08961de38f77d684704bd51b2f3">I2C_PLATFORM_UNKNOWN</a>&#160;&#160;&#160;2</td></tr>
 <tr class="memdesc:a7135a08961de38f77d684704bd51b2f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant for an unknown platform.  <br /></td></tr>
-<tr class="memitem:a621319d4e6b913f077d3c8339eb9b93b" id="r_a621319d4e6b913f077d3c8339eb9b93b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a621319d4e6b913f077d3c8339eb9b93b">I2C_PLATFORM</a>&#160;&#160;&#160;<a class="el" href="#a5e9cf5cf07df5ab333b78df30cfc54dd">I2C_PLATFORM_FX_C</a></td></tr>
+<tr class="memitem:a621319d4e6b913f077d3c8339eb9b93b" id="r_a621319d4e6b913f077d3c8339eb9b93b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a621319d4e6b913f077d3c8339eb9b93b">I2C_PLATFORM</a></td></tr>
 <tr class="memdesc:a621319d4e6b913f077d3c8339eb9b93b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The platform being used.  <br /></td></tr>
 <tr class="memitem:afd74d0ddc5d78f0d7957c5bbe90eb222" id="r_afd74d0ddc5d78f0d7957c5bbe90eb222"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afd74d0ddc5d78f0d7957c5bbe90eb222">I2C_FREQUENCY</a>&#160;&#160;&#160;100000</td></tr>
 <tr class="memdesc:afd74d0ddc5d78f0d7957c5bbe90eb222"><td class="mdescLeft">&#160;</td><td class="mdescRight">The initial <a class="el" href="class_i2_c.html">I2C</a> frequency in Hz.  <br /></td></tr>
 <tr class="memitem:ac73f85d176e73ac821bf6c21abee83b3" id="r_ac73f85d176e73ac821bf6c21abee83b3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac73f85d176e73ac821bf6c21abee83b3">I2C_BUFFER_CAPACITY</a>&#160;&#160;&#160;32</td></tr>
 <tr class="memdesc:ac73f85d176e73ac821bf6c21abee83b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The capacity of the buffer used for writes/target (slave) operations.  <br /></td></tr>
-<tr class="memitem:a19f4a62ac3e2dfb317f31cac267b8490" id="r_a19f4a62ac3e2dfb317f31cac267b8490"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a19f4a62ac3e2dfb317f31cac267b8490">I2C_MULTI_CONTROLLER_BUSY_CHECKS</a>&#160;&#160;&#160;16</td></tr>
+<tr class="memitem:a19f4a62ac3e2dfb317f31cac267b8490" id="r_a19f4a62ac3e2dfb317f31cac267b8490"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a19f4a62ac3e2dfb317f31cac267b8490">I2C_MULTI_CONTROLLER_BUSY_CHECKS</a>&#160;&#160;&#160;8</td></tr>
 <tr class="memdesc:a19f4a62ac3e2dfb317f31cac267b8490"><td class="mdescLeft">&#160;</td><td class="mdescRight">The amount of times the bus is checked before continuing with a read/write operation.  <br /></td></tr>
 <tr class="memitem:afecd6be59c3d3d809937b074f2f5fd57" id="r_afecd6be59c3d3d809937b074f2f5fd57"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#afecd6be59c3d3d809937b074f2f5fd57">I2C_CHECK_CABLE_FLIPPED_CHECKS</a>&#160;&#160;&#160;128</td></tr>
 <tr class="memdesc:afecd6be59c3d3d809937b074f2f5fd57"><td class="mdescLeft">&#160;</td><td class="mdescRight">The total number of checks to perform when checking for a flipped cable.  <br /></td></tr>
@@ -241,13 +241,13 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define I2C_PLATFORM&#160;&#160;&#160;<a class="el" href="#a5e9cf5cf07df5ab333b78df30cfc54dd">I2C_PLATFORM_FX_C</a></td>
+          <td class="memname">#define I2C_PLATFORM</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>The platform being used. </p>
-<p>Defaults to <span class="tt"><a class="el" href="#a5e9cf5cf07df5ab333b78df30cfc54dd" title="Constant for the Arduboy FX-C platform.">I2C_PLATFORM_FX_C</a></span>. Options: <br  />
+<p>No default. Options: <br  />
 </p><ul>
 <li><span class="tt"><a class="el" href="#a5e9cf5cf07df5ab333b78df30cfc54dd" title="Constant for the Arduboy FX-C platform.">I2C_PLATFORM_FX_C</a></span>: Arduboy FX-C <br  />
 </li>
@@ -302,7 +302,7 @@ Standard frequencies: <br  />
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define I2C_MULTI_CONTROLLER_BUSY_CHECKS&#160;&#160;&#160;16</td>
+          <td class="memname">#define I2C_MULTI_CONTROLLER_BUSY_CHECKS&#160;&#160;&#160;8</td>
         </tr>
       </table>
 </div><div class="memdoc">

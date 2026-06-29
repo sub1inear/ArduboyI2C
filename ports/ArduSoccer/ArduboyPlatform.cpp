@@ -1,5 +1,5 @@
 #define I2C_IMPLEMENTATION
-// #define I2C_CHECK_BUS_BUSY_CHECKS 255
+#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include <ArduboyI2C.h>
 #include "ArduboyPlatform.h"
 #include "Engine.h"

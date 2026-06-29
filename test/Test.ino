@@ -33,6 +33,7 @@ SOFTWARE.
 			Serial.println(a); \
 			Serial.print(F(", ")); \
 			Serial.println(b); \
+			allTestsPassed = false; \
 			return false; \
 		} \
 	} while (0)
@@ -42,6 +43,7 @@ SOFTWARE.
 			Serial.print(a); \
 			Serial.print(F(", ")); \
 			Serial.println(b); \
+			allTestsPassed = false; \
 			return false; \
 		} \
 	} while (0)
@@ -60,6 +62,7 @@ SOFTWARE.
 			Serial.print(a); \
 			Serial.print(F(", ")); \
 			Serial.println(b); \
+			allTestsPassed = false; \
 			return false; \
 		} \
 	} while (0)
@@ -76,6 +79,8 @@ volatile bool writeCallbackCalled = false;
 const __FlashStringHelper *volatile writeCallbackError = nullptr;
 volatile int writeCallbackA = 0;
 volatile uint8_t writeCallbackB = 0;
+
+bool allTestsPassed = true;
 
 void displayTest(const __FlashStringHelper *name, bool result) {
 	arduboy.print(name);
@@ -201,6 +206,17 @@ void setup() {
 	displayTest(F("write"), testWrite(id));
 	displayTest(F("checkEmulator"), testCheckEmulator());
 	displayTest(F("idToAddress"), testIdToAddress());
+
+	if (allTestsPassed) {
+		arduboy.digitalWriteRGB(GREEN_LED, RGB_ON);
+	} else {
+		arduboy.digitalWriteRGB(RED_LED, RGB_ON);
+	}
+
 }
 
-void loop() { }
+void loop() {
+	if (arduboy.anyPressed(A_BUTTON | B_BUTTON)) {
+		arduboy.exitToBootloader();
+	}
+}

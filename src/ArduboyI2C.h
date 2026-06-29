@@ -71,7 +71,7 @@ SOFTWARE.
  * - `I2C_PLATFORM_UNKNOWN`: Unknown platform (must define all other platform-specific macros)
  */
 #define I2C_PLATFORM
-#elif !defined(I2C_PLATFORM)
+#elif defined(I2C_IMPLEMENTATION) && !defined(I2C_PLATFORM)
 #error "I2C_PLATFORM must be defined."
 #endif
 
@@ -111,7 +111,7 @@ SOFTWARE.
  * Increase if the game ever freezes.
  * More information: https://www.robotroom.com/Atmel-AVR-TWI-I2C-Multi-Master-Problem.html
  */
-#define I2C_MULTI_CONTROLLER_BUSY_CHECKS 16
+#define I2C_MULTI_CONTROLLER_BUSY_CHECKS 8
 #elif I2C_MULTI_CONTROLLER_BUSY_CHECKS > 255
 #error "I2C_MULTI_CONTROLLER_BUSY_CHECKS is too big."
 #endif
@@ -547,7 +547,6 @@ public:
      * \param function The function to be called if the cable is flipped.
      * \details
      * This function works by seeing which line behaves more like a clock (equal high and low) over a sampling period.
-     * The callback \p function will be called with interrupts disabled (i.e. no `Serial`, `delay`, `millis`, etc.).
      * It is by no means perfect, but it should suffice.
      * This is only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable.
      * This method must be used with I2C::handshake.
@@ -627,13 +626,15 @@ struct i2c_data_t {
 bool checkBusBusy() {
     uint8_t busyChecks = I2C_MULTI_CONTROLLER_BUSY_CHECKS;
     while (busyChecks) {
-        if ((I2C_PIN & _BV(I2C_SDA_BIT)) && (I2C_PIN & _BV(I2C_SCL_BIT))) {
+        if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) ==
+            (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
             busyChecks--;
         } else {
             i2c_detail::data.error = I2C_ERROR_ARB_LOST;
             i2c_detail::data.active = false;
             return true;
         }
+        _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
     return false;
 }
@@ -641,36 +642,27 @@ bool checkBusBusy() {
 
 #if I2C_USE_CHECK_CABLE_FLIPPED
 bool checkCableFlippedCore(bool disconnectFlip = false) {
-    // count frequency of each state of the SDA and SCL lines
-    uint8_t sdaHigh = 0;
-    uint8_t sclHigh = 0;
+    uint8_t prev = I2C_PIN;
+    uint8_t sdaEdges = 0;
+    uint8_t sclEdges = 0;
+
     for (uint8_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_CHECKS; i++) {
-        // probably should buffer the pin reads
-        // but saves an instruction not to
-        // and will only be off by a very small amount
-        if (I2C_PIN & _BV(I2C_SDA_BIT)) { sdaHigh++; }
-        if (I2C_PIN & _BV(I2C_SCL_BIT)) { sclHigh++; }
-        // half-period delay (otherwise way too fast to detect changes)
-        // double will be optimized away into constant cycle loop
+        uint8_t cur = I2C_PIN;
+        uint8_t diff = cur ^ prev;
+
+        if (diff & _BV(I2C_SDA_BIT)) sdaEdges++;
+        if (diff & _BV(I2C_SCL_BIT)) sclEdges++;
+
+        prev = cur;
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
-    // if the cable disconnected (both lines high) for the entire check
-    // and disconnectFlip is true, return true (flipped)
-    // otherwise will return false in same case
-    // (sdaScore = halfChecks, sclScore = halfChecks, sdaScore < sclScore is false)
-    if (disconnectFlip &&
-        sdaHigh == I2C_CHECK_CABLE_FLIPPED_CHECKS &&
-        sclHigh == I2C_CHECK_CABLE_FLIPPED_CHECKS) {
-        return true;
+
+    if (sdaEdges + sclEdges <= 2) {
+        return disconnectFlip;
     }
-    // score each line based on its distance from half the checks being high
-    constexpr uint8_t halfChecks = I2C_CHECK_CABLE_FLIPPED_CHECKS / 2;
-    uint8_t sdaScore = (uint8_t)abs((int8_t)(sdaHigh - halfChecks));
-    uint8_t sclScore = (uint8_t)abs((int8_t)(sclHigh - halfChecks));
-    // less score means more like a clock
-    // so flipped if sdaScore is less than sclScore
-    return sdaScore < sclScore;
+    return sdaEdges > sclEdges;
 }
+
 // optimizes for debounce in checkCableFlipped (only needs uint16_t)
 uint16_t millisShort() {
     return (uint16_t)millis();
@@ -679,6 +671,7 @@ uint16_t millisShort() {
 
 void startReadWrite(uint8_t address, bool readWrite, uint8_t bufferSize) {
     while (i2c_detail::data.active) {}
+    i2c_detail::data.active = true;
 
     i2c_detail::data.error = I2C_ERROR_NONE;
     i2c_detail::data.slaRW = address << 1 | readWrite;
@@ -724,14 +717,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
 #if I2C_USE_MULTI_CONTROLLER
     if (i2c_detail::checkBusBusy()) { return; }
-    // note: TOCTOU race condition here, but it's unavoidable
-    // no way to fix while prioritizing target (slave) interrupts so handshaking is solid
-    if (i2c_detail::data.active) {
-        i2c_detail::data.error = I2C_ERROR_ARB_LOST;
-        return;
-    }
 #endif // #if I2C_USE_MULTI_CONTROLLER
-    i2c_detail::data.active = true;
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
     if (wait) {
         while (i2c_detail::data.active) {}
@@ -745,14 +731,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 
 #if I2C_USE_MULTI_CONTROLLER
     if (i2c_detail::checkBusBusy()) { return; }
-    // note: TOCTOU race condition here, but it's unavoidable
-    // no way to fix while prioritizing target (slave) interrupts so handshaking is solid
-    if (i2c_detail::data.active) {
-        i2c_detail::data.error = I2C_ERROR_ARB_LOST;
-        return;
-    }
 #endif // #if I2C_USE_MULTI_CONTROLLER
-    i2c_detail::data.active = true;
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
     while (i2c_detail::data.active) {}
 }
@@ -798,7 +777,7 @@ void I2C::checkCableFlipped(void (*function)()) {
             if (i2c_detail::checkCableFlippedCore(true)) {
                 start = i2c_detail::millisShort();
             } else if (i2c_detail::millisShort() - start >
-                       I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT) {
+                    I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT) {
                 break;
             }
         }
@@ -818,6 +797,7 @@ bool I2C::checkEmulator() {
 uint8_t I2C::idToAddress(uint8_t id) {
     return 0x8 + id;
 }
+extern Arduboy2 arduboy;
 
 #if I2C_USE_HANDSHAKE
 uint8_t I2C::handshake(uint8_t numPlayers) {
@@ -838,9 +818,13 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             // so we send 0b00000000 to have SDA change as little as possible
             // while detecting it.
 #if I2C_USE_CHECK_CABLE_FLIPPED
-            dummy = 0b00000000;
-            while (i2c_detail::handshakeState < i) {
-                I2C::write(I2C_GENERAL_CALL_ADDR, dummy, true);
+            {
+                uint8_t buffer[4] = { 0b00000000, 0b00000000, 0b00000000, 0b00000000 };
+                while (i2c_detail::handshakeState < i) {
+                    I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
+                    // avoid hogging the bus
+                    _delay_us(1000000.0 / I2C_FREQUENCY);
+                }
             }
 #else
             while (i2c_detail::handshakeState < i) { }
@@ -851,6 +835,7 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             i--;
             break;
         case I2C_ERROR_ARB_LOST:
+            arduboy.digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
             // we lost arbitration
             // break without decrementing i to try again
             break;

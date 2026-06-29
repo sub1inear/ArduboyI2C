@@ -33,7 +33,7 @@ public:
 	static void Write(uint8_t data);
 	static uint8_t Read();
 	static bool ReadAvailable();
-private:
+
 	static volatile uint8_t data;
 	static volatile bool dataAvailable;
 };
