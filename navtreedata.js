@@ -58,6 +58,10 @@ var NAVTREE =
         [ "Why can't I use certain I2C addresses for my own address?", "index.html#autotoc_md27", null ],
         [ "Is <span class=\"tt\">checkCableFlipped()</span> 100% reliable?", "index.html#autotoc_md28", null ],
         [ "How do I minimize memory usage?", "index.html#autotoc_md29", null ]
+      ] ],
+      [ "Types of Multiplayer", "index.html#autotoc_md30", [
+        [ "State Sync Multiplayer", "index.html#autotoc_md31", null ],
+        [ "Lockstep Multiplayer", "index.html#autotoc_md32", null ]
       ] ]
     ] ],
     [ "Classes", "annotated.html", [
