@@ -11,5 +11,5 @@ var searchData=
   ['wire_8',['Why ArduboyI2C over Wire?',['../index.html#autotoc_md3',1,'']]],
   ['wire_20library_9',['Migrating from Wire Library',['../index.html#autotoc_md17',1,'']]],
   ['write_10',['4. Read/Write',['../index.html#autotoc_md11',1,'']]],
-  ['write_11',['write',['../class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03',1,'I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait)'],['../class_i2_c.html#aa0054f1d24c4bab77b2a8c37700f56cc',1,'I2C::write(uint8_t address, const T &amp;object, bool wait)']]]
+  ['write_11',['write',['../class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03',1,'I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait)'],['../class_i2_c.html#aa0054f1d24c4bab77b2a8c37700f56cc',1,'I2C::write(uint8_t address, const T &amp;object, bool wait)'],['../class_i2_c.html#ab34eb7608b7732f111832421372f138d',1,'I2C::write(uint8_t address, const T(&amp;buffer)[N], bool wait)']]]
 ];

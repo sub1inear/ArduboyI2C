@@ -107,14 +107,20 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:afb38ec006200442dbdca3fecc9af0d03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to become the bus controller (master) and sends data over <a class="el" href="class_i2_c.html">I2C</a> to the specified address.  <br /></td></tr>
 <tr class="memitem:aa0054f1d24c4bab77b2a8c37700f56cc" id="r_aa0054f1d24c4bab77b2a8c37700f56cc"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
 <tr class="memitem:aa0054f1d24c4bab77b2a8c37700f56cc template"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa0054f1d24c4bab77b2a8c37700f56cc">write</a> (uint8_t address, const T &amp;object, bool wait)</td></tr>
+<tr class="memitem:ab34eb7608b7732f111832421372f138d" id="r_ab34eb7608b7732f111832421372f138d"><td class="memTemplParams" colspan="2">template&lt;typename T, size_t N&gt; </td></tr>
+<tr class="memitem:ab34eb7608b7732f111832421372f138d template"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ab34eb7608b7732f111832421372f138d">write</a> (uint8_t address, const T(&amp;buffer)[N], bool wait)</td></tr>
 <tr class="memitem:a7fa12af5a3f24c3db496672a4d5c3fe0" id="r_a7fa12af5a3f24c3db496672a4d5c3fe0"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0">read</a> (uint8_t address, void *buffer, uint8_t size)</td></tr>
 <tr class="memdesc:a7fa12af5a3f24c3db496672a4d5c3fe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attempts to become the bus controller (master) and reads data over <a class="el" href="class_i2_c.html">I2C</a> from the specified address.  <br /></td></tr>
 <tr class="memitem:aecef3517445837858950b1ecc722cc9a" id="r_aecef3517445837858950b1ecc722cc9a"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
 <tr class="memitem:aecef3517445837858950b1ecc722cc9a template"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aecef3517445837858950b1ecc722cc9a">read</a> (uint8_t address, T &amp;object)</td></tr>
+<tr class="memitem:ac0a3ae78005a200ab70d65f38bddc2c8" id="r_ac0a3ae78005a200ab70d65f38bddc2c8"><td class="memTemplParams" colspan="2">template&lt;typename T, size_t N&gt; </td></tr>
+<tr class="memitem:ac0a3ae78005a200ab70d65f38bddc2c8 template"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ac0a3ae78005a200ab70d65f38bddc2c8">read</a> (uint8_t address, T(&amp;buffer)[N])</td></tr>
 <tr class="memitem:a0039ed613883e9203aa3ebac7b467aa1" id="r_a0039ed613883e9203aa3ebac7b467aa1"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0039ed613883e9203aa3ebac7b467aa1">reply</a> (const void *buffer, uint8_t size)</td></tr>
 <tr class="memdesc:a0039ed613883e9203aa3ebac7b467aa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replies back to the controller (master).  <br /></td></tr>
 <tr class="memitem:a5619952fffa9305ab6528425e238e298" id="r_a5619952fffa9305ab6528425e238e298"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
 <tr class="memitem:a5619952fffa9305ab6528425e238e298 template"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a5619952fffa9305ab6528425e238e298">reply</a> (const T &amp;object)</td></tr>
+<tr class="memitem:aa1644a852a42e6efa4dbead69007dc2e" id="r_aa1644a852a42e6efa4dbead69007dc2e"><td class="memTemplParams" colspan="2">template&lt;typename T, size_t N&gt; </td></tr>
+<tr class="memitem:aa1644a852a42e6efa4dbead69007dc2e template"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa1644a852a42e6efa4dbead69007dc2e">reply</a> (const T(&amp;buffer)[N])</td></tr>
 <tr class="memitem:a026eaad0ba8bb6a698d3eaca9dd9887d" id="r_a026eaad0ba8bb6a698d3eaca9dd9887d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d">onRequest</a> (void(*function)())</td></tr>
 <tr class="memdesc:a026eaad0ba8bb6a698d3eaca9dd9887d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up/disables the callback to be called when data is requested from the device's address (a read).  <br /></td></tr>
 <tr class="memitem:aba82f80b86f08e2caf0f6cab4860728d" id="r_aba82f80b86f08e2caf0f6cab4860728d"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d">onReceive</a> (void(*function)())</td></tr>
@@ -223,7 +229,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Set the address of the device and whether to enable or disable general calls for it. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to respond to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to respond to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">generalCall</td><td>Whether to enable or disable general calls. Defaults to true. </td></tr>
   </table>
   </dd>
@@ -233,7 +239,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="afb38ec006200442dbdca3fecc9af0d03" name="afb38ec006200442dbdca3fecc9af0d03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afb38ec006200442dbdca3fecc9af0d03">&#9670;&#160;</a></span>write() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afb38ec006200442dbdca3fecc9af0d03">&#9670;&#160;</a></span>write() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -272,7 +278,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Attempts to become the bus controller (master) and sends data over <a class="el" href="class_i2_c.html">I2C</a> to the specified address. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to send the data. To send a general call, use <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac637ca58cc3535ed0e85eb8878718815" title="The address used for general calls.">I2C_GENERAL_CALL_ADDR</a></span>. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. To send a general call, use <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac637ca58cc3535ed0e85eb8878718815" title="The address used for general calls.">I2C_GENERAL_CALL_ADDR</a></span>. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A pointer to the data to send. </td></tr>
     <tr><td class="paramname">size</td><td>The amount of data in bytes to send. This cannot be zero. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
@@ -287,7 +293,7 @@ Internally, this function uses a buffer to enable asynchronous writes. The buffe
 </div>
 </div>
 <a id="aa0054f1d24c4bab77b2a8c37700f56cc" name="aa0054f1d24c4bab77b2a8c37700f56cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0054f1d24c4bab77b2a8c37700f56cc">&#9670;&#160;</a></span>write() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0054f1d24c4bab77b2a8c37700f56cc">&#9670;&#160;</a></span>write() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -327,7 +333,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object to send. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
   </table>
@@ -337,8 +343,60 @@ template&lt;typename T&gt; </div>
 
 </div>
 </div>
+<a id="ab34eb7608b7732f111832421372f138d" name="ab34eb7608b7732f111832421372f138d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab34eb7608b7732f111832421372f138d">&#9670;&#160;</a></span>write() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, size_t N&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void I2C::write </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>address</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T(&amp;)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>[N], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>wait</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The type of the array to send. </td></tr>
+    <tr><td class="paramname">N</td><td>The number of elements in the array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. </td></tr>
+    <tr><td class="paramname">buffer</td><td>A reference to the array to send. </td></tr>
+    <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This function will automatically deduce the size of the array. Arrays with sizes greater than or equal to 255 should not be used with this function. </p>
+
+</div>
+</div>
 <a id="a7fa12af5a3f24c3db496672a4d5c3fe0" name="a7fa12af5a3f24c3db496672a4d5c3fe0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7fa12af5a3f24c3db496672a4d5c3fe0">&#9670;&#160;</a></span>read() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fa12af5a3f24c3db496672a4d5c3fe0">&#9670;&#160;</a></span>read() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -372,7 +430,7 @@ template&lt;typename T&gt; </div>
 <p>Attempts to become the bus controller (master) and reads data over <a class="el" href="class_i2_c.html">I2C</a> from the specified address. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A pointer to the buffer in which to store the data. </td></tr>
     <tr><td class="paramname">size</td><td>The maximum amount of bytes to receive. This cannot be 0 or 255.</td></tr>
   </table>
@@ -384,7 +442,7 @@ template&lt;typename T&gt; </div>
 </div>
 </div>
 <a id="aecef3517445837858950b1ecc722cc9a" name="aecef3517445837858950b1ecc722cc9a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aecef3517445837858950b1ecc722cc9a">&#9670;&#160;</a></span>read() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aecef3517445837858950b1ecc722cc9a">&#9670;&#160;</a></span>read() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -419,7 +477,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address which to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object in which to store the data.</td></tr>
   </table>
   </dd>
@@ -428,8 +486,54 @@ template&lt;typename T&gt; </div>
 
 </div>
 </div>
+<a id="ac0a3ae78005a200ab70d65f38bddc2c8" name="ac0a3ae78005a200ab70d65f38bddc2c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0a3ae78005a200ab70d65f38bddc2c8">&#9670;&#160;</a></span>read() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, size_t N&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void I2C::read </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>address</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T(&amp;)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>[N]&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The type of the array to read. </td></tr>
+    <tr><td class="paramname">N</td><td>The number of elements in the array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. </td></tr>
+    <tr><td class="paramname">buffer</td><td>A reference to the array in which to store the data.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This function will automatically deduce the size of the array. Arrays with sizes greater than or equal to 255 should not be used with this function. </p>
+
+</div>
+</div>
 <a id="a0039ed613883e9203aa3ebac7b467aa1" name="a0039ed613883e9203aa3ebac7b467aa1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0039ed613883e9203aa3ebac7b467aa1">&#9670;&#160;</a></span>reply() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0039ed613883e9203aa3ebac7b467aa1">&#9670;&#160;</a></span>reply() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -469,7 +573,7 @@ template&lt;typename T&gt; </div>
 </div>
 </div>
 <a id="a5619952fffa9305ab6528425e238e298" name="a5619952fffa9305ab6528425e238e298"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5619952fffa9305ab6528425e238e298">&#9670;&#160;</a></span>reply() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5619952fffa9305ab6528425e238e298">&#9670;&#160;</a></span>reply() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -505,6 +609,47 @@ template&lt;typename T&gt; </div>
   </dd>
 </dl>
 <p>This function will automatically deduce the size of the object. Objects with sizes greater than or equal to 255 should not be used with this function. </p>
+
+</div>
+</div>
+<a id="aa1644a852a42e6efa4dbead69007dc2e" name="aa1644a852a42e6efa4dbead69007dc2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1644a852a42e6efa4dbead69007dc2e">&#9670;&#160;</a></span>reply() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, size_t N&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void I2C::reply </td>
+          <td>(</td>
+          <td class="paramtype">const T(&amp;)</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>[N]</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. </p><dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The type of the array to reply with. </td></tr>
+    <tr><td class="paramname">N</td><td>The number of elements in the array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buffer</td><td>A reference to the array to reply with.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This function will automatically deduce the size of the array. Arrays with sizes greater than or equal to 255 should not be used with this function. </p>
 
 </div>
 </div>
