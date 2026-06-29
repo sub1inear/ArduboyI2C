@@ -272,9 +272,10 @@ SOFTWARE.
 
 /** \brief
  * This device lost arbitration while trying to become the controller (master); another device is already the controller (master).
- * There code has no distinction between reads and writes (hardware constraint).
  * \details
  * Error code returned by I2C::getError().
+ * \note
+ * This code has no distinction between reads and writes (hardware constraint).
  */
 #define I2C_ERROR_ARB_LOST TW_MT_ARB_LOST
 
@@ -668,16 +669,14 @@ struct i2c_data_t {
 } data;
 
 #if I2C_USE_MULTI_CONTROLLER
-bool checkBusBusy() {
+void checkBusBusy() {
     uint8_t busyChecks = I2C_MULTI_CONTROLLER_BUSY_CHECKS;
     while (busyChecks) {
         if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) ==
             (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
             busyChecks--;
         } else {
-            i2c_detail::data.error = I2C_ERROR_ARB_LOST;
-            i2c_detail::data.active = false;
-            return true;
+            busyChecks = I2C_MULTI_CONTROLLER_BUSY_CHECKS;
         }
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
@@ -695,8 +694,8 @@ bool checkCableFlippedCore(bool disconnectFlip = false) {
         uint8_t cur = I2C_PIN;
         uint8_t diff = cur ^ prev;
 
-        if (diff & _BV(I2C_SDA_BIT)) sdaEdges++;
-        if (diff & _BV(I2C_SCL_BIT)) sclEdges++;
+        if (diff & _BV(I2C_SDA_BIT)) { sdaEdges++; }
+        if (diff & _BV(I2C_SCL_BIT)) { sclEdges++; }
 
         prev = cur;
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
@@ -761,7 +760,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
 
 #if I2C_USE_MULTI_CONTROLLER
-    if (i2c_detail::checkBusBusy()) { return; }
+    i2c_detail::checkBusBusy();
 #endif // #if I2C_USE_MULTI_CONTROLLER
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
     if (wait) {
@@ -775,7 +774,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::data.readBuffer = (uint8_t *)buffer;
 
 #if I2C_USE_MULTI_CONTROLLER
-    if (i2c_detail::checkBusBusy()) { return; }
+    i2c_detail::checkBusBusy();
 #endif // #if I2C_USE_MULTI_CONTROLLER
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
     while (i2c_detail::data.active) {}
@@ -1259,7 +1258,7 @@ get_buffer_addr:
         [error]             "i" (offsetof(i2c_detail::i2c_data_t, error)),
         [active]            "i" (offsetof(i2c_detail::i2c_data_t, active)),
         [bufferIdx]         "i" (offsetof(i2c_detail::i2c_data_t, bufferIdx)),
-        [readBuffer]          "i" (offsetof(i2c_detail::i2c_data_t, readBuffer)),
+        [readBuffer]        "i" (offsetof(i2c_detail::i2c_data_t, readBuffer)),
         [onRequestFunction] "i" (offsetof(i2c_detail::i2c_data_t, onRequestFunction)),
         [onReceiveFunction] "i" (offsetof(i2c_detail::i2c_data_t, onReceiveFunction)),
         [bufferSize]        "i" (offsetof(i2c_detail::i2c_data_t, bufferSize)),
