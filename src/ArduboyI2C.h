@@ -721,7 +721,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     // note: TOCTOU race condition here, but it's unavoidable
     // no way to fix while prioritizing target (slave) interrupts so handshaking is solid
     if (i2c_detail::data.active) {
-        i2c_detail::data.error = TW_MT_ARB_LOST; // same as TW_MR_ARB_LOST
+        i2c_detail::data.error = I2C_ERROR_ARB_LOST;
         return;
     }
 #endif // #if I2C_USE_MULTI_CONTROLLER
@@ -742,7 +742,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     // note: TOCTOU race condition here, but it's unavoidable
     // no way to fix while prioritizing target (slave) interrupts so handshaking is solid
     if (i2c_detail::data.active) {
-        i2c_detail::data.error = TW_MT_ARB_LOST; // same as TW_MR_ARB_LOST
+        i2c_detail::data.error = I2C_ERROR_ARB_LOST;
         return;
     }
 #endif // #if I2C_USE_MULTI_CONTROLLER
