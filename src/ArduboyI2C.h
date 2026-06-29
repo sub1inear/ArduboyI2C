@@ -407,6 +407,23 @@ public:
         I2C::write(address, (const void *)&object, sizeof(T), wait);
     }
 
+    /** \overload
+     * \tparam T The type of the array to send.
+     * \tparam N The number of elements in the array.
+     * \param address The 7-bit address to send the data to.
+     * \param buffer A reference to the array to send.
+     * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
+     * \details
+     * This function will automatically deduce the size of the array.
+     * Arrays with sizes greater than or equal to 255 should not be used with this function.
+     */
+    template<typename T, size_t N>
+    static void write(uint8_t address, const T (&buffer)[N], bool wait) {
+        // N must be size_t otherwise const T & variant captures overload with N > 255
+        static_assert(sizeof(T) * N <= I2C_BUFFER_CAPACITY, "Size of T * N must be less than or equal to I2C_BUFFER_CAPACITY.");
+        I2C::write(address, (const void *)buffer, sizeof(T) * N, wait);
+    }
+
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
      * \param address The 7-bit address to receive the data from.
@@ -434,6 +451,22 @@ public:
         static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
         static_assert(sizeof(T) < 255, "Size of T must be less than 255.");
         I2C::read(address, (void *)&object, sizeof(T));
+    }
+
+    /** \overload
+     * \tparam T The type of the array to read.
+     * \tparam N The number of elements in the array.
+     * \param address The 7-bit address to receive the data from.
+     * \param buffer A reference to the array in which to store the data.
+     * \details
+     * This function will automatically deduce the size of the array.
+     * Arrays with sizes greater than or equal to 255 should not be used with this function.
+     */
+    template<typename T, size_t N>
+    static void read(uint8_t address, T (&buffer)[N]) {
+        // N must be size_t otherwise const T & variant captures overload with N > 255
+        static_assert(sizeof(T) * N < 255, "Size of T * N must be less than 255.");
+        I2C::read(address, (void *)buffer, sizeof(T) * N);
     }
 
     /** \brief
@@ -464,6 +497,21 @@ public:
         static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
         static_assert(sizeof(T) <= I2C_BUFFER_CAPACITY, "Size of T must be less than or equal to I2C_BUFFER_CAPACITY.");
         I2C::reply((const void *)&object, sizeof(T));
+    }
+
+    /** \overload
+     * \tparam T The type of the array to reply with.
+     * \tparam N The number of elements in the array.
+     * \param buffer A reference to the array to reply with.
+     * \details
+     * This function will automatically deduce the size of the array.
+     * Arrays with sizes greater than or equal to 255 should not be used with this function.
+     */
+    template<typename T, size_t N>
+    static void reply(const T (&buffer)[N]) {
+        // N must be size_t otherwise const T & variant captures overload with N > 255
+        static_assert(sizeof(T) * N <= I2C_BUFFER_CAPACITY, "Size of T * N must be less than or equal to I2C_BUFFER_CAPACITY.");
+        I2C::reply((const void *)buffer, sizeof(T) * N);
     }
 
     /** \brief
