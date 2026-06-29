@@ -33,6 +33,9 @@ public:
 	uint8_t deviceId = deviceIdNull;
 	volatile uint8_t data;
 	volatile bool dataAvailable = false;
+private:
+	void sendInput();
+	void getRemoteInput();
 };
 
 void ERROR(const char* msg);

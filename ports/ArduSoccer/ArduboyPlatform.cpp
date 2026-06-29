@@ -62,20 +62,16 @@ void ArduboyPlatform::update()
 	updateInput();
 	if (deviceId != deviceIdNull)
 	{
-		do
+		if (deviceId == 0)
 		{
-        	I2C::write(I2C_GENERAL_CALL_ADDR, inputState[LOCAL_PLAYER], true);
+			sendInput();
+			getRemoteInput();
 		}
-		while (I2C::getError() != I2C_ERROR_NONE);
-
-		while (!dataAvailable)
+		else
 		{
-			// Wait for data to be received
+			getRemoteInput();
+			sendInput();
 		}
-
-		dataAvailable = false;
-		lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
-		inputState[REMOTE_PLAYER] = data;
 	}
 }
 
@@ -113,3 +109,24 @@ bool ArduboyPlatform::connectMultiplayer()
 	return deviceId == 0;
 }
 
+
+void ArduboyPlatform::sendInput()
+{
+	do
+	{
+		I2C::write(I2C_GENERAL_CALL_ADDR, inputState[LOCAL_PLAYER], true);
+	}
+	while (I2C::getError() != I2C_ERROR_NONE);
+}
+
+void ArduboyPlatform::getRemoteInput()
+{
+	while (!dataAvailable)
+	{
+		// Wait for data to be received
+	}
+	dataAvailable = false;
+
+	lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
+	inputState[REMOTE_PLAYER] = data;
+}
