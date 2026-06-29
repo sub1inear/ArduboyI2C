@@ -1,6 +1,7 @@
 #include <Arduboy2.h>
 #include <ArduboyTones.h>
 #define I2C_IMPLEMENTATION
+#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #define I2C_FREQUENCY 400000
 #include <ArduboyI2C.h>
 #include "Game.h"

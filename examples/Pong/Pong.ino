@@ -24,6 +24,7 @@ SOFTWARE.
 #include <Arduboy2.h>
 
 #define I2C_IMPLEMENTATION
+#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include <ArduboyI2C.h>
 
 Arduboy2 arduboy;

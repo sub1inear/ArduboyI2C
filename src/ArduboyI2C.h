@@ -42,12 +42,14 @@ SOFTWARE.
  * This is the default platform if `I2C_PLATFORM` is not defined.
  */
 #define I2C_PLATFORM_FX_C 0
+
 /** \brief
  * Constant for the Arduboy Mini platform.
  * \details
  * Set `I2C_PLATFORM` to this value to use the Arduboy Mini platform.
  */
 #define I2C_PLATFORM_MINI 1
+
 /** \brief
  * Constant for an unknown platform.
  * \details
@@ -56,18 +58,22 @@ SOFTWARE.
 #define I2C_PLATFORM_UNKNOWN 2
 
 #ifndef I2C_PLATFORM
+#endif
+
+#ifdef __DOXYGEN__
 /** \brief
  * The platform being used.
  * \details
- * Defaults to `I2C_PLATFORM_FX_C`.
+ * No default.
  * Options: \n
  * - `I2C_PLATFORM_FX_C`: Arduboy FX-C \n
  * - `I2C_PLATFORM_MINI`: Arduboy Mini \n
  * - `I2C_PLATFORM_UNKNOWN`: Unknown platform (must define all other platform-specific macros)
  */
-#define I2C_PLATFORM I2C_PLATFORM_FX_C
+#define I2C_PLATFORM
+#elif !defined(I2C_PLATFORM)
+#error "I2C_PLATFORM must be defined."
 #endif
-
 
 #ifndef I2C_FREQUENCY
 /** \brief

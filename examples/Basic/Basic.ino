@@ -24,8 +24,7 @@ SOFTWARE.
 #include <Arduboy2.h>
 // define in one file before including
 #define I2C_IMPLEMENTATION
-// disable cable flipping and software pullups for the Arduboy Mini
-// #define I2C_PLATFORM I2C_PLATFORM_MINI
+#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include <ArduboyI2C.h>
 
 Arduboy2 arduboy;
