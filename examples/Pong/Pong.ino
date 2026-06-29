@@ -241,11 +241,7 @@ void updateBall() {
     }
 }
 
-void update(uint8_t localInput, uint8_t remoteInput) {
-    // convert local and remote input into left and right player input based on the player type
-    uint8_t leftInput = (playerType == PlayerType::Left) ? localInput : remoteInput;
-    uint8_t rightInput = (playerType == PlayerType::Right) ? localInput : remoteInput;
-
+void update(uint8_t leftInput, uint8_t rightInput) {
     updatePlayer(leftPlayer, leftInput);
     updatePlayer(rightPlayer, rightInput);
     updateBall();
@@ -357,12 +353,21 @@ void loop() {
         return;
     }
 
-    // read our input
     uint8_t localInput = arduboy.buttonsState();
-    sendInput(localInput);
-    // wait for the other player's input
-    uint8_t remoteInput = getRemoteInput();
-
-    update(localInput, remoteInput);
+    uint8_t leftInput, rightInput;
+    // to avoid arbitration-related desyncing,
+    // each player sends/receives in a different order
+    // left player -> sends first, then receives
+    // right player -> receives first, then sends
+    if (playerType == PlayerType::Left) {
+        leftInput = localInput;
+        sendInput(leftInput);
+        rightInput = getRemoteInput();
+    } else {
+        leftInput = getRemoteInput();
+        rightInput = localInput;
+        sendInput(rightInput);
+    }
+    update(leftInput, rightInput);
     draw();
 }
