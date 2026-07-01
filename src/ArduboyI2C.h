@@ -288,13 +288,21 @@ SOFTWARE.
 
 /** \brief
  * No error has occurred.
+ * \details
  */
 #define I2C_ERROR_NONE 0xFF
 
 /** \brief
+ * A read/write operation is pending.
+ * \details
+ * Error code returned by I2C::getError().
+ */
+#define I2C_ERROR_PENDING 0xFE
+
+/** \brief
  * Error code returned by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
  */
-#define I2C_HANDSHAKE_FULL 0xFE
+#define I2C_HANDSHAKE_FULL 0xFD
 
 /** \brief
  * The maximum amount of ids available to a device.
@@ -387,6 +395,8 @@ public:
      * Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
      * must be defined before including to be larger.
+     * Asynchronous writes with `I2C_USE_MULTI_CONTROLLER` are on a best-effort basis; if the device is addressed by another controller (master) during this time, it may fail silently.
+     * Synchronous writes with `I2C_USE_MULTI_CONTROLLER` will handle this correctly.
      * \see transmit() read()
      */
     static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
@@ -433,7 +443,7 @@ public:
      * \param size The maximum amount of bytes to receive. This cannot be 0 or 255.
      * \details
      * \note
-     * Unlike the `write` function, this function is bufferless and is not limited to 32 bytes.
+     * Unlike the `write` function, this function is bufferless and is not limited to `I2C_BUFFER_CAPACITY` bytes.
      * \see write()
      */
     static void read(uint8_t address, void *buffer, uint8_t size);
@@ -632,6 +642,8 @@ public:
      * \return A unique id for this device.
      * \details
      * This function may be called only once; further calls will not work.
+     * General calls must be disabled previously (defaults to disabled) for this function to work.
+     * This function will enable general calls.
      * This function will wait until every single player has joined.
      * \note
      * The onReceive() callback will be overridden by this function.
@@ -663,6 +675,7 @@ struct i2c_data_t {
     volatile uint8_t bufferSize;
 
     volatile uint8_t active;
+
     volatile uint8_t slaRW;
     volatile uint8_t error;
 
@@ -680,6 +693,7 @@ void checkBusBusy() {
         }
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
+    cli();
 }
 #endif // #if I2C_USE_MULTI_CONTROLLER
 
@@ -713,14 +727,21 @@ uint16_t millisShort() {
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
 void startReadWrite(uint8_t address, bool readWrite, uint8_t bufferSize) {
-    while (i2c_detail::data.active) {}
     i2c_detail::data.active = true;
-
+#if I2C_USE_MULTI_CONTROLLER
+    i2c_detail::data.error = I2C_ERROR_PENDING;
+#else
     i2c_detail::data.error = I2C_ERROR_NONE;
+#endif // #if I2C_USE_MULTI_CONTROLLER
     i2c_detail::data.slaRW = address << 1 | readWrite;
     i2c_detail::data.bufferIdx = 0;
     i2c_detail::data.bufferSize = bufferSize;
 }
+
+void waitActive() {
+    while (i2c_detail::data.active) { }
+}
+
 }
 /// \endcond
 
@@ -753,31 +774,85 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
     TWAR = address << 1 | generalCall;
 }
 
-void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
-    i2c_detail::startReadWrite(address, TW_WRITE, size);
-
-    memcpy(i2c_detail::data.twiBuffer, buffer, size);
+extern Arduboy2 arduboy;
 
 #if I2C_USE_MULTI_CONTROLLER
-    i2c_detail::checkBusBusy();
-#endif // #if I2C_USE_MULTI_CONTROLLER
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
-    if (wait) {
-        while (i2c_detail::data.active) {}
+void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = true) {
+    while (true) {
+        i2c_detail::waitActive();
+        i2c_detail::checkBusBusy();
+        // cli() in checkBusBusy()
+        if (i2c_detail::data.active) {
+            sei();
+            continue;
+        }
+
+        i2c_detail::startReadWrite(address, TW_WRITE, size);
+        memcpy(i2c_detail::data.twiBuffer, buffer, size);
+
+        TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+
+        sei();
+        if (wait) {
+            i2c_detail::waitActive();
+            if (i2c_detail::data.error == I2C_ERROR_PENDING) {
+                continue;
+            }
+        }
+        break;
     }
 }
+#else
+void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = true) {
+    i2c_detail::waitActive();
 
-void I2C::read(uint8_t address, void *buffer, uint8_t size) {
-    i2c_detail::startReadWrite(address, TW_READ, size - 1);
+    i2c_detail::startReadWrite(address, TW_WRITE, size);
+    memcpy(i2c_detail::data.twiBuffer, buffer, size);
 
-    i2c_detail::data.readBuffer = (uint8_t *)buffer;
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+
+    if (wait) {
+        i2c_detail::waitActive();
+    }
+}
+#endif // #if I2C_USE_MULTI_CONTROLLER
 
 #if I2C_USE_MULTI_CONTROLLER
-    i2c_detail::checkBusBusy();
-#endif // #if I2C_USE_MULTI_CONTROLLER
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
-    while (i2c_detail::data.active) {}
+void I2C::read(uint8_t address, void *buffer, uint8_t size) {
+    while (true) {
+        i2c_detail::waitActive();
+        i2c_detail::checkBusBusy();
+        // cli() in checkBusBusy()
+        if (i2c_detail::data.active) {
+            sei();
+            continue;
+        }
+
+        i2c_detail::startReadWrite(address, TW_READ, size);
+        i2c_detail::data.readBuffer = (uint8_t *)buffer;
+
+        TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+
+        sei();
+        i2c_detail::waitActive();
+        if (i2c_detail::data.error == I2C_ERROR_PENDING) {
+            continue;
+        }
+        break;
+    }
 }
+#else
+void I2C::read(uint8_t address, void *buffer, uint8_t size) {
+    i2c_detail::waitActive();
+
+    i2c_detail::startReadWrite(address, TW_READ, size);
+    i2c_detail::data.readBuffer = (uint8_t *)buffer;
+
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+
+    i2c_detail::waitActive();
+}
+#endif // #if I2C_USE_MULTI_CONTROLLER
 
 void I2C::reply(const void *buffer, uint8_t size) {
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
@@ -807,7 +882,7 @@ uint8_t I2C::getBufferSize() {
 #if I2C_USE_CHECK_CABLE_FLIPPED
 void I2C::checkCableFlipped(void (*function)()) {
     // wait to finish ongoing operations
-    while (i2c_detail::data.active) { }
+    i2c_detail::waitActive();
     TWCR = 0; // disable TWI
 
     if (i2c_detail::checkCableFlippedCore()) {
@@ -852,8 +927,6 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
 
         switch (I2C::getError()) {
         case I2C_ERROR_READ_ADDR_NACK:
-            I2C::setAddress(address);
-
             // handshakeState is the number of times the callback has been called.
             // when the callback has been called i times, the final Arduboy has joined.
             // cable flipped detection relies on clock detection,
@@ -863,14 +936,10 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
             dummy = 0b00000000;
             while (i2c_detail::handshakeState < i) {
                 I2C::write(I2C_GENERAL_CALL_ADDR, dummy, true);
-                // avoid hogging the bus
-                // delay required is inversely correlated to the frequency and number of bus busy checks
-                _delay_us(1000000.0 / I2C_FREQUENCY / I2C_MULTI_CONTROLLER_BUSY_CHECKS);
             }
 #else
             while (i2c_detail::handshakeState < i) { }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
-
             return i;
         case I2C_ERROR_NONE:
             i--;
@@ -915,6 +984,7 @@ R"(
 ; r19     - general use
 ; r20     - REPLY_ACK
 ; r21     - REPLY_NACK
+; r22     - I2C_ERROR_NONE/%[errorNone] if I2C_USE_MULTI_CONTROLLER
 ; r26 (X) - general use
 ; r27 (X) - general use
 ; r28 (Y) - data pointer
@@ -956,7 +1026,14 @@ clr r31
 ; set up r20 and r21 (REPLY_ACK and REPLY_NACK)
 ldi r20, REPLY_ACK
 ldi r21, REPLY_NACK
-
+)"
+#if I2C_USE_MULTI_CONTROLLER
+R"(
+; set up r22 (I2C_ERROR_NONE/%[errorNone])
+ldi r22, %[errorNone]
+)"
+#endif // #if I2C_USE_MULTI_CONTROLLER
+R"(
 ; switch (TWSR)
 ldd r18, Z + TWSR ; no mask needed because prescaler bits are cleared
 
@@ -991,17 +1068,30 @@ TW_START:
 
 TW_MT_SLA_ACK:
 TW_MT_DATA_ACK:
-    ; if (i2c_detail::data.bufferIdx >= i2c_detail::data.bufferSize) { stop(); return; }
+    ; if (i2c_detail::data.bufferIdx >= i2c_detail::data.bufferSize) {
+    ; #if I2C_USE_MULTI_CONTROLLER
+    ;    i2c_detail::data.error = I2C_ERROR_NONE
+    ; #endif // #if I2C_USE_MULTI_CONTROLLER
+    ;    stop();
+    ;    return;
+    ; }
     ldd r26, Y + %[bufferIdx]
     ldd r27, Y + %[bufferSize]
     cp r26, r27
 
-    brlo 1f ; 64 instruction limit on branches
+    brlo 1f
+)"
+#if I2C_USE_MULTI_CONTROLLER
+R"(
+    std Y + %[error], r22
+)"
+#endif // #if I2C_USE_MULTI_CONTROLLER
+R"(
     rjmp stop_reti
     1:
 
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
-    call get_buffer_addr
+    rcall get_buffer_addr
     ld r26, X
     std Z + TWDR, r26
 
@@ -1015,7 +1105,7 @@ TW_MT_ARB_LOST:
     std Z + TWCR, r20
     ; i2c_detail::data.error = TW_MT_ARB_LOST;
     std Y + %[error], r18
-    ; active = false;
+    ; i2c_detail::data.active = false;
     ; return;
     rjmp active_false_reti
 ; ----------------------------------------------------- ;
@@ -1036,10 +1126,23 @@ TW_MR_DATA_ACK:
     ldd r19, Z + TWDR
     st X, r19
 
-    ; if (TWSR == TW_MR_DATA_NACK) { stop(); return; }
+    ; if (TWSR == TW_MR_DATA_NACK) {
+    ; #if I2C_USE_MULTI_CONTROLLER
+    ;     i2c_detail::data.error = I2C_ERROR_NONE;
+    ; #endif // #if I2C_USE_MULTI_CONTROLLER
+    ;     stop();
+    ;     return;
+    ; }
     ; r18 holds TWSR
     cpi r18, 0x58
-    brne 1f ; 64 instruction limit on branches
+    brne 1f
+)"
+#if I2C_USE_MULTI_CONTROLLER
+R"(
+    std Y + %[error], r22
+)"
+#endif // #if I2C_USE_MULTI_CONTROLLER
+R"(
     rjmp stop_reti
     1:
 ; ------------------ fallthrough ---------------------- ;
@@ -1091,10 +1194,12 @@ breq TW_ST_LAST_DATA
 
 rjmp default
 
-TW_SR_SLA_ACK:
 TW_SR_ARB_LOST_SLA_ACK:
-TW_SR_GCALL_ACK:
 TW_SR_ARB_LOST_GCALL_ACK:
+    rcall set_arb_lost_error
+    ; ------------------ fallthrough ---------------------- ;
+TW_SR_SLA_ACK:
+TW_SR_GCALL_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18 ; r18 holds TWSR
     ; i2c_detail::data.bufferIdx = 0;
@@ -1107,7 +1212,7 @@ TW_SR_ARB_LOST_GCALL_ACK:
 TW_SR_DATA_ACK:
 TW_SR_GCALL_DATA_ACK:
     ; i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++] = TWDR;
-    call get_buffer_addr
+    rcall get_buffer_addr
     ldd r19, Z + TWDR
     st X, r19
 
@@ -1132,13 +1237,15 @@ TW_SR_STOP:
 
     icall
     ; TW register pointer may be clobbered, do not use
-    ; r20 and r21 may be clobbered, do not use
+    ; r20, r21, and r22 may be clobbered, do not use
 
     ; i2c_detail::data.active = false;
     ; return;
     rjmp active_false_reti;
 ; ----------------------------------------------------- ;
 TW_ST_ARB_LOST_SLA_ACK:
+    rcall set_arb_lost_error
+; ------------------ fallthrough ---------------------- ;
 TW_ST_SLA_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18
@@ -1164,13 +1271,13 @@ TW_ST_SLA_ACK:
     ; restore Z pointer
     ldi r30, TWPTR
     clr r31
-    ; r20 and r21 may be clobbered, do not use
+    ; r20, r21, and r22 may be clobbered, do not use
     1:
 
     ; ------------------ fallthrough ---------------------- ;
 TW_ST_DATA_ACK:
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
-    call get_buffer_addr
+    rcall get_buffer_addr
     ld r26, X
     std Z + TWDR, r26
 
@@ -1209,7 +1316,7 @@ default:
 
     active_false_reti:
     ; Z pointer may be clobbered, do not use
-    ; r20 and r21 may be clobbered, do not use
+    ; r20, r21, and r22 may be clobbered, do not use
 
     ; i2c_detail::data.active = false;
     std Y + %[active], __zero_reg__
@@ -1236,6 +1343,11 @@ default:
     pop r18
     reti
 ; -------------------- subroutines --------------------- ;
+set_arb_lost_error:
+    ; i2c_detail::data.error = TW_MT_ARB_LOST;
+    ldi r26, 0x38
+    std Y + %[error], r26
+    ret
 ; output: X = &twiBuffer[bufferIdx++]
 get_buffer_addr:
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
@@ -1251,11 +1363,28 @@ get_buffer_addr:
     sbci r27, hi8(-(%[twiBuffer] - 1))
     ret
 )"
+#if 0
+R"(
+debug_green:
+    cbi 0x05, 7
+    ret
+debug_red:
+    cbi 0x05, 6
+    ret
+debug_blue:
+    cbi 0x05, 5
+    ret
+
+)"
+#endif // #if 0
         : // Output Operands
         [data]             "=m" (i2c_detail::data),
         [twiBuffer]        "=m" (i2c_detail::data.twiBuffer)
         : // Input Operands
         [error]             "i" (offsetof(i2c_detail::i2c_data_t, error)),
+#if I2C_USE_MULTI_CONTROLLER
+        [errorNone]         "M" (I2C_ERROR_NONE),
+#endif // #if I2C_USE_MULTI_CONTROLLER
         [active]            "i" (offsetof(i2c_detail::i2c_data_t, active)),
         [bufferIdx]         "i" (offsetof(i2c_detail::i2c_data_t, bufferIdx)),
         [readBuffer]        "i" (offsetof(i2c_detail::i2c_data_t, readBuffer)),
@@ -1284,6 +1413,7 @@ ISR(TWI_vect) {
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
             while (TWCR & _BV(TWSTO)) {  }
             i2c_detail::data.active = false;
+            i2c_detail::data.error = I2C_ERROR_NONE;
         }
         break;
     case TW_MT_ARB_LOST: // same as TW_MR_ARB_LOST
@@ -1307,10 +1437,13 @@ ISR(TWI_vect) {
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
         while (TWCR & _BV(TWSTO)) {  }
         i2c_detail::data.active = false;
+        i2c_detail::data.error = I2C_ERROR_NONE;
         break;
     // ST
-    case TW_ST_SLA_ACK:
     case TW_ST_ARB_LOST_SLA_ACK:
+        i2c_detail::data.error = TW_MT_ARB_LOST;
+        __attribute__((fallthrough));
+    case TW_ST_SLA_ACK:
         i2c_detail::data.active = true;
         i2c_detail::data.bufferIdx = 0;
         i2c_detail::data.bufferSize = 1; // default to sending 1 junk byte if the user does not fill buffer
@@ -1332,10 +1465,12 @@ ISR(TWI_vect) {
         i2c_detail::data.active = false;
         break;
     // SR
-    case TW_SR_SLA_ACK:
-    case TW_SR_GCALL_ACK:
     case TW_SR_ARB_LOST_SLA_ACK:
     case TW_SR_ARB_LOST_GCALL_ACK:
+        i2c_detail::data.error = TW_MT_ARB_LOST;
+        __attribute__((fallthrough));
+    case TW_SR_SLA_ACK:
+    case TW_SR_GCALL_ACK:
         i2c_detail::data.bufferIdx = 0;
         i2c_detail::data.active = true;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);

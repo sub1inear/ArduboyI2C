@@ -24,16 +24,16 @@ SOFTWARE.
 #include <Arduboy2.h>
 #define I2C_IMPLEMENTATION
 #define I2C_PLATFORM I2C_PLATFORM_FX_C
+#define I2C_MULTI_CONTROLLER_BUSY_CHECKS 24
 #include <ArduboyI2C.h>
 
 #undef assert
 #define assert(cond, a, b) do { \
 		if (!(cond)) { \
 			Serial.print(F("Assertion failed: " #cond ", ")); \
-			Serial.println(a); \
+			Serial.print(a); \
 			Serial.print(F(", ")); \
 			Serial.println(b); \
-			allTestsPassed = false; \
 			return false; \
 		} \
 	} while (0)
@@ -43,7 +43,6 @@ SOFTWARE.
 			Serial.print(a); \
 			Serial.print(F(", ")); \
 			Serial.println(b); \
-			allTestsPassed = false; \
 			return false; \
 		} \
 	} while (0)
@@ -62,7 +61,6 @@ SOFTWARE.
 			Serial.print(a); \
 			Serial.print(F(", ")); \
 			Serial.println(b); \
-			allTestsPassed = false; \
 			return false; \
 		} \
 	} while (0)
@@ -89,8 +87,25 @@ void displayTest(const __FlashStringHelper *name, bool result) {
 		arduboy.println(F("PASS"));
 	} else {
 		arduboy.println(F("FAIL"));
+		allTestsPassed = false;
 	}
 	arduboy.display();
+}
+
+void displayId(uint8_t id) {
+	int16_t cursorX = arduboy.getCursorX();
+	int16_t cursorY = arduboy.getCursorY();
+
+	arduboy.setCursor(WIDTH - 6 * 5, 0);
+	arduboy.print(F("ID: "));
+	if (id == I2C_HANDSHAKE_FULL) {
+		arduboy.print('F');
+	} else {
+		arduboy.print(id);
+	}
+	arduboy.display();
+
+	arduboy.setCursor(cursorX, cursorY);
 }
 
 bool testBeginEnd() {
@@ -110,10 +125,11 @@ bool testBeginEnd() {
 }
 
 bool testSetAddress() {
-	I2C::setAddress(0x12, false);
-	assert_eq(TWAR, 0x12 << 1);
 	I2C::setAddress(0x12, true);
 	assert_eq(TWAR, (0x12 << 1 | 1));
+	I2C::setAddress(0x12, false);
+	assert_eq(TWAR, 0x12 << 1);
+	// general calls must be disabled before handshake!
 	return true;
 }
 
@@ -193,11 +209,20 @@ void setup() {
     arduboy.begin();
 	arduboy.clear();
 
+	while (!Serial) {
+		if (arduboy.anyPressed(A_BUTTON | B_BUTTON)) {
+			break;
+		}
+	}
+	arduboy.waitNoButtons();
+
 	displayTest(F("beginEnd"), testBeginEnd());
 	displayTest(F("setAddress"), testSetAddress());
 	displayTest(F("ccFlipped"), testCheckCableFlipped());
 
 	uint8_t id = I2C::handshake(numPlayers);
+	displayId(id);
+
 	I2C::onReceive(testWriteCallback);
 	I2C::onRequest(testReadCallback);
 	displayTest(F("handshake"), testHandshake(id));
@@ -208,9 +233,9 @@ void setup() {
 	displayTest(F("idToAddress"), testIdToAddress());
 
 	if (allTestsPassed) {
-		arduboy.digitalWriteRGB(GREEN_LED, RGB_ON);
+		// arduboy.digitalWriteRGB(GREEN_LED, RGB_ON);
 	} else {
-		arduboy.digitalWriteRGB(RED_LED, RGB_ON);
+		// arduboy.digitalWriteRGB(RED_LED, RGB_ON);
 	}
 
 }
