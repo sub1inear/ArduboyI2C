@@ -152,7 +152,7 @@ void ProjectileManager::Update()
 				p.life = 0;
 			}
 		}
-	}	
+	}
 }
 
 void ProjectileManager::Init()

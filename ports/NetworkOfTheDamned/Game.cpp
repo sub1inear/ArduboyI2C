@@ -125,22 +125,15 @@ void Game::Draw()
 
 void Game::TickInGame()
 {
-	uint8_t localInput, remoteInput;
-	if (Game::localPlayerId == 0)
+	uint8_t localInput = Platform::GetInput();
+	uint8_t remoteInput;
+	if (localPlayerId == 1)
 	{
-		localInput = Platform::GetInput();
-		PlatformNet::Write(localInput);
-
-		while (!PlatformNet::ReadAvailable()) { }
-		remoteInput = PlatformNet::Read();
+		PlatformNet::RunController(localInput, remoteInput);
 	}
 	else
 	{
-		while (!PlatformNet::ReadAvailable()) { }
-		remoteInput = PlatformNet::Read();
-
-		localInput = Platform::GetInput();
-		PlatformNet::Write(localInput);
+		PlatformNet::RunTarget(localInput, remoteInput);
 	}
 
 	if (displayMessageTime > 0)
@@ -154,7 +147,7 @@ void Game::TickInGame()
 	ParticleSystemManager::Update();
 	EnemyManager::Update();
 
-	for (int n = 0; n < 2; n++)
+	for (uint8_t n = 0; n < 2; n++)
 	{
 		Player& player = players[n];
 		player.Tick(localPlayerId == n ? localInput : remoteInput);

@@ -39,13 +39,11 @@ SOFTWARE.
 /** \brief
  * The initial I2C frequency in Hz.
  * \details
- * Defaults to 100000 Hz, with a maximum of 400000 Hz. \n
- * Standard frequencies: \n
- * 100000 Hz - Standard Mode \n
- * 400000 Hz - Fast Mode
+ * Defaults to 100000 Hz, with a maximum of 200000 Hz.
+ * The Arduboy FX-C only has software pullups, so the I2C frequency must be < 200000 Hz to ensure reliability.
  */
 #define I2C_FREQUENCY 100000
-#elif I2C_FREQUENCY > 400000
+#elif I2C_FREQUENCY > 200000
 #error "I2C_FREQUENCY is too high."
 #endif
 

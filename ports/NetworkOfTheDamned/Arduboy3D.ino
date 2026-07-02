@@ -1,8 +1,7 @@
 #include <Arduboy2.h>
 #include <ArduboyTones.h>
 #define I2C_IMPLEMENTATION
-#define I2C_PLATFORM I2C_PLATFORM_FX_C
-#define I2C_FREQUENCY 400000
+#define I2C_FREQUENCY 200000
 #include <ArduboyI2C.h>
 #include "Game.h"
 #include "Draw.h"
@@ -171,62 +170,73 @@ void Platform::ExpectLoadDelay()
 	lastTimingSample = millis();
 }
 
-volatile uint8_t PlatformNet::data = 0;
-volatile bool PlatformNet::dataAvailable = false;
+#define CENTER_STR(str, csize) (WIDTH / 2 - (sizeof(str) - 1) * csize / 2)
+
+volatile bool controllerReceived = false;
+volatile uint8_t controllerInput = 0;
+
+volatile bool controllerRequested = false;
+volatile uint8_t targetInput = 0;
 
 static void onReceive()
 {
   const uint8_t *buffer = I2C::getBuffer();
-  PlatformNet::data = buffer[0];
-  PlatformNet::dataAvailable = true;
+  controllerInput = buffer[0];
+  controllerReceived = true;
+}
+
+static void onRequest()
+{
+  I2C::reply(targetInput);
+  controllerRequested = true;
 }
 
 static void PlatformNet::Init()
 {
   I2C::begin();
 
-  if (I2C::checkEmulator())
-  {
-	  Game::menu.DrawHandshaking(PSTR("No I2C in emulator"), 4, 30);
-    arduboy.display(CLEAR_BUFFER);
-    while (true) {}
-  }
 
   I2C::checkCableFlipped([]() {
-    Game::menu.DrawHandshaking(PSTR("Please flip the cable"), 4, 25);
+    Game::menu.DrawHandshaking(PSTR("Please flip the cable"), 4, CENTER_STR("Please flip the cable", 4));
     arduboy.display(CLEAR_BUFFER);
   });
 
-  Game::menu.DrawHandshaking(PSTR("Waiting..."), 4, 45);
+  Game::menu.DrawHandshaking(PSTR("Waiting..."), 4, CENTER_STR("Waiting...", 4));
   arduboy.display(CLEAR_BUFFER);
 
-  uint8_t id = I2C::handshake();
-  if (id == I2C_HANDSHAKE_FULL)
+  bool isController = I2C::handshake();
+  if (!isController)
   {
-    arduboy.exitToBootloader();
+    I2C::setAddress(I2C_NULL_ADDRESS);
+    I2C::onReceive(onReceive);
+    I2C::onRequest(onRequest);
   }
-  I2C::onReceive(onReceive);
-  Game::localPlayerId = id;
+  Game::localPlayerId = isController ? 1 : 0;
 }
 
-static void PlatformNet::Write(uint8_t data)
+static void PlatformNet::RunController(uint8_t localInput, uint8_t &remoteInput)
 {
   do {
-    I2C::write(I2C_GENERAL_CALL_ADDR, data, true);
+      I2C::write(I2C_TARGET_ADDRESS, localInput, true);
+  } while (I2C::getError() != I2C_ERROR_NONE);
+  do {
+      I2C::read(I2C_TARGET_ADDRESS, remoteInput);
   } while (I2C::getError() != I2C_ERROR_NONE);
 }
 
-static uint8_t PlatformNet::Read()
+static void PlatformNet::RunTarget(uint8_t localInput, uint8_t &remoteInput)
 {
-  dataAvailable = false;
-  return data;
-}
+  targetInput = localInput;
 
-static bool PlatformNet::ReadAvailable()
-{
-  return dataAvailable;
-}
+  I2C::setAddress(I2C_TARGET_ADDRESS);
+  while (!controllerReceived) { }
+  remoteInput = controllerInput;
+  controllerReceived = false;
 
+  while (!controllerRequested) { }
+  controllerRequested = false;
+  I2C::setAddress(I2C_NULL_ADDRESS);
+}
 void setup()
 {
   arduboy.boot();

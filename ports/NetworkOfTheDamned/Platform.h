@@ -30,10 +30,6 @@ class PlatformNet
 {
 public:
 	static void Init();
-	static void Write(uint8_t data);
-	static uint8_t Read();
-	static bool ReadAvailable();
-
-	static volatile uint8_t data;
-	static volatile bool dataAvailable;
+	static void RunController(uint8_t localInput, uint8_t &remoteInput);
+	static void RunTarget(uint8_t localInput, uint8_t &remoteInput);
 };
