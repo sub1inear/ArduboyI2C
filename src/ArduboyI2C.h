@@ -1041,7 +1041,7 @@ clr r31
 ldi r20, REPLY_ACK
 ldi r21, REPLY_NACK
 )"
-#if 0//I2C_USE_MULTI_CONTROLLER
+#if I2C_USE_MULTI_CONTROLLER
 R"(
 ; set up r22 (I2C_ERROR_NONE/%[errorNone])
 ldi r22, %[errorNone]
@@ -1095,7 +1095,7 @@ TW_MT_DATA_ACK:
 
     brlo 1f
 )"
-#if 0//I2C_USE_MULTI_CONTROLLER
+#if I2C_USE_MULTI_CONTROLLER
 R"(
     std Y + %[error], r22
 )"
@@ -1151,7 +1151,7 @@ TW_MR_DATA_ACK:
     cpi r18, 0x58
     brne 1f
 )"
-#if 0//I2C_USE_MULTI_CONTROLLER
+#if I2C_USE_MULTI_CONTROLLER
 R"(
     std Y + %[error], r22
 )"
