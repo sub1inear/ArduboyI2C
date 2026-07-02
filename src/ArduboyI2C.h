@@ -146,6 +146,8 @@ SOFTWARE.
  */
 #define I2C_TARGET_ADDRESS 0x08
 
+#define I2C_NULL_ADDRESS 0x7F
+
 /** \brief
  * Target (slave) did not acknowledge its address during a write; it is not connected or is not responding.
  * \details

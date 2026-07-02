@@ -24,7 +24,6 @@ SOFTWARE.
 #include <Arduboy2.h>
 
 #define I2C_IMPLEMENTATION
-#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include <ArduboyI2C.h>
 
 Arduboy2 arduboy;
@@ -32,8 +31,6 @@ Arduboy2 arduboy;
 // -------------------------------------------------------------
 // Constants
 // -------------------------------------------------------------
-constexpr uint8_t numPlayers = 2;
-
 constexpr uint8_t fieldLeft = 0;
 constexpr uint8_t fieldRight = WIDTH;
 constexpr uint8_t fieldTop = 0;
@@ -62,6 +59,8 @@ constexpr uint8_t leftScoreY = 0;
 constexpr uint8_t rightScoreX = fieldCenterX + (fieldCenterX / 2) - (charWidth / 2);
 constexpr uint8_t rightScoreY = 0;
 
+constexpr uint8_t nullInput = 0xFF;
+
 // -------------------------------------------------------------
 // Structs
 // -------------------------------------------------------------
@@ -79,15 +78,6 @@ struct Player {
 };
 
 // -------------------------------------------------------------
-// Enums
-// -------------------------------------------------------------
-
-enum PlayerType : uint8_t {
-    Left,
-    Right,
-};
-
-// -------------------------------------------------------------
 // Data
 // -------------------------------------------------------------
 
@@ -95,46 +85,33 @@ Ball ball;
 
 Player leftPlayer;
 Player rightPlayer;
-PlayerType playerType;
+bool isRightPlayer = false;
 
 bool serveRight = true;
 bool serveDown = false;
 
 
-// `volatile` is used here because these variables are modified in a callback and read in the main loop
-// the compiler will not know this, so it may optimize the `while (!remoteReady)` into an infinite loop,
-// because it can't see that `remoteReady` is modified in the callback
-// the same applies to `remoteInput`, because the compiler could optimize thinking it could never change
-volatile bool remoteReady = false;
-volatile uint8_t remoteInput = 0;
+volatile bool controllerReceived = false;
+volatile uint8_t controllerInput = 0;
+
+volatile bool controllerRequested = false;
+volatile uint8_t targetInput = 0;
 
 // -------------------------------------------------------------
-// Multiplayer Functions
+// Target Functions
 // -------------------------------------------------------------
 
 void onReceive() {
     const uint8_t *buffer = I2C::getBuffer();
     // the first byte of the buffer is the input from the remote player
-    remoteInput = buffer[0];
+    controllerInput = buffer[0];
     // tell the main loop that we have new input
-    remoteReady = true;
+    controllerReceived = true;
 }
 
-void sendInput(uint8_t localInput) {
-    // send our input repeatedly until the write succeeds
-    // if the write fails and we proceed, the other device will not receive our input
-    // and we can become desynchronized
-    do {
-        I2C::write(I2C_GENERAL_CALL_ADDR, localInput, true);
-    } while (I2C::getError() != I2C_ERROR_NONE);
-}
-
-uint8_t getRemoteInput() {
-    // wait until remote input is received
-    while (!remoteReady) { }
-    // reset the flag for the next frame
-    remoteReady = false;
-    return remoteInput;
+void onRequest() {
+    I2C::reply(targetInput);
+    controllerRequested = true;
 }
 
 // -------------------------------------------------------------
@@ -147,7 +124,6 @@ void resetBall() {
     ball.y = ballStartY;
 
     // alternate the direction of the ball each time it is reset
-
     ball.dx = serveRight ? ballSpeedX : -ballSpeedX;
     serveRight = !serveRight;
 
@@ -312,14 +288,6 @@ void setup() {
     arduboy.begin();
     I2C::begin();
 
-    // if we are running in an emulator without I2C support,
-    if (I2C::checkEmulator()) {
-        // display a message
-        drawMessage(F("Emulator does not\nsupport I2C."));
-        // wait forever
-        while (true) { }
-    }
-
     // check if the cable is flipped
     // calls function to display message if it is flipped
     // waits for it to be flipped back
@@ -331,19 +299,12 @@ void setup() {
     // display handshaking message, I2C::handshake blocks
     drawMessage(F("Waiting for other\nplayer..."));
 
-    // handshake with other devices and get a unique id for this device
-    // note: I2C::handshake enables general calls by default
-    uint8_t id = I2C::handshake();
-
-    // if the handshaking is full (two players have joined already), exit
-    if (id == I2C_HANDSHAKE_FULL) {
-        arduboy.exitToBootloader();
+    isRightPlayer = I2C::handshake();
+    if (!isRightPlayer) {
+        I2C::onReceive(onReceive);
+        I2C::onRequest(onRequest);
+        I2C::setAddress(I2C_NULL_ADDRESS);
     }
-    // convert our id (0 or 1) into a player type (left or right)
-    playerType = (id == 0) ? PlayerType::Left : PlayerType::Right;
-
-    // set the callback function to be called when we receive data from the other player
-    I2C::onReceive(onReceive);
 
     reset();
 }
@@ -352,22 +313,29 @@ void loop() {
     if (!arduboy.nextFrame()) {
         return;
     }
-
     uint8_t localInput = arduboy.buttonsState();
     uint8_t leftInput, rightInput;
-    // to avoid arbitration-related desyncing,
-    // each player sends/receives in a different order
-    // left player -> sends first, then receives
-    // right player -> receives first, then sends
-    if (playerType == PlayerType::Left) {
-        leftInput = localInput;
-        sendInput(leftInput);
-        rightInput = getRemoteInput();
-    } else {
-        leftInput = getRemoteInput();
+
+    if (isRightPlayer) {
         rightInput = localInput;
-        sendInput(rightInput);
+        do {
+            I2C::write(I2C_TARGET_ADDRESS, rightInput, true);
+        } while (I2C::getError() != I2C_ERROR_NONE);
+        do {
+            I2C::read(I2C_TARGET_ADDRESS, leftInput);
+        } while (I2C::getError() != I2C_ERROR_NONE);
+    } else {
+        targetInput = leftInput = localInput;
+        I2C::setAddress(I2C_TARGET_ADDRESS);
+        while (!controllerReceived) { }
+        rightInput = controllerInput;
+        controllerReceived = false;
+
+        while (!controllerRequested) { }
+        controllerRequested = false;
+        I2C::setAddress(I2C_NULL_ADDRESS);
     }
+
     update(leftInput, rightInput);
     draw();
 }
