@@ -742,10 +742,18 @@ void waitActive() {
     while (i2c_detail::data.active) { }
 }
 
+void sendStart() {
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+#if I2C_USE_MULTI_CONTROLLER
+    sei();
+#endif // #if I2C_USE_MULTI_CONTROLLER
+}
+
 }
 /// \endcond
 
 void I2C::begin() {
+    TWAR = 0xFE;
     power_twi_enable();
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 
@@ -774,14 +782,13 @@ void I2C::setAddress(uint8_t address, bool generalCall) {
     TWAR = address << 1 | generalCall;
 }
 
-extern Arduboy2 arduboy;
-
 #if I2C_USE_MULTI_CONTROLLER
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = true) {
     while (true) {
         i2c_detail::waitActive();
         i2c_detail::checkBusBusy();
         // cli() in checkBusBusy()
+
         if (i2c_detail::data.active) {
             sei();
             continue;
@@ -789,10 +796,10 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = t
 
         i2c_detail::startReadWrite(address, TW_WRITE, size);
         memcpy(i2c_detail::data.twiBuffer, buffer, size);
+        i2c_detail::sendStart();
 
-        TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+        // sei() in sendStart()
 
-        sei();
         if (wait) {
             i2c_detail::waitActive();
             if (i2c_detail::data.error == I2C_ERROR_PENDING) {
@@ -809,7 +816,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = t
     i2c_detail::startReadWrite(address, TW_WRITE, size);
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
 
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+    i2c_detail::sendStart();
 
     if (wait) {
         i2c_detail::waitActive();
@@ -823,6 +830,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
         i2c_detail::waitActive();
         i2c_detail::checkBusBusy();
         // cli() in checkBusBusy()
+
         if (i2c_detail::data.active) {
             sei();
             continue;
@@ -830,12 +838,13 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 
         i2c_detail::startReadWrite(address, TW_READ, size);
         i2c_detail::data.readBuffer = (uint8_t *)buffer;
+        i2c_detail::sendStart();
 
-        TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+        // sei() in sendStart()
 
-        sei();
         i2c_detail::waitActive();
         if (i2c_detail::data.error == I2C_ERROR_PENDING) {
+            extern Arduboy2 ardu
             continue;
         }
         break;
@@ -927,17 +936,22 @@ uint8_t I2C::handshake(uint8_t numPlayers) {
 
         switch (I2C::getError()) {
         case I2C_ERROR_READ_ADDR_NACK:
+
             // handshakeState is the number of times the callback has been called.
             // when the callback has been called i times, the final Arduboy has joined.
             // cable flipped detection relies on clock detection,
             // so we send 0b00000000 to have SDA change as little as possible
             // while detecting it.
 #if I2C_USE_CHECK_CABLE_FLIPPED
+            I2C::setAddress(address, false);
             dummy = 0b00000000;
             while (i2c_detail::handshakeState < i) {
                 I2C::write(I2C_GENERAL_CALL_ADDR, dummy, true);
             }
+            TWAR |= _BV(TWGCE);
 #else
+            I2C::setAddress(address, true);
+
             while (i2c_detail::handshakeState < i) { }
 #endif // #if I2C_USE_CHECK_CABLE_FLIPPED
             return i;
@@ -1027,7 +1041,7 @@ clr r31
 ldi r20, REPLY_ACK
 ldi r21, REPLY_NACK
 )"
-#if I2C_USE_MULTI_CONTROLLER
+#if 0//I2C_USE_MULTI_CONTROLLER
 R"(
 ; set up r22 (I2C_ERROR_NONE/%[errorNone])
 ldi r22, %[errorNone]
@@ -1081,7 +1095,7 @@ TW_MT_DATA_ACK:
 
     brlo 1f
 )"
-#if I2C_USE_MULTI_CONTROLLER
+#if 0//I2C_USE_MULTI_CONTROLLER
 R"(
     std Y + %[error], r22
 )"
@@ -1137,7 +1151,7 @@ TW_MR_DATA_ACK:
     cpi r18, 0x58
     brne 1f
 )"
-#if I2C_USE_MULTI_CONTROLLER
+#if 0//I2C_USE_MULTI_CONTROLLER
 R"(
     std Y + %[error], r22
 )"
