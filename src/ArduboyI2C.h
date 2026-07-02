@@ -39,11 +39,11 @@ SOFTWARE.
 /** \brief
  * The initial I2C frequency in Hz.
  * \details
- * Defaults to 100000 Hz, with a maximum of 200000 Hz.
- * The Arduboy FX-C only has software pullups, so the I2C frequency must be < 200000 Hz to ensure reliability.
+ * Defaults to 100000 Hz, with a maximum of 300000 Hz.
+ * The Arduboy FX-C only has software pullups, so the I2C frequency must be < 300000 Hz to ensure reliability.
  */
 #define I2C_FREQUENCY 100000
-#elif I2C_FREQUENCY > 200000
+#elif I2C_FREQUENCY > 300000
 #error "I2C_FREQUENCY is too high."
 #endif
 
@@ -131,13 +131,6 @@ SOFTWARE.
  */
 #define I2C_DDR DDRD
 #endif
-
-/** \brief
- * The address used for general calls.
- * \details
- * General calls are sent to this address and are received by every device on the bus.
- */
-#define I2C_GENERAL_CALL_ADDRESS 0x00
 
 /** \brief
  * The target address set by the handshake function.
@@ -251,10 +244,7 @@ public:
     static void end();
 
     static void setAddress(uint8_t address);
-    static void setGeneralCall(bool generalCall);
-    static void setAddressGeneralCall(uint8_t address, bool generalCall);
     static uint8_t getAddress();
-    static bool getGeneralCall();
 
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
@@ -582,23 +572,12 @@ void I2C::end() {
 }
 
 void I2C::setAddress(uint8_t address) {
-    TWAR = address << 1 | (TWAR & _BV(TWGCE));
+    TWAR = address << 1;
 }
 
-void I2C::setGeneralCall(bool generalCall) {
-    TWAR = (TWAR & ~_BV(TWGCE)) | generalCall;
-}
-
-void I2C::setAddressGeneralCall(uint8_t address, bool generalCall) {
-    TWAR = address << 1 | generalCall;
-}
 
 uint8_t I2C::getAddress() {
     return TWAR >> 1;
-}
-
-bool I2C::getGeneralCall() {
-    return TWAR & _BV(TWGCE);
 }
 
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
@@ -678,7 +657,7 @@ bool I2C::handshake() {
     for (uint8_t i = 0; i < 255; i++) {
         if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
             (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
-            I2C::setAddressGeneralCall(I2C_TARGET_ADDRESS, true);
+            I2C::setAddress(I2C_TARGET_ADDRESS);
             _delay_us((1000000.0 / I2C_FREQUENCY * 18.0 + 25.0) * 2.0);
             return false;
         }

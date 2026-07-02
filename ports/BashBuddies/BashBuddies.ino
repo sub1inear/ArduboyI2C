@@ -2,7 +2,6 @@
 
 #include <Arduboy2.h>
 #define I2C_IMPLEMENTATION
-#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include <ArduboyI2C.h>
 
 #include <ArduboyPlaytune.h>
@@ -11,12 +10,12 @@
 
 Arduboy2 arduboy;
 
-enum PlayerRole {
-    PLAYER_1 = 0,
-    PLAYER_2 = 1
-} playerRole = PLAYER_1;
+// Define player role (1 for Player 1, 2 for Player 2)
+int playerRole = 0; // 1 for Player 1 (controller), 2 for Player 2 (target)
 
 bool isSinglePlayer = false; // Add a flag to determine if it's single-player mode
+
+bool isController = false;
 
 // Command Types
 const uint8_t CMD_UPDATE = 0;
@@ -97,15 +96,123 @@ Player player2;
 
 bool platformsInitialized = false;  // To check if platforms have been initialized
 
+// Reply struct: target (Player 2) sends this to controller (Player 1) via onRequest
+struct TargetReply {
+  int16_t x, y;
+  int8_t velX, velY;
+  uint8_t attacking, chargedAttack, health, idle;
+  uint8_t hasAttack, attackCharged;
+  int8_t attackVelX, attackVelY;
+  uint8_t attackHealth;
+} targetReply;
+
+void onRequest() {
+  I2C::reply(targetReply);
+  targetReply.hasAttack = 0;
+}
+
+// Function to receive data (target only; called by I2C::onReceive interrupt)
+void receiveData() {
+  const uint8_t *buf = I2C::getBuffer();
+  uint8_t idx = 0;
+  uint8_t commandType = buf[idx++];
+  if (commandType == CMD_UPDATE) {
+    // Receive regular update
+    Player& remotePlayer = (playerRole == 1) ? player2 : player1;
+    remotePlayer.x = ((int16_t)buf[idx] << 8) | buf[idx + 1]; idx += 2;
+    remotePlayer.y = ((int16_t)buf[idx] << 8) | buf[idx + 1]; idx += 2;
+    remotePlayer.velX = (int8_t)buf[idx++];
+    remotePlayer.velY = (int8_t)buf[idx++];
+    remotePlayer.attacking = buf[idx++];
+    remotePlayer.chargedAttack = buf[idx++];
+    remotePlayer.health = buf[idx++];
+    remotePlayer.idle = buf[idx++];
+  } else if (commandType == CMD_ATTACK) {
+    // Receive attack notification
+    bool chargedAttack = buf[idx++];
+    int8_t velX = (int8_t)buf[idx++];
+    int8_t velY = (int8_t)buf[idx++];
+    int health = buf[idx++];
+
+    // Apply attack to local defender
+    Player& defender = (playerRole == 1) ? player1 : player2;
+    defender.velX = velX;
+    defender.velY = velY;
+    defender.health = health;
+    Player& attacker = (playerRole == 2) ? player1 : player2;
+    attacker.attackDisplay = 5;
+
+  } else if (commandType == CMD_PLATFORM_UPDATE) {
+    // Receive platform updates
+    for (int i = 0; i < PLATFORM_COUNT; i++) {
+      Platform& platform = platforms[i];
+      int prevX = platform.x;  // Save previous x position
+      platform.x = ((int16_t)buf[idx] << 8) | buf[idx + 1]; idx += 2;
+      platform.y = ((int16_t)buf[idx] << 8) | buf[idx + 1]; idx += 2;
+      platform.width = buf[idx++];
+      platform.moving = buf[idx++];
+      platform.direction = (int8_t)buf[idx++];
+      if (platformsInitialized) {
+        platform.deltaX = platform.x - prevX;  // Calculate movement delta
+      } else {
+        platform.deltaX = 0;  // Initial frame
+      }
+    }
+    platformsInitialized = true;
+  }
+}
+
+// Controller reads player2 state + any pending attack notification from target
+void readFromTarget() {
+  I2C::read(I2C_TARGET_ADDRESS, targetReply);
+  player2.x = targetReply.x;
+  player2.y = targetReply.y;
+  player2.velX = targetReply.velX;
+  player2.velY = targetReply.velY;
+  player2.attacking = targetReply.attacking;
+  player2.chargedAttack = targetReply.chargedAttack;
+  player2.health = targetReply.health;
+  player2.idle = targetReply.idle;
+  if (targetReply.hasAttack) {
+    player1.velX = targetReply.attackVelX;
+    player1.velY = targetReply.attackVelY;
+    player1.health = targetReply.attackHealth;
+    player2.attackDisplay = 5;
+  }
+}
+
+// Initialize particle system
+void initParticles() {
+  for (int i = 0; i < MAX_PARTICLES; i++) {
+    particles[i].active = false;
+    particles[i].shrinkCounter = 0;  // Initialize shrink counter
+  }
+}
+
+void resetPlayers() {
+  // Initialize players
+  player1 = { platforms[0].x + 5, platforms[0].y - PLAYER_HEIGHT, 0, 0,
+              MAX_HEALTH, false, false, 0, false, 0, true, 0 , 1 };
+  player2 = { platforms[1].x + 5, platforms[1].y - PLAYER_HEIGHT, 0, 0,
+              MAX_HEALTH, false, false, 0, false, 0, true, 0 , 2 };
+}
+
 void setup() {
   // Arduboy setup
   arduboy.beginDoFirst();
   Serial.begin(9600);
 
+  pinMode(5, OUTPUT);
+  pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
+
   tunes.initChannel(PIN_SPEAKER_1);
   tunes.initChannel(PIN_SPEAKER_2);
   if (!tunes.playing())
     tunes.playScore(score);
+
+  // I2C initialization
+  I2C::begin();
 
   arduboy.clear();
   arduboy.setFrameRate(30);  // Ensure the game runs at a consistent 30 FPS
@@ -185,7 +292,7 @@ void setup() {
       arduboy.drawBitmap(80, 0, punch10, 48, 48, WHITE);
     }
     if (titleY < -118) {
-      arduboy.drawBitmap(-1,-1, darken, 50, 50, BLACK);
+      arduboy.drawBitmap(-1, -1, darken, 50, 50, BLACK);
       arduboy.drawBitmap(0, 0, punch11, 48, 48, WHITE);
     }
     if (titleY < -134) {
@@ -212,15 +319,6 @@ void setup() {
     }
 
 
-
-
-
-    //arduboy.fillRect(0,0,20,20,BLACK);
-    //arduboy.setCursor(0,0);
-    //arduboy.print(titleY);
-
-
-
     arduboy.display();
 
 
@@ -244,76 +342,56 @@ void setup() {
 
   arduboy.clear();
   arduboy.drawBitmap(0, -6, bashTitle, 128, 128, WHITE);
-  arduboy.setCursor(0,48);
+  arduboy.setCursor(0, 48);
   arduboy.println("  [A] Single Player   ");
   arduboy.println("  [B] Multiplayer     ");
-  arduboy.display(CLEAR_BUFFER);
-// Inside setup()
-do {
-  arduboy.pollButtons();
-  if (arduboy.justPressed(A_BUTTON)) {
-    isSinglePlayer = true; // Single-player mode
-    break;
-  }
-  if (arduboy.justPressed(B_BUTTON)) {
-    isSinglePlayer = false; // Multiplayer mode
-    break;
-  }
-} while (true);
+  arduboy.display();
+  // Inside setup()
+  do {
+    arduboy.pollButtons();
+    if (arduboy.justPressed(A_BUTTON)) {
+      isSinglePlayer = true; // Single-player mode
+      break;
+    }
+    if (arduboy.justPressed(B_BUTTON)) {
+      isSinglePlayer = false; // Multiplayer mode
+      break;
+    }
+  } while (true);
 
   tunes.stopScore();
 
-if (!isSinglePlayer) {
-  // Multiplayer: Initialize I2C
-  I2C::begin();
-if (I2C::checkEmulator()) {
-    arduboy.setCursor(10, 25);
-    arduboy.print(F("No I2C in emulator"));
+  if (!isSinglePlayer) {
+    // Multiplayer: Initialize I2C handshake
+    arduboy.clear();
+    I2C::checkCableFlipped([]() {
+      arduboy.print(F("Please flip the cable"));
+      arduboy.display();
+      arduboy.clear();
+    });
+    arduboy.print(F("Waiting for other\nplayer..."));
     arduboy.display();
-    while (true) { }
-}
-I2C::checkCableFlipped([]() {
-    arduboy.setCursor(0, 25);
-    arduboy.print(F("Please flip the cable"));
-    arduboy.display(CLEAR_BUFFER);
-});
 
-arduboy.setCursor(35, 25);
-arduboy.print(F("Waiting..."));
-arduboy.display(CLEAR_BUFFER);
+    isController = I2C::handshake();
+    playerRole = isController ? 1 : 2;
 
-playerRole = I2C::handshake();
-if (playerRole == I2C_HANDSHAKE_FULL) {
-    arduboy.exitToBootloader();
-}
-I2C::onReceive(receiveData);
-} else {
-  // Single-player: No I2C initialization
-  playerRole = PLAYER_1; // Player 1 will always be controlled by the user in single-player
-}
+    if (!isController) {
+      I2C::setAddress(I2C_TARGET_ADDRESS);
+      I2C::onReceive(receiveData);
+      I2C::onRequest(onRequest);
+    }
+  } else {
+    // Single-player: No I2C
+    playerRole = 1;
+    isController = true;
+  }
 
-resetPlayers();
+  resetPlayers();
 
 
   initParticles();  // Initialize particles
 }
 
-
-// Initialize particle system
-void initParticles() {
-  for (int i = 0; i < MAX_PARTICLES; i++) {
-    particles[i].active = false;
-    particles[i].shrinkCounter = 0;  // Initialize shrink counter
-  }
-}
-
-void resetPlayers() {
-  // Initialize players
-  player1 = { platforms[0].x + 5, platforms[0].y - PLAYER_HEIGHT, 0, 0,
-              MAX_HEALTH, false, false, 0, false, 0, true, 0 , 1};
-  player2 = { platforms[1].x + 5, platforms[1].y - PLAYER_HEIGHT, 0, 0,
-              MAX_HEALTH, false, false, 0, false, 0, true, 0 , 2};
-}
 
 void loop() {
   if (!(arduboy.nextFrame())) {
@@ -329,7 +407,7 @@ void loop() {
     sendPlatformUpdate(); // Only in multiplayer mode
   }
   // Handle input and physics
-  if (playerRole == PLAYER_1) {
+  if (playerRole == 1) {
     handleInput(player1);
   } else {
     handleInput(player2);
@@ -342,6 +420,9 @@ void loop() {
   } else {
     // Multiplayer mode: Handle Player 2 as remote player
     sendPlayerUpdate(); // Only in multiplayer mode
+    if (isController) {
+      readFromTarget();
+    }
   }
 
   applyPhysics(player1);
@@ -350,17 +431,17 @@ void loop() {
 
 
 
-if (!isSinglePlayer) {
-  // Send regular updates
-  sendPlayerUpdate();
-}
+  if (!isSinglePlayer) {
+    // Send regular updates
+    sendPlayerUpdate();
+  }
 
   // Player 1 checks for attacks
   if (player1.attacking && player1.attackTimer > 0) {
     if (checkAttackCollision(player1, player2)) {
       processAttack(player1, player2);
       if (!isSinglePlayer) {
-      sendAttackNotification(player1, player2);
+        sendAttackNotification(player1, player2);
       }
     }
   }
@@ -370,7 +451,7 @@ if (!isSinglePlayer) {
     if (checkAttackCollision(player2, player1)) {
       processAttack(player2, player1);
       if (!isSinglePlayer) {
-      sendAttackNotification(player2, player1);
+        sendAttackNotification(player2, player1);
       }
     }
   }
@@ -395,10 +476,10 @@ int aiAttackCooldown = 0;
 // Global variables for random jumping
 unsigned long nextJumpTime = 0;  // When the AI should jump next
 
-void controlAI(Player &player) {
+void controlAI(Player& player) {
   unsigned long currentTime = millis();
 
-    if (player.knockbackTimer > 0) {
+  if (player.knockbackTimer > 0) {
     player.knockbackTimer--;
     return;  // Skip other movement while knockback is active
   }
@@ -419,7 +500,7 @@ void controlAI(Player &player) {
 
   // Handle random jumping at random intervals
   if (!player.jumping && currentTime >= nextJumpTime) {
-    player.velY = JUMP_STRENGTH-1;
+    player.velY = JUMP_STRENGTH - 1;
     player.jumping = true;
 
     // Set the next jump to a random time in the future (2 to 5 seconds)
@@ -447,11 +528,8 @@ void controlAI(Player &player) {
 }
 
 
-
-
-
 // Function to handle player input
-void handleInput(Player &player) {
+void handleInput(Player& player) {
   bool moving = false;
 
   if (arduboy.pressed(LEFT_BUTTON)) {
@@ -507,7 +585,7 @@ int roundFloat(float value) {
 
 
 // Function to apply physics
-void applyPhysics(Player &player) {
+void applyPhysics(Player& player) {
   player.velY += GRAVITY;
 
 
@@ -529,12 +607,12 @@ void applyPhysics(Player &player) {
 
   // Check for platform collisions
   bool onPlatform = false;
-  Platform *currentPlatform = nullptr;
+  Platform* currentPlatform = nullptr;
 
   int platformOnNum;
 
   for (int i = 0; i < PLATFORM_COUNT; i++) {
-    Platform &platform = platforms[i];
+    Platform& platform = platforms[i];
     if (player.x + PLAYER_WIDTH > platform.x && player.x < platform.x + platform.width) {
       if (player.y + PLAYER_HEIGHT >= platform.y && player.y + PLAYER_HEIGHT - player.velY <= platform.y) {
         player.y = platform.y - PLAYER_HEIGHT;
@@ -556,9 +634,6 @@ void applyPhysics(Player &player) {
   }
 
 
-
-
-
   if (!onPlatform && player.y > SCREEN_HEIGHT - PLAYER_HEIGHT) {
     player.y = SCREEN_HEIGHT - PLAYER_HEIGHT;
     player.velY = 0;
@@ -571,7 +646,7 @@ void applyPhysics(Player &player) {
 
 // Function to update platforms
 void updatePlatforms() {
-  if (playerRole == PLAYER_1) {  // Only Player 1 updates the platforms
+  if (playerRole == 1) {  // Only Player 1 updates the platforms
     for (int i = 0; i < PLATFORM_COUNT; i++) {
       if (platforms[i].moving) {
         int prevX = platforms[i].x;  // Save previous x position
@@ -596,30 +671,25 @@ void updatePlatforms() {
 
 // Function to send platform updates from Player 1 to Player 2
 void sendPlatformUpdate() {
-  if (playerRole != PLAYER_1) return;  // Only Player 1 sends platform updates
+  if (playerRole != 1) return;  // Only Player 1 sends platform updates
 
-  uint8_t buffer[1 + PLATFORM_COUNT * 7];  // 1 byte for command + 7 bytes per platform
-  buffer[0] = CMD_PLATFORM_UPDATE;  // Command type
-  uint8_t idx = 1;
+  uint8_t buf[29]; // CMD byte + 4 platforms * 7 bytes each
+  uint8_t idx = 0;
+  buf[idx++] = CMD_PLATFORM_UPDATE;
 
   // Send platform positions
   for (int i = 0; i < PLATFORM_COUNT; i++) {
-    Platform &platform = platforms[i];
-    // Send platform.x as 2 bytes
-    buffer[idx++] = platform.x >> 8;
-    buffer[idx++] = platform.x & 0xFF;
-    // Send platform.y as 2 bytes
-    buffer[idx++] = platform.y >> 8;
-    buffer[idx++] = platform.y & 0xFF;
-    // Send platform.width as 1 byte
-    buffer[idx++] = platform.width;
-    // Send platform.moving as 1 byte
-    buffer[idx++] = platform.moving;
-    // Send platform.direction as 1 byte (signed int)
-    buffer[idx++] = (int8_t)platform.direction;
+    Platform& platform = platforms[i];
+    buf[idx++] = platform.x >> 8;
+    buf[idx++] = platform.x & 0xFF;
+    buf[idx++] = platform.y >> 8;
+    buf[idx++] = platform.y & 0xFF;
+    buf[idx++] = platform.width;
+    buf[idx++] = platform.moving;
+    buf[idx++] = (int8_t)platform.direction;
   }
 
-  I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
+  I2C::write(I2C_TARGET_ADDRESS, buf, idx, true);
 }
 
 
@@ -672,12 +742,12 @@ void drawParticles() {
 
 
 // Function to check for attack collision
-bool checkAttackCollision(Player &attacker, Player &defender) {
+bool checkAttackCollision(Player& attacker, Player& defender) {
   return abs(attacker.x - defender.x) < PLAYER_WIDTH && abs(attacker.y - defender.y) < PLAYER_HEIGHT;
 }
 
 // Function to process an attack
-void processAttack(Player &attacker, Player &defender) {
+void processAttack(Player& attacker, Player& defender) {
   int knockback = attacker.chargedAttack ? CHARGED_KNOCKBACK : BASE_KNOCKBACK;
   knockback += (MAX_HEALTH - defender.health) / 20;
   defender.velX = (attacker.x < defender.x) ? knockback * 8 : -knockback * 8;
@@ -699,88 +769,53 @@ void processAttack(Player &attacker, Player &defender) {
 
 // Function to send regular player updates
 void sendPlayerUpdate() {
-
-  uint8_t buffer[1 + 2 + 2 + 1 + 1 + 1 + 1 + 1 + 1]; // Command type + x (2 bytes) + y (2 bytes) + velX (1 byte) + velY (1 byte) + attacking (1 byte) + chargedAttack (1 byte) + health (1 byte) + idle (1 byte)
-
-  Player &player = (playerRole == PLAYER_1) ? player1 : player2;
-  buffer[0] = CMD_UPDATE;
-  buffer[1] = player.x >> 8;    // High byte of x
-  buffer[2] = player.x & 0xFF;  // Low byte of x
-  buffer[3] = player.y >> 8;    // High byte of y
-  buffer[4] = player.y & 0xFF;  // Low byte of y
-  buffer[5] = (int8_t)player.velX;  // velX
-  buffer[6] = (int8_t)player.velY;  // velY
-  buffer[7] = player.attacking;  // attacking
-  buffer[8] = player.chargedAttack;  // chargedAttack
-  buffer[9] = player.health;  // health
-  buffer[10] = player.idle;  // idle
-  I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
+  Player& player = (playerRole == 1) ? player1 : player2;
+  if (isController) {
+    uint8_t buf[11];
+    uint8_t idx = 0;
+    buf[idx++] = CMD_UPDATE;
+    buf[idx++] = player.x >> 8;
+    buf[idx++] = player.x & 0xFF;
+    buf[idx++] = player.y >> 8;
+    buf[idx++] = player.y & 0xFF;
+    buf[idx++] = (int8_t)player.velX;
+    buf[idx++] = (int8_t)player.velY;
+    buf[idx++] = player.attacking;
+    buf[idx++] = player.chargedAttack;
+    buf[idx++] = player.health;
+    buf[idx++] = player.idle;
+    I2C::write(I2C_TARGET_ADDRESS, buf, idx, true);
+  } else {
+    // Store in reply struct for onRequest
+    targetReply.x = player.x;
+    targetReply.y = player.y;
+    targetReply.velX = (int8_t)player.velX;
+    targetReply.velY = (int8_t)player.velY;
+    targetReply.attacking = player.attacking;
+    targetReply.chargedAttack = player.chargedAttack;
+    targetReply.health = player.health;
+    targetReply.idle = player.idle;
+  }
 }
 
 // Function to send attack notification
-void sendAttackNotification(Player &attacker, Player &defender) {
-  uint8_t buffer[1 + 1 + 1 + 1 + 1]; // Command type + chargedAttack (1 byte) + velX (1 byte) + velY (1 byte) + health (1 byte)
-  buffer[0] = CMD_ATTACK;
-  buffer[1] = attacker.chargedAttack;
-  buffer[2] = (int8_t)defender.velX;
-  buffer[3] = (int8_t)defender.velY;
-  buffer[4] = defender.health;
-  I2C::write(I2C_GENERAL_CALL_ADDR, buffer, true);
-}
-
-// Function to receive data
-void receiveData() {
-  const uint8_t *buffer = I2C::getBuffer();
-  uint8_t commandType = buffer[0];
-  if (commandType == CMD_UPDATE) {
-    // Receive regular update
-    Player &remotePlayer = (playerRole == PLAYER_1) ? player2 : player1;
-    remotePlayer.x = (buffer[1] << 8) | buffer[2];
-    remotePlayer.y = (buffer[3] << 8) | buffer[4];
-    remotePlayer.velX = (int8_t)buffer[5];
-    remotePlayer.velY = (int8_t)buffer[6];
-    remotePlayer.attacking = buffer[7];
-    remotePlayer.chargedAttack = buffer[8];
-    remotePlayer.health = buffer[9];
-    remotePlayer.idle = buffer[10];
-  } else if (commandType == CMD_ATTACK) {
-    // Receive attack notification
-    bool chargedAttack = buffer[1];
-    int8_t velX = (int8_t)buffer[2];
-    int8_t velY = (int8_t)buffer[3];
-    int health = buffer[4];
-
-    // Apply attack to local defender
-    Player &defender = (playerRole == PLAYER_1) ? player1 : player2;
-    defender.velX = velX;
-    defender.velY = velY;
-    defender.health = health;
-    Player &attacker = (playerRole == PLAYER_2) ? player1 : player2;
-    attacker.attackDisplay = 5;
-
-
-  } else if (commandType == CMD_PLATFORM_UPDATE) {
-    // Receive platform updates
-    uint8_t idx = 1;
-    for (int i = 0; i < PLATFORM_COUNT; i++) {
-      Platform &platform = platforms[i];
-      int prevX = platform.x;  // Save previous x position
-      uint8_t hiX = buffer[idx++];
-      uint8_t loX = buffer[idx++];
-      platform.x = (hiX << 8) | loX;
-      uint8_t hiY = buffer[idx++];
-      uint8_t loY = buffer[idx++];
-      platform.y = (hiY << 8) | loY;
-      platform.width = buffer[idx++];
-      platform.moving = buffer[idx++];
-      platform.direction = (int8_t)buffer[idx++];
-      if (platformsInitialized) {
-        platform.deltaX = platform.x - prevX;  // Calculate movement delta
-      } else {
-        platform.deltaX = 0;  // Initial frame
-      }
-    }
-    platformsInitialized = true;
+void sendAttackNotification(Player& attacker, Player& defender) {
+  if (isController) {
+    uint8_t buf[5];
+    uint8_t idx = 0;
+    buf[idx++] = CMD_ATTACK;
+    buf[idx++] = attacker.chargedAttack;
+    buf[idx++] = (int8_t)defender.velX;
+    buf[idx++] = (int8_t)defender.velY;
+    buf[idx++] = defender.health;
+    I2C::write(I2C_TARGET_ADDRESS, buf, idx, true);
+  } else {
+    // Store pending attack in reply struct for onRequest
+    targetReply.hasAttack = 1;
+    targetReply.attackCharged = attacker.chargedAttack;
+    targetReply.attackVelX = (int8_t)defender.velX;
+    targetReply.attackVelY = (int8_t)defender.velY;
+    targetReply.attackHealth = defender.health;
   }
 }
 
@@ -792,7 +827,7 @@ void drawPlatforms() {
 }
 
 // Function to draw a player
-void drawPlayer(Player &player) {
+void drawPlayer(Player& player) {
   if (player.idle) {
     if (arduboy.frameCount % 60 < 30) {
       // Draw a slightly shorter rectangle for 10 frames
@@ -806,16 +841,16 @@ void drawPlayer(Player &player) {
     arduboy.fillRect(player.x, player.y, PLAYER_WIDTH, PLAYER_HEIGHT, WHITE);
   }
 
-  arduboy.setCursor(player.x+1,player.y+1);
+  arduboy.setCursor(player.x + 1, player.y + 1);
   arduboy.setTextColor(BLACK);
 
 
-  if(player.playerNum==1){
+  if (player.playerNum == 1) {
     arduboy.write(34);
-  }else{
+  } else {
     arduboy.write(19);
   }
-arduboy.setTextColor(WHITE);
+  arduboy.setTextColor(WHITE);
 
   if (player.attacking) {
     arduboy.fillRect(player.x + 1, player.y + 1, PLAYER_WIDTH - 2, PLAYER_HEIGHT - 2, BLACK);
@@ -845,11 +880,11 @@ void drawHUD() {
 // Function to check victory condition
 bool checkVictory() {
   if (player1.health <= 0 || player1.y > SCREEN_HEIGHT) {
-    victoryAnimation(PLAYER_2);
+    victoryAnimation(2);
     return true;
   }
   if (player2.health <= 0 || player2.y > SCREEN_HEIGHT) {
-    victoryAnimation(PLAYER_1);
+    victoryAnimation(1);
     return true;
   }
   return false;
@@ -859,11 +894,11 @@ bool checkVictory() {
 void victoryAnimation(int winner) {
   arduboy.clear();
   arduboy.setCursor(40, 30);
-  arduboy.print((winner == PLAYER_1) ? "P1 Wins!" : "P2 Wins!");
+  arduboy.print((winner == 1) ? "P1 Wins!" : "P2 Wins!");
   arduboy.display();
   tunes.playScore(end);
 
-    while (arduboy.buttonsState()) {
+  while (arduboy.buttonsState()) {
     arduboy.pollButtons();  // Poll the buttons but do nothing
   }
   delay(500);
