@@ -601,7 +601,7 @@ bool I2C::getGeneralCall() {
     return TWAR & _BV(TWGCE);
 }
 
-void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = true) {
+void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
     i2c_detail::waitActive();
 
     i2c_detail::startReadWrite(address, TW_WRITE, size);
@@ -617,7 +617,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = t
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::waitActive();
 
-    i2c_detail::startReadWrite(address, TW_READ, size);
+    i2c_detail::startReadWrite(address, TW_READ, size - 1);
     i2c_detail::data.readBuffer = (uint8_t *)buffer;
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
@@ -675,24 +675,24 @@ void I2C::checkCableFlipped(void (*function)()) {
 }
 
 bool I2C::handshake() {
-    uint8_t disconnect = 1;
     for (uint8_t i = 0; i < 255; i++) {
         if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
             (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
-            disconnect = 0;
-            break;
+            I2C::setAddressGeneralCall(I2C_TARGET_ADDRESS, true);
+            _delay_us((1000000.0 / I2C_FREQUENCY * 18.0 + 25.0) * 2.0);
+            return false;
         }
+        _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
-    if (disconnect) {
-        do {
-            I2C::write(I2C_GENERAL_CALL_ADDRESS, disconnect, true);
-        } while (I2C::getError() != I2C_ERROR_NONE);
-        return true;
-    }
-    I2C::setAddressGeneralCall(I2C_TARGET_ADDRESS, true);
-    return false;
+    uint8_t zeros = 0b00000000;
+    do {
+        I2C::write(I2C_TARGET_ADDRESS, zeros, true);
+    } while (I2C::getError() != I2C_ERROR_NONE);
+    return true;
+
 }
 
+#if 1
 ISR(TWI_vect, ISR_NAKED) {
     asm volatile (
 R"(
@@ -1080,9 +1080,8 @@ debug_blue:
         [slaRW]             "i" (offsetof(i2c_detail::i2c_data_t, slaRW))
     );
 }
-
+#else
 // C++ ISR version for reference
-#if 0
 ISR(TWI_vect) {
     switch (TWSR) { // prescaler bits are cleared, no mask needed
     case TW_START:
@@ -1141,10 +1140,6 @@ ISR(TWI_vect) {
         i2c_detail::data.active = false;
         break;
     // SR
-    case TW_SR_ARB_LOST_SLA_ACK:
-    case TW_SR_ARB_LOST_GCALL_ACK:
-        i2c_detail::data.error = TW_MT_ARB_LOST;
-        __attribute__((fallthrough));
     case TW_SR_SLA_ACK:
     case TW_SR_GCALL_ACK:
         i2c_detail::data.bufferIdx = 0;
@@ -1171,6 +1166,6 @@ ISR(TWI_vect) {
         break;
     }
 }
-#endif // #if 0
+#endif // #if 1
 
 #endif // #ifdef I2C_IMPLEMENTATION

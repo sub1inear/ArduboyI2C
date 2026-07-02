@@ -23,8 +23,6 @@ SOFTWARE.
 */
 #include <Arduboy2.h>
 #define I2C_IMPLEMENTATION
-#define I2C_PLATFORM I2C_PLATFORM_FX_C
-#define I2C_MULTI_CONTROLLER_BUSY_CHECKS 24
 #include <ArduboyI2C.h>
 
 #undef assert
@@ -66,7 +64,6 @@ SOFTWARE.
 	} while (0)
 
 
-constexpr uint8_t numPlayers = 2;
 constexpr uint8_t bufferExpected[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
 Arduboy2 arduboy;
@@ -92,18 +89,17 @@ void displayTest(const __FlashStringHelper *name, bool result) {
 	arduboy.display();
 }
 
-void displayId(uint8_t id) {
+void displayIsController(bool isController) {
 	int16_t cursorX = arduboy.getCursorX();
 	int16_t cursorY = arduboy.getCursorY();
 
-	arduboy.setCursor(WIDTH - 6 * 5, 0);
-	arduboy.print(F("ID: "));
-	if (id == I2C_HANDSHAKE_FULL) {
-		arduboy.print('F');
+	arduboy.setCursor(WIDTH - 1 * 5, 0);
+
+	if (isController) {
+		arduboy.print(F("C"));
 	} else {
-		arduboy.print(id);
+		arduboy.print(F("T"));
 	}
-	arduboy.display();
 
 	arduboy.setCursor(cursorX, cursorY);
 }
@@ -124,37 +120,21 @@ bool testBeginEnd() {
 	return true;
 }
 
-bool testSetAddress() {
-	I2C::setAddress(0x12, true);
-	assert_eq(TWAR, (0x12 << 1 | 1));
-	I2C::setAddress(0x12, false);
+bool testAddressGeneralCall() {
+	I2C::setAddressGeneralCall(0x12, false);
 	assert_eq(TWAR, 0x12 << 1);
-	// general calls must be disabled before handshake!
-	return true;
-}
-
-void testWriteCallback() {
-	writeCallbackCalled = true;
-	assert_cb(I2C::getBufferSize() == 16, writeCallbackError, writeCallbackA = I2C::getBufferSize(), writeCallbackB = 16);
-
-	int memcmpResult = memcmp(I2C::getBuffer(), bufferExpected, 16);
-	assert_cb(memcmpResult == 0, writeCallbackError, writeCallbackA = memcmpResult, writeCallbackB = 0);
-}
-
-bool testWrite(uint8_t id) {
-	if (id == 0) {
-		I2C::write(I2C::idToAddress(1), bufferExpected, 16, true);
-		assert_eq(I2C::getError(), I2C_ERROR_NONE);
-	} else {
-		uint32_t start = millis();
-		while (!writeCallbackCalled) {
-			if (millis() - start > 1000) {
-				Serial.println(F("Write callback timeout"));
-				return false;
-			}
-		}
-		assert_cb_ok(writeCallbackError, writeCallbackA, writeCallbackB);
-	}
+	I2C::setAddressGeneralCall(0x12, true);
+	assert_eq(TWAR, (0x12 << 1 | 1));
+	I2C::setGeneralCall(false);
+	assert_eq(TWAR, (0x12 << 1));
+	I2C::setGeneralCall(true);
+	assert_eq(TWAR, (0x12 << 1 | 1));
+	I2C::setAddress(0x34);
+	assert_eq(TWAR, (0x34 << 1 | 1));
+	assert_eq(I2C::getAddress(), 0x34);
+	assert_eq(I2C::getGeneralCall(), true);
+	// general calls must be off
+	I2C::setGeneralCall(false);
 	return true;
 }
 
@@ -163,10 +143,10 @@ void testReadCallback() {
 	readCallbackCalled = true;
 }
 
-bool testRead(uint8_t id) {
-	if (id == 0) {
+bool testRead(bool isController) {
+	if (isController) {
 		uint8_t buffer[16];
-		I2C::read(I2C::idToAddress(1), buffer);
+		I2C::read(I2C_TARGET_ADDRESS, buffer);
 		assert_eq(I2C::getError(), I2C_ERROR_NONE);
 		assert_eq(memcmp(buffer, bufferExpected, 16), 0);
 	} else {
@@ -181,9 +161,34 @@ bool testRead(uint8_t id) {
 	return true;
 }
 
-bool testCheckEmulator() {
-	bool isEmulator = I2C::checkEmulator();
-	assert_eq(isEmulator, false);
+uint8_t debugBuffer[16];
+
+void testWriteCallback() {
+	writeCallbackCalled = true;
+	assert_cb(I2C::getBufferSize() == 16, writeCallbackError, writeCallbackA = I2C::getBufferSize(), writeCallbackB = 16);
+
+	int memcmpResult = memcmp(I2C::getBuffer(), bufferExpected, 16);
+	assert_cb(memcmpResult == 0, writeCallbackError, writeCallbackA = memcmpResult, writeCallbackB = 0);
+	memcpy(debugBuffer, I2C::getBuffer(), 16);
+}
+
+bool testWrite(bool isController) {
+	if (isController) {
+		I2C::write(I2C_TARGET_ADDRESS, bufferExpected, 16, true);
+		assert_eq(I2C::getError(), I2C_ERROR_NONE);
+	} else {
+		uint32_t start = millis();
+		while (!writeCallbackCalled) {
+			if (millis() - start > 1000) {
+				Serial.println(F("Write callback timeout"));
+				return false;
+			}
+		}
+		for (uint8_t i = 0; i < 16; i++) {
+			Serial.println(debugBuffer[i]);
+		}
+		assert_cb_ok(writeCallbackError, writeCallbackA, writeCallbackB);
+	}
 	return true;
 }
 
@@ -192,16 +197,7 @@ bool testCheckCableFlipped() {
 	return true;
 }
 
-bool testIdToAddress() {
-	for (uint8_t i = 0; i <= I2C_MAX_IDS - 1; i++) {
-		assert_eq(I2C::idToAddress(i), 0x8 + i);
-	}
-	return true;
-}
-
-bool testHandshake(uint8_t id) {
-	assert(id != I2C_HANDSHAKE_FULL, id, I2C_HANDSHAKE_FULL);
-	assert(id < numPlayers, id, numPlayers);
+bool testHandshake() {
 	return true;
 }
 
@@ -217,25 +213,24 @@ void setup() {
 	arduboy.waitNoButtons();
 
 	displayTest(F("beginEnd"), testBeginEnd());
-	displayTest(F("setAddress"), testSetAddress());
+	displayTest(F("setAddressGC"), testAddressGeneralCall());
 	displayTest(F("ccFlipped"), testCheckCableFlipped());
 
-	uint8_t id = I2C::handshake(numPlayers);
-	displayId(id);
-
+	bool isController = I2C::handshake();
 	I2C::onReceive(testWriteCallback);
 	I2C::onRequest(testReadCallback);
-	displayTest(F("handshake"), testHandshake(id));
 
-	displayTest(F("read"), testRead(id));
-	displayTest(F("write"), testWrite(id));
-	displayTest(F("checkEmulator"), testCheckEmulator());
-	displayTest(F("idToAddress"), testIdToAddress());
+	displayIsController(isController);
+
+	displayTest(F("handshake"), testHandshake());
+
+	displayTest(F("read"), testRead(isController));
+	displayTest(F("write"), testWrite(isController));
 
 	if (allTestsPassed) {
-		// arduboy.digitalWriteRGB(GREEN_LED, RGB_ON);
+		arduboy.digitalWriteRGB(GREEN_LED, RGB_ON);
 	} else {
-		// arduboy.digitalWriteRGB(RED_LED, RGB_ON);
+		arduboy.digitalWriteRGB(RED_LED, RGB_ON);
 	}
 
 }
