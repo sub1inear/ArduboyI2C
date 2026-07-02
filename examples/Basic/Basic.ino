@@ -24,7 +24,6 @@ SOFTWARE.
 #include <Arduboy2.h>
 // define in one file before including
 #define I2C_IMPLEMENTATION
-#define I2C_PLATFORM I2C_PLATFORM_FX_C
 #include <ArduboyI2C.h>
 
 Arduboy2 arduboy;
@@ -37,8 +36,7 @@ struct Player {
 Player localPlayer = { 0, 0 };
 Player remotePlayer = { 0, 0 };
 
-// unique id for this device
-uint8_t id = 0;
+bool isController = false;
 
 void drawMessage(const __FlashStringHelper *message) {
     // __FlashStringHelper ensures message is stored in flash memory (with the F() macro)
@@ -49,11 +47,12 @@ void drawMessage(const __FlashStringHelper *message) {
 }
 
 void onReceive() {
-    const uint8_t *buffer = I2C::getBuffer();
-    // interpret the received data as a player struct
-    const Player *newPlayer = reinterpret_cast<const Player *>(buffer);
-    // update remote player data
-    remotePlayer = *newPlayer;
+    remotePlayer = *reinterpret_cast<const Player *>(I2C::getBuffer());
+}
+
+void onRequest() {
+    // send our player data to the other device
+    I2C::reply(localPlayer);
 }
 
 void setup() {
@@ -63,18 +62,9 @@ void setup() {
     // initialize I2C (twi) hardware
     I2C::begin();
 
-    // if an emulator without I2C support is detected, ...
-    if (I2C::checkEmulator()) {
-        // display a message
-        drawMessage(F("Emulator does not\nsupport I2C."));
-        // wait forever
-        while (true) { }
-    }
-
     // check if the cable is flipped
     // calls function to display message if it is flipped
     // waits for it to be flipped back
-    // only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable
     I2C::checkCableFlipped([]() {
         // cable is flipped, display message
         drawMessage(F("Please flip the cable\non this device."));
@@ -85,15 +75,12 @@ void setup() {
 
     // handshake with other devices and get a unique id for this device
     // note: I2C::handshake enables general calls by default
-    id = I2C::handshake();
+    isController = I2C::handshake();
 
-    // if the handshaking is full (two players have joined already), exit
-    if (id == I2C_HANDSHAKE_FULL) {
-        arduboy.exitToBootloader();
+    if (!isController) {
+        I2C::onReceive(onReceive);
+        I2C::onRequest(onRequest);
     }
-
-    // setup our receive event to be called when we receive a write
-    I2C::onReceive(onReceive);
 }
 
 void loop() {
@@ -112,14 +99,16 @@ void loop() {
     localPlayer.x = constrain(localPlayer.x, 0, WIDTH - 8);
     localPlayer.y = constrain(localPlayer.y, 0, HEIGHT - 8);
 
-    // send out a general call to give the other device our data
-    // false -> will not wait for the write to complete
-    I2C::write(I2C_GENERAL_CALL_ADDR, localPlayer, false);
+    if (isController) {
+        // send our player data to the other device
+        I2C::read(I2C_TARGET_ADDRESS, remotePlayer);
+        I2C::write(I2C_TARGET_ADDRESS, localPlayer, false);
+    }
 
     // draw the players
-    // id 0 -> filled, id 1 -> outlined
-    Player &filledPlayer = (id == 0) ? localPlayer : remotePlayer;
-    Player &outlinedPlayer = (id == 0) ? remotePlayer : localPlayer;
+    // isController -> filled, !isController -> outlined
+    Player &filledPlayer = (isController) ? localPlayer : remotePlayer;
+    Player &outlinedPlayer = (isController) ? remotePlayer : localPlayer;
 
     arduboy.fillRect(filledPlayer.x, filledPlayer.y, 8, 8, WHITE);
     arduboy.drawRect(outlinedPlayer.x, outlinedPlayer.y, 8, 8, WHITE);

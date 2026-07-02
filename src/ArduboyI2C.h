@@ -35,43 +35,6 @@ SOFTWARE.
 #include <stdint.h>
 #include <stddef.h>
 
-/** \brief
- * Constant for the Arduboy FX-C platform.
- * \details
- * Set `I2C_PLATFORM` to this value to use the Arduboy FX-C platform.
- * This is the default platform if `I2C_PLATFORM` is not defined.
- */
-#define I2C_PLATFORM_FX_C 0
-
-/** \brief
- * Constant for the Arduboy Mini platform.
- * \details
- * Set `I2C_PLATFORM` to this value to use the Arduboy Mini platform.
- */
-#define I2C_PLATFORM_MINI 1
-
-/** \brief
- * Constant for an unknown platform.
- * \details
- * Set `I2C_PLATFORM` to this value to use an unknown platform.
- */
-#define I2C_PLATFORM_UNKNOWN 2
-
-#ifdef __DOXYGEN__
-/** \brief
- * The platform being used.
- * \details
- * No default.
- * Options: \n
- * - `I2C_PLATFORM_FX_C`: Arduboy FX-C \n
- * - `I2C_PLATFORM_MINI`: Arduboy Mini \n
- * - `I2C_PLATFORM_UNKNOWN`: Unknown platform (must define all other platform-specific macros)
- */
-#define I2C_PLATFORM
-#elif defined(I2C_IMPLEMENTATION) && !defined(I2C_PLATFORM)
-#error "I2C_PLATFORM must be defined."
-#endif
-
 #ifndef I2C_FREQUENCY
 /** \brief
  * The initial I2C frequency in Hz.
@@ -98,21 +61,6 @@ SOFTWARE.
 #error "I2C_BUFFER_CAPACITY is too big."
 #endif
 
-#ifndef I2C_MULTI_CONTROLLER_BUSY_CHECKS
-/** \brief
- * The amount of times the bus is checked before continuing with a read/write operation.
- * \details
- * Defaults to 8, with a maximum of 255. Fixes design flaw where TWI hardware does not check if the bus has become busy during a stop interrupt,
- * so if multiple targets (slaves) receive the stop interrupt right before
- * they become the controller (master) and send a start, they all will think the bus is free and clobber each other.
- * Increase if the game ever freezes.
- * More information: https://www.robotroom.com/Atmel-AVR-TWI-I2C-Multi-Master-Problem.html
- */
-#define I2C_MULTI_CONTROLLER_BUSY_CHECKS 8
-#elif I2C_MULTI_CONTROLLER_BUSY_CHECKS > 255
-#error "I2C_MULTI_CONTROLLER_BUSY_CHECKS is too big."
-#endif
-
 #ifndef I2C_CHECK_CABLE_FLIPPED_CHECKS
 /** \brief
  * The total number of checks to perform when checking for a flipped cable.
@@ -133,62 +81,6 @@ SOFTWARE.
 #define I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT 1000
 #elif I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT > 32767
 #error "I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT is too big."
-#endif
-
-#ifndef I2C_USE_HANDSHAKE
-/** \brief
- * Whether or not to enable handshake functionality.
- * \details
- * Defaults to 1.
- * Set to 0 if you do not use the built-in handshake (e.g. you use a custom handshake or no handshake at all) to save memory.
- */
-#define I2C_USE_HANDSHAKE 1
-#endif
-
-#ifndef I2C_USE_MULTI_CONTROLLER
-/** \brief
- * Whether or not to enable multi-controller (master) safety checks.
- * \details
- * Defaults to 1.
- * Set to 0 if there is only one controller (master) on the bus to save memory.
- */
-#define I2C_USE_MULTI_CONTROLLER 1
-#endif
-
-#ifndef I2C_USE_CHECK_CABLE_FLIPPED
-/** \brief
- * Whether or not to enable flipped cable detection functionality.
- * \details
- * Default is 1 on the FX-C and 0 on the Mini.
- * Set to 0 if you do not need to detect flipped cables to save memory.
- */
-#if I2C_PLATFORM == I2C_PLATFORM_FX_C
-#define I2C_USE_CHECK_CABLE_FLIPPED 1
-#elif I2C_PLATFORM == I2C_PLATFORM_MINI
-#define I2C_USE_CHECK_CABLE_FLIPPED 0
-#else
-#error "I2C_USE_CHECK_CABLE_FLIPPED must be defined for unknown platforms."
-#endif
-#endif
-
-#if !I2C_USE_MULTI_CONTROLLER && I2C_USE_CHECK_CABLE_FLIPPED
-#error "I2C_USE_CHECK_CABLE_FLIPPED cannot be enabled without I2C_USE_MULTI_CONTROLLER."
-#endif
-
-#ifndef I2C_USE_SOFTWARE_PULLUPS
-/** \brief
- * Whether or not to enable software pullups on the SDA and SCL lines.
- * \details
- * Default is 1 on the FX-C and 0 on the Mini.
- * Set to 0 if you have external pullups on the SDA and SCL lines to save memory.
- */
-#if I2C_PLATFORM == I2C_PLATFORM_FX_C
-#define I2C_USE_SOFTWARE_PULLUPS 1
-#elif I2C_PLATFORM == I2C_PLATFORM_MINI
-#define I2C_USE_SOFTWARE_PULLUPS 0
-#else
-#error "I2C_USE_SOFTWARE_PULLUPS must be defined for unknown platforms."
-#endif
 #endif
 
 #ifndef I2C_SDA_BIT
@@ -247,7 +139,12 @@ SOFTWARE.
  * \details
  * General calls are sent to this address and are received by every device on the bus.
  */
-#define I2C_GENERAL_CALL_ADDR 0x00
+#define I2C_GENERAL_CALL_ADDRESS 0x00
+
+/** \brief
+ * The target address set by the handshake function.
+ */
+#define I2C_TARGET_ADDRESS 0x08
 
 /** \brief
  * Target (slave) did not acknowledge its address during a write; it is not connected or is not responding.
@@ -293,25 +190,9 @@ SOFTWARE.
 #define I2C_ERROR_NONE 0xFF
 
 /** \brief
- * A read/write operation is pending.
- * \details
- * Error code returned by I2C::getError().
- */
-#define I2C_ERROR_PENDING 0xFE
-
-/** \brief
  * Error code returned by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
  */
-#define I2C_HANDSHAKE_FULL 0xFD
-
-/** \brief
- * The maximum amount of ids available to a device.
- * \details
- * I2C uses a 7-bit addressing scheme with 128 available unique addresses.
- * However, addresses 0-7 and 120-127 are reserved by the standard and should not be used.
- * This leaves 112 unique addresses, and by extension, ids, for a device to use.
- */
-#define I2C_MAX_IDS 112
+#define I2C_HANDSHAKE_FULL 0xFE
 
 /** \brief
  * I2C library major version.
@@ -369,21 +250,15 @@ public:
      */
     static void end();
 
-    /** \brief
-     * Set the address of the device and whether to enable or disable general calls for it.
-     * \param address The 7-bit address to respond to.
-     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
-     * \param generalCall Whether to enable or disable general calls. Defaults to true.
-     * \note
-     * General calls are a way for a device to broadcast data to every other device without addressing them individually.
-     * They are sent by sending a write to address `I2C_GENERAL_CALL_ADDR`. If they are disabled, the device will not respond to them.
-     * These two functionalities are combined for efficiency, as together they make up the TWAR register.
-     */
-    static void setAddress(uint8_t address, bool generalCall = true);
+    static void setAddress(uint8_t address);
+    static void setGeneralCall(bool generalCall);
+    static void setAddressGeneralCall(uint8_t address, bool generalCall);
+    static uint8_t getAddress();
+    static bool getGeneralCall();
 
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
-     * \param address The 7-bit address to send the data to. To send a general call, use `I2C_GENERAL_CALL_ADDR`.
+     * \param address The 7-bit address to send the data to. To send a general call, use `I2C_GENERAL_CALL_ADDRESS`.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param size The amount of data in bytes to send. This cannot be zero.
@@ -395,8 +270,6 @@ public:
      * Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
      * must be defined before including to be larger.
-     * Asynchronous writes with `I2C_USE_MULTI_CONTROLLER` are on a best-effort basis; if the device is addressed by another controller (master) during this time, it may fail silently.
-     * Synchronous writes with `I2C_USE_MULTI_CONTROLLER` will handle this correctly.
      * \see transmit() read()
      */
     static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
@@ -574,7 +447,6 @@ public:
      * - `I2C_ERROR_WRITE_ADDR_NACK`: Target (slave) did not acknowledge its address during a write; it is not connected or is not responding. \n
      * - `I2C_ERROR_WRITE_DATA_NACK`: Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving. \n
      * - `I2C_ERROR_READ_ADDR_NACK`: Target (slave) did not acknowledge its address during a read; it is not connected or is not responding. \n
-     * - `I2C_ERROR_ARB_LOST`: This device lost arbitration while trying to become the controller (master); another device is already the controller (master). \n
      * - `I2C_ERROR_BUS`: An illegal start or stop condition was detected on the bus. \n
      * - `I2C_ERROR_NONE`: No error has occurred. \n
      */
@@ -621,34 +493,7 @@ public:
      */
     static void checkCableFlipped(void (*function)());
 
-    /** \brief
-     * Checks if an emulator without I2C support is being used to run the code.
-     * \return True if an emulator without I2C support has been detected and false if it has not
-     */
-    static bool checkEmulator();
-
-    /** \brief
-     * Gets the address from a provided id.
-     * \param id An id between 0 and I2C_MAX_IDS - 1.
-     * \return The address corresponding to that id.
-     * \details
-     * This function is provided to standardize addresses for each id. It is used by I2C::handshake.
-     */
-    static uint8_t idToAddress(uint8_t id);
-
-    /** \brief
-     * Handshakes with other devices and returns a unique id once complete.
-     * \param numPlayers The number of players to wait for before completing the handshake. Must be between 1 and I2C_MAX_IDS. Defaults to 2.
-     * \return A unique id for this device.
-     * \details
-     * This function may be called only once; further calls will not work.
-     * General calls must be disabled previously (defaults to disabled) for this function to work.
-     * This function will enable general calls.
-     * This function will wait until every single player has joined.
-     * \note
-     * The onReceive() callback will be overridden by this function.
-     */
-    static uint8_t handshake(uint8_t numPlayers = 2);
+    static bool handshake();
 };
 
 #ifdef I2C_IMPLEMENTATION
@@ -657,14 +502,6 @@ public:
  * Not officially part of the library.
  */
 namespace i2c_detail {
-#if I2C_USE_HANDSHAKE
-volatile uint8_t handshakeState;
-
-void handshakeOnRequest() {
-    handshakeState++;
-}
-#endif // #if I2C_USE_HANDSHAKE
-
 struct i2c_data_t {
     void (*onRequestFunction)() = nullptr;
     void (*onReceiveFunction)() = nullptr;
@@ -681,23 +518,6 @@ struct i2c_data_t {
 
 } data;
 
-#if I2C_USE_MULTI_CONTROLLER
-void checkBusBusy() {
-    uint8_t busyChecks = I2C_MULTI_CONTROLLER_BUSY_CHECKS;
-    while (busyChecks) {
-        if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) ==
-            (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
-            busyChecks--;
-        } else {
-            busyChecks = I2C_MULTI_CONTROLLER_BUSY_CHECKS;
-        }
-        _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
-    }
-    cli();
-}
-#endif // #if I2C_USE_MULTI_CONTROLLER
-
-#if I2C_USE_CHECK_CABLE_FLIPPED
 bool checkCableFlippedCore(bool disconnectFlip = false) {
     uint8_t prev = I2C_PIN;
     uint8_t sdaEdges = 0;
@@ -724,15 +544,10 @@ bool checkCableFlippedCore(bool disconnectFlip = false) {
 uint16_t millisShort() {
     return (uint16_t)millis();
 }
-#endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
 void startReadWrite(uint8_t address, bool readWrite, uint8_t bufferSize) {
     i2c_detail::data.active = true;
-#if I2C_USE_MULTI_CONTROLLER
-    i2c_detail::data.error = I2C_ERROR_PENDING;
-#else
     i2c_detail::data.error = I2C_ERROR_NONE;
-#endif // #if I2C_USE_MULTI_CONTROLLER
     i2c_detail::data.slaRW = address << 1 | readWrite;
     i2c_detail::data.bufferIdx = 0;
     i2c_detail::data.bufferSize = bufferSize;
@@ -744,72 +559,48 @@ void waitActive() {
 
 void sendStart() {
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
-#if I2C_USE_MULTI_CONTROLLER
-    sei();
-#endif // #if I2C_USE_MULTI_CONTROLLER
 }
 
 }
 /// \endcond
 
 void I2C::begin() {
-    TWAR = 0xFE;
     power_twi_enable();
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-
-    // clear prescaler bits
-    TWSR = 0;
-
     TWBR = (F_CPU / I2C_FREQUENCY - 16) / 2;
 
-#if I2C_USE_SOFTWARE_PULLUPS
     // enable software pullups
     I2C_DDR &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
     I2C_PORT |= _BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT);
-#endif // #if I2C_USE_SOFTWARE_PULLUPS
 }
 
 void I2C::end() {
     TWCR = 0;
     power_twi_disable();
-#if I2C_USE_SOFTWARE_PULLUPS
     // disable software pullups
     I2C_PORT &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
-#endif // #if I2C_USE_SOFTWARE_PULLUPS
 }
 
-void I2C::setAddress(uint8_t address, bool generalCall) {
+void I2C::setAddress(uint8_t address) {
+    TWAR = address << 1 | (TWAR & _BV(TWGCE));
+}
+
+void I2C::setGeneralCall(bool generalCall) {
+    TWAR = (TWAR & ~_BV(TWGCE)) | generalCall;
+}
+
+void I2C::setAddressGeneralCall(uint8_t address, bool generalCall) {
     TWAR = address << 1 | generalCall;
 }
 
-#if I2C_USE_MULTI_CONTROLLER
-void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = true) {
-    while (true) {
-        i2c_detail::waitActive();
-        i2c_detail::checkBusBusy();
-        // cli() in checkBusBusy()
-
-        if (i2c_detail::data.active) {
-            sei();
-            continue;
-        }
-
-        i2c_detail::startReadWrite(address, TW_WRITE, size);
-        memcpy(i2c_detail::data.twiBuffer, buffer, size);
-        i2c_detail::sendStart();
-
-        // sei() in sendStart()
-
-        if (wait) {
-            i2c_detail::waitActive();
-            if (i2c_detail::data.error == I2C_ERROR_PENDING) {
-                continue;
-            }
-        }
-        break;
-    }
+uint8_t I2C::getAddress() {
+    return TWAR >> 1;
 }
-#else
+
+bool I2C::getGeneralCall() {
+    return TWAR & _BV(TWGCE);
+}
+
 void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = true) {
     i2c_detail::waitActive();
 
@@ -822,35 +613,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait = t
         i2c_detail::waitActive();
     }
 }
-#endif // #if I2C_USE_MULTI_CONTROLLER
 
-#if I2C_USE_MULTI_CONTROLLER
-void I2C::read(uint8_t address, void *buffer, uint8_t size) {
-    while (true) {
-        i2c_detail::waitActive();
-        i2c_detail::checkBusBusy();
-        // cli() in checkBusBusy()
-
-        if (i2c_detail::data.active) {
-            sei();
-            continue;
-        }
-
-        i2c_detail::startReadWrite(address, TW_READ, size);
-        i2c_detail::data.readBuffer = (uint8_t *)buffer;
-        i2c_detail::sendStart();
-
-        // sei() in sendStart()
-
-        i2c_detail::waitActive();
-        if (i2c_detail::data.error == I2C_ERROR_PENDING) {
-            extern Arduboy2 ardu
-            continue;
-        }
-        break;
-    }
-}
-#else
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::waitActive();
 
@@ -861,7 +624,6 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 
     i2c_detail::waitActive();
 }
-#endif // #if I2C_USE_MULTI_CONTROLLER
 
 void I2C::reply(const void *buffer, uint8_t size) {
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
@@ -888,7 +650,6 @@ uint8_t I2C::getBufferSize() {
     return i2c_detail::data.bufferSize;
 }
 
-#if I2C_USE_CHECK_CABLE_FLIPPED
 void I2C::checkCableFlipped(void (*function)()) {
     // wait to finish ongoing operations
     i2c_detail::waitActive();
@@ -912,65 +673,25 @@ void I2C::checkCableFlipped(void (*function)()) {
 
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) |  _BV(TWINT); // re-enable TWI
 }
-#endif // #if I2C_USE_CHECK_CABLE_FLIPPED
 
-bool I2C::checkEmulator() {
-    // TWWC is set when TWDR is written to without TWINT being set
-    // not done in emulator
-    TWDR = 0;
-    return !(TWCR & _BV(TWWC));
-}
-
-uint8_t I2C::idToAddress(uint8_t id) {
-    return 0x8 + id;
-}
-
-#if I2C_USE_HANDSHAKE
-uint8_t I2C::handshake(uint8_t numPlayers) {
-    I2C::onRequest(i2c_detail::handshakeOnRequest);
-    for (int8_t i = numPlayers - 1; i >= 0; ) {
-        uint8_t dummy;
-        uint8_t address = I2C::idToAddress(i);
-
-        I2C::read(address, dummy);
-
-        switch (I2C::getError()) {
-        case I2C_ERROR_READ_ADDR_NACK:
-
-            // handshakeState is the number of times the callback has been called.
-            // when the callback has been called i times, the final Arduboy has joined.
-            // cable flipped detection relies on clock detection,
-            // so we send 0b00000000 to have SDA change as little as possible
-            // while detecting it.
-#if I2C_USE_CHECK_CABLE_FLIPPED
-            I2C::setAddress(address, false);
-            dummy = 0b00000000;
-            while (i2c_detail::handshakeState < i) {
-                I2C::write(I2C_GENERAL_CALL_ADDR, dummy, true);
-            }
-            TWAR |= _BV(TWGCE);
-#else
-            I2C::setAddress(address, true);
-
-            while (i2c_detail::handshakeState < i) { }
-#endif // #if I2C_USE_CHECK_CABLE_FLIPPED
-            return i;
-        case I2C_ERROR_NONE:
-            i--;
-            break;
-        case I2C_ERROR_ARB_LOST:
-            // we lost arbitration
-            // break without decrementing i to try again
-            break;
-        default:
-            // unknown error happened
-            // break without decrementing i to try again
+bool I2C::handshake() {
+    uint8_t disconnect = 1;
+    for (uint8_t i = 0; i < 255; i++) {
+        if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
+            (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
+            disconnect = 0;
             break;
         }
     }
-    return I2C_HANDSHAKE_FULL;
+    if (disconnect) {
+        do {
+            I2C::write(I2C_GENERAL_CALL_ADDRESS, disconnect, true);
+        } while (I2C::getError() != I2C_ERROR_NONE);
+        return true;
+    }
+    I2C::setAddressGeneralCall(I2C_TARGET_ADDRESS, true);
+    return false;
 }
-#endif // #if I2C_USE_HANDSHAKE
 
 ISR(TWI_vect, ISR_NAKED) {
     asm volatile (
@@ -998,7 +719,6 @@ R"(
 ; r19     - general use
 ; r20     - REPLY_ACK
 ; r21     - REPLY_NACK
-; r22     - I2C_ERROR_NONE/%[errorNone] if I2C_USE_MULTI_CONTROLLER
 ; r26 (X) - general use
 ; r27 (X) - general use
 ; r28 (Y) - data pointer
@@ -1040,14 +760,7 @@ clr r31
 ; set up r20 and r21 (REPLY_ACK and REPLY_NACK)
 ldi r20, REPLY_ACK
 ldi r21, REPLY_NACK
-)"
-#if I2C_USE_MULTI_CONTROLLER
-R"(
-; set up r22 (I2C_ERROR_NONE/%[errorNone])
-ldi r22, %[errorNone]
-)"
-#endif // #if I2C_USE_MULTI_CONTROLLER
-R"(
+
 ; switch (TWSR)
 ldd r18, Z + TWSR ; no mask needed because prescaler bits are cleared
 
@@ -1083,9 +796,6 @@ TW_START:
 TW_MT_SLA_ACK:
 TW_MT_DATA_ACK:
     ; if (i2c_detail::data.bufferIdx >= i2c_detail::data.bufferSize) {
-    ; #if I2C_USE_MULTI_CONTROLLER
-    ;    i2c_detail::data.error = I2C_ERROR_NONE
-    ; #endif // #if I2C_USE_MULTI_CONTROLLER
     ;    stop();
     ;    return;
     ; }
@@ -1093,14 +803,7 @@ TW_MT_DATA_ACK:
     ldd r27, Y + %[bufferSize]
     cp r26, r27
 
-    brlo 1f
-)"
-#if I2C_USE_MULTI_CONTROLLER
-R"(
-    std Y + %[error], r22
-)"
-#endif // #if I2C_USE_MULTI_CONTROLLER
-R"(
+    brlo 1f ; 64 instruction limit on branches
     rjmp stop_reti
     1:
 
@@ -1141,22 +844,12 @@ TW_MR_DATA_ACK:
     st X, r19
 
     ; if (TWSR == TW_MR_DATA_NACK) {
-    ; #if I2C_USE_MULTI_CONTROLLER
-    ;     i2c_detail::data.error = I2C_ERROR_NONE;
-    ; #endif // #if I2C_USE_MULTI_CONTROLLER
     ;     stop();
     ;     return;
     ; }
     ; r18 holds TWSR
     cpi r18, 0x58
-    brne 1f
-)"
-#if I2C_USE_MULTI_CONTROLLER
-R"(
-    std Y + %[error], r22
-)"
-#endif // #if I2C_USE_MULTI_CONTROLLER
-R"(
+    brne 1f ; 64 instruction limit on branches
     rjmp stop_reti
     1:
 ; ------------------ fallthrough ---------------------- ;
@@ -1183,12 +876,8 @@ TW_MR_SLA_ACK:
 SR_ST:
 cpi r18, 0x60
 breq TW_SR_SLA_ACK
-cpi r18, 0x68
-breq TW_SR_ARB_LOST_SLA_ACK
 cpi r18, 0x70
 breq TW_SR_GCALL_ACK
-cpi r18, 0x78
-breq TW_SR_ARB_LOST_GCALL_ACK
 cpi r18, 0x80
 breq TW_SR_DATA_ACK
 cpi r18, 0x90
@@ -1197,8 +886,6 @@ cpi r18, 0xA0
 breq TW_SR_STOP
 cpi r18, 0xA8
 breq TW_ST_SLA_ACK
-cpi r18, 0xB0
-breq TW_ST_ARB_LOST_SLA_ACK
 cpi r18, 0xB8
 breq TW_ST_DATA_ACK
 cpi r18, 0xC0
@@ -1208,10 +895,6 @@ breq TW_ST_LAST_DATA
 
 rjmp default
 
-TW_SR_ARB_LOST_SLA_ACK:
-TW_SR_ARB_LOST_GCALL_ACK:
-    rcall set_arb_lost_error
-    ; ------------------ fallthrough ---------------------- ;
 TW_SR_SLA_ACK:
 TW_SR_GCALL_ACK:
     ; i2c_detail::data.active = TWSR; (true)
@@ -1257,9 +940,6 @@ TW_SR_STOP:
     ; return;
     rjmp active_false_reti;
 ; ----------------------------------------------------- ;
-TW_ST_ARB_LOST_SLA_ACK:
-    rcall set_arb_lost_error
-; ------------------ fallthrough ---------------------- ;
 TW_ST_SLA_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18
@@ -1357,11 +1037,6 @@ default:
     pop r18
     reti
 ; -------------------- subroutines --------------------- ;
-set_arb_lost_error:
-    ; i2c_detail::data.error = TW_MT_ARB_LOST;
-    ldi r26, 0x38
-    std Y + %[error], r26
-    ret
 ; output: X = &twiBuffer[bufferIdx++]
 get_buffer_addr:
     ; TWDR = i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++];
@@ -1396,9 +1071,6 @@ debug_blue:
         [twiBuffer]        "=m" (i2c_detail::data.twiBuffer)
         : // Input Operands
         [error]             "i" (offsetof(i2c_detail::i2c_data_t, error)),
-#if I2C_USE_MULTI_CONTROLLER
-        [errorNone]         "M" (I2C_ERROR_NONE),
-#endif // #if I2C_USE_MULTI_CONTROLLER
         [active]            "i" (offsetof(i2c_detail::i2c_data_t, active)),
         [bufferIdx]         "i" (offsetof(i2c_detail::i2c_data_t, bufferIdx)),
         [readBuffer]        "i" (offsetof(i2c_detail::i2c_data_t, readBuffer)),
@@ -1427,13 +1099,7 @@ ISR(TWI_vect) {
             TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
             while (TWCR & _BV(TWSTO)) {  }
             i2c_detail::data.active = false;
-            i2c_detail::data.error = I2C_ERROR_NONE;
         }
-        break;
-    case TW_MT_ARB_LOST: // same as TW_MR_ARB_LOST
-        i2c_detail::data.active = false;
-        i2c_detail::data.error = TW_MT_ARB_LOST;
-        TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         break;
     // MR
     case TW_MR_DATA_ACK:
@@ -1451,12 +1117,8 @@ ISR(TWI_vect) {
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWSTO) | _BV(TWEA);
         while (TWCR & _BV(TWSTO)) {  }
         i2c_detail::data.active = false;
-        i2c_detail::data.error = I2C_ERROR_NONE;
         break;
     // ST
-    case TW_ST_ARB_LOST_SLA_ACK:
-        i2c_detail::data.error = TW_MT_ARB_LOST;
-        __attribute__((fallthrough));
     case TW_ST_SLA_ACK:
         i2c_detail::data.active = true;
         i2c_detail::data.bufferIdx = 0;
