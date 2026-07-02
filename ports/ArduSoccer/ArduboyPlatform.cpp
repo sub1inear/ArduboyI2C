@@ -4,15 +4,27 @@
 #include "ArduboyPlatform.h"
 #include "Engine.h"
 
+#define CENTER_STR(str, csize) (WIDTH / 2 - (sizeof(str) - 1) * csize / 2)
+
 //#include "Generated/Data_Audio.h"
 
 ArduboyPlatform Platform;
 
+volatile bool controllerReceived = false;
+volatile bool controllerRequested = false;
+
 void onReceive()
 {
 	const uint8_t *buffer = I2C::getBuffer();
-	Platform.data = buffer[0];
-	Platform.dataAvailable = true;
+	Platform.lastInputState[REMOTE_PLAYER] = Platform.inputState[REMOTE_PLAYER];
+	Platform.inputState[REMOTE_PLAYER] = buffer[0];
+	controllerReceived = true;
+}
+
+void onRequest()
+{
+	I2C::reply(Platform.inputState[LOCAL_PLAYER]);
+	controllerRequested = true;
 }
 
 void ArduboyPlatform::updateInput()
@@ -52,81 +64,66 @@ void ArduboyPlatform::update()
     {
 		if(m_isMuted)
 		{
-				arduboy.audio.off();
+			arduboy.audio.off();
 		}
 		else
 		{
-				arduboy.audio.on();
+			arduboy.audio.on();
 		}
     }
 	updateInput();
-	if (deviceId != deviceIdNull)
+	if (multiplayerConnected)
 	{
-		if (deviceId == 0)
+		if (isController)
 		{
-			sendInput();
-			getRemoteInput();
+			do {
+            	I2C::write(I2C_TARGET_ADDRESS, inputState[LOCAL_PLAYER], true);
+			} while (I2C::getError() != I2C_ERROR_NONE);
+
+			lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
+			do {
+				I2C::read(I2C_TARGET_ADDRESS, inputState[REMOTE_PLAYER]);
+			} while (I2C::getError() != I2C_ERROR_NONE);
 		}
 		else
 		{
-			getRemoteInput();
-			sendInput();
+			I2C::setAddress(I2C_TARGET_ADDRESS);
+			while (!controllerReceived) { }
+			controllerReceived = false;
+			while (!controllerRequested) { }
+			controllerRequested = false;
+			I2C::setAddress(I2C_NULL_ADDRESS);
 		}
+
 	}
 }
 
 void ArduboyPlatform::disconnectMultiplayer()
 {
-	deviceId = deviceIdNull;
-	I2C::onReceive(nullptr);
+	multiplayerConnected = false;
+	I2C::setAddress(I2C_NULL_ADDRESS);
 }
 
 bool ArduboyPlatform::connectMultiplayer()
 {
 	arduboy.display(CLEAR_BUFFER);
 
-	if (I2C::checkEmulator())
-	{
-		engine.renderer.drawText(smallFont, PSTR("NO I2C IN EMULATOR"), 12, 30, 1);
-		arduboy.display();
-		while (true) {}
-	}
-
 	I2C::checkCableFlipped([]() {
-		engine.renderer.drawText(smallFont, PSTR("PLEASE FLIP THE CABLE"), 2, 30, 1);
+		engine.renderer.drawText(smallFont, PSTR("PLEASE FLIP THE CABLE"), CENTER_STR("PLEASE FLIP THE CABLE", 6), 30, 1);
 		arduboy.display(CLEAR_BUFFER);
 	});
 
-	engine.renderer.drawText(smallFont, PSTR("WAITING FOR PLAYERS"), 8, 30, 1);
+	engine.renderer.drawText(smallFont, PSTR("WAITING FOR PLAYERS"), CENTER_STR("WAITING FOR PLAYERS", 6), 30, 1);
 	arduboy.display(CLEAR_BUFFER);
-	deviceId = I2C::handshake();
-	if (deviceId == I2C_HANDSHAKE_FULL)
+
+	isController = I2C::handshake();
+	if (!isController)
 	{
-		arduboy.exitToBootloader();
+		I2C::setAddress(I2C_NULL_ADDRESS);
+		I2C::onReceive(onReceive);
+		I2C::onRequest(onRequest);
 	}
+	multiplayerConnected = true;
 
-	I2C::onReceive(onReceive);
-	return deviceId == 0;
-}
-
-
-void ArduboyPlatform::sendInput()
-{
-	do
-	{
-		I2C::write(I2C_GENERAL_CALL_ADDR, inputState[LOCAL_PLAYER], true);
-	}
-	while (I2C::getError() != I2C_ERROR_NONE);
-}
-
-void ArduboyPlatform::getRemoteInput()
-{
-	while (!dataAvailable)
-	{
-		// Wait for data to be received
-	}
-	dataAvailable = false;
-
-	lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
-	inputState[REMOTE_PLAYER] = data;
+	return isController;
 }

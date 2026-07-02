@@ -30,12 +30,9 @@ public:
 	void update();
 	void updateInput();
 
-	uint8_t deviceId = deviceIdNull;
-	volatile uint8_t data;
-	volatile bool dataAvailable = false;
 private:
-	void sendInput();
-	void getRemoteInput();
+	bool isController = false;
+	bool multiplayerConnected = false;
 };
 
 void ERROR(const char* msg);
