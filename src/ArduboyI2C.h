@@ -26,7 +26,6 @@ SOFTWARE.
  * An I2C library for Arduboy multiplayer games.
  */
 #pragma once
-#include <Arduino.h>
 #include <avr/interrupt.h>
 #include <avr/power.h>
 #include <util/twi.h>
@@ -34,6 +33,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifndef I2C_FREQUENCY
 /** \brief
@@ -543,11 +543,6 @@ bool checkCableFlippedCore(bool disconnectFlip) {
     }
     // otherwise, if the number of SDA edges is greater than the number of SCL edges, the cable is flipped
     return sdaEdges > sclEdges;
-}
-
-// optimizes for debounce in checkCableFlipped (only needs uint16_t)
-uint16_t millisShort() {
-    return (uint16_t)millis();
 }
 
 void startReadWrite(uint8_t address, bool readWrite, uint8_t bufferSize) {
