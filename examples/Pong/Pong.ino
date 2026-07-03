@@ -85,16 +85,25 @@ Ball ball;
 
 Player leftPlayer;
 Player rightPlayer;
+
+// right player is the controller (master) and left player is the target (slave)
 bool isRightPlayer = false;
 
 bool serveRight = true;
 bool serveDown = false;
 
+// volatile variables are used to communicate between the main loop and the I2C callbacks
+// otherwise the compiler may optimize the variables away in while (variable) { } loops
+// because it can't see that they will change
 
+// have we received input from the controller (master) yet?
 volatile bool controllerReceived = false;
+// the corresponding input
 volatile uint8_t controllerInput = 0;
 
+// have we been requested to send our input to the controller (master) yet?
 volatile bool controllerRequested = false;
+// the corresponding input
 volatile uint8_t targetInput = 0;
 
 // -------------------------------------------------------------
@@ -110,7 +119,9 @@ void onReceive() {
 }
 
 void onRequest() {
+    // send our input to the controller (master)
     I2C::reply(targetInput);
+    // tell the main loop that this has happened
     controllerRequested = true;
 }
 
@@ -124,6 +135,7 @@ void resetBall() {
     ball.y = ballStartY;
 
     // alternate the direction of the ball each time it is reset
+
     ball.dx = serveRight ? ballSpeedX : -ballSpeedX;
     serveRight = !serveRight;
 
@@ -288,21 +300,27 @@ void setup() {
     arduboy.begin();
     I2C::begin();
 
-    // check if the cable is flipped
-    // calls function to display message if it is flipped
-    // waits for it to be flipped back
+    // check if the cable is flipped and waits for it to be flipped back
     // only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable
     I2C::checkCableFlipped([]() {
+        // cable is flipped, draw message
+        // F() macro ensures the string is stored in flash memory instead of RAM
         drawMessage(F("Please flip the cable\non this device."));
     });
 
-    // display handshaking message, I2C::handshake blocks
-    drawMessage(F("Waiting for other\nplayer..."));
+    isRightPlayer = I2C::handshake([]() {
+        // waiting for a handshake, display message
+        // F() macro ensures the string is stored in flash memory instead of RAM
+        drawMessage(F("Waiting for other\nplayer..."));
+    });
 
-    isRightPlayer = I2C::handshake();
+    // if we're the target (slave), ...
     if (!isRightPlayer) {
+        // set up the I2C callbacks
         I2C::onReceive(onReceive);
         I2C::onRequest(onRequest);
+        // set our address to the null address
+        // so we won't respond to any requests until we want to
         I2C::setAddress(I2C_NULL_ADDRESS);
     }
 
@@ -318,21 +336,32 @@ void loop() {
 
     if (isRightPlayer) {
         rightInput = localInput;
+        // send our input to the other device and wait for it to be received
         do {
             I2C::write(I2C_TARGET_ADDRESS, rightInput, true);
         } while (I2C::getError() != I2C_ERROR_NONE);
+        // read the other device's input and wait for it to be received
         do {
             I2C::read(I2C_TARGET_ADDRESS, leftInput);
         } while (I2C::getError() != I2C_ERROR_NONE);
     } else {
+        // let the onReceive() callback get our input through targetInput
         targetInput = leftInput = localInput;
+        // set our address to I2C_TARGET_ADDRESS; we're ready
         I2C::setAddress(I2C_TARGET_ADDRESS);
+        // wait for the controller (master) to send us its input
         while (!controllerReceived) { }
+        // store the controller's input and reset the flag
         rightInput = controllerInput;
         controllerReceived = false;
 
+        // wait for the controller (master) to request our input
         while (!controllerRequested) { }
+        // reset the flag
         controllerRequested = false;
+        // set our address to the null address; we're done
+        // otherwise the controller may get ahead of us and request our input again before we have a chance to update it
+        // thus destroying our synchronization
         I2C::setAddress(I2C_NULL_ADDRESS);
     }
 

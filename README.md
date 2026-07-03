@@ -13,16 +13,14 @@ See the [online documentation](https://sub1inear.github.io/ArduboyI2C/) for more
 ## Features
 - Controller (master) and target (slave) I2C support.
 - Built-in handshake function for multiplayer games.
-- Multi-controller support for easy peer-to-peer communication.
-    - Optional bus busy checks to prevent freezes.
 - Built-in cable flip detection for FX-C.
 - Bufferless reading.
 - Minimal memory overhead.
 - Customizable configuration.
 
 ## Why ArduboyI2C over Wire?
-- Highly optimized (saves ~2KiB of PROGMEM and ~200 bytes of RAM).
-- Adds functions for multiplayer games (handshake, multi-controller support).
+- Highly optimized (saves ~1KiB of PROGMEM and ~200 bytes of RAM).
+- Adds easy handshake functionality.
 - Adds cable flip detection for FX-C.
 - More customizable (see [Configuration](#configuration)).
 
@@ -45,7 +43,6 @@ lib_deps =
 ### 1. Include the library
 ```cpp
 #define I2C_IMPLEMENTATION
-#define I2C_PLATFORM ... // see [Configuration](#configuration) for options
 #include <ArduboyI2C.h>
 ```
 ### 2. Initialize
@@ -62,43 +59,33 @@ uint8_t id = I2C::handshake(numPlayers);
 ```
 ### 4. Read/Write
 ```cpp
-I2C::write(I2C_GENERAL_CALL, data, /* wait = */true);
-I2C::read(I2C::idtoAddress(id), data);
+I2C::write(I2C_TARGET_ADDRESS, data, /* wait = */true);
+I2C::read(I2C_TARGET_ADDRESS, data);
 ```
 > Write data to every device with the `I2C_GENERAL_CALL` address.
 ### 5. Callbacks
 ```cpp
-I2C::onReceive(receiveCallback);
-I2C::onRequest(requestCallback);
+I2C::onReceive(onReceive);
+I2C::onRequest(onRequest);
 ```
 
 ```cpp
-void requestCallback() {
-  I2C::reply(data);
+void onReceive() {
+    const uint8_t *data = I2C::getBuffer();
+    ...
+}
+void onRequest() {
+    I2C::reply(data);
 }
 ```
 
 ## Configuration
 Define before `#include <ArduboyI2C.h>`.
-### Core Settings
 | Macro | Default | Options | Description |
 |-------|---------|---------|-------------|
-| `I2C_PLATFORM` | None | `I2C_PLATFORM_MINI`, `I2C_PLATFORM_FX_C`, `I2C_PLATFORM_UNKNOWN` | Platform presets |
+| `I2C_IMPLEMENTATION` | - | - | Must be defined in **one** source file to include the implementation. |
 | `I2C_FREQUENCY` | 100000 | 0-400000 | Bus frequency (Hz) |
 | `I2C_BUFFER_SIZE` | 32 | 1-255 | Transaction buffer size |
-### Reliability
-| Macro | Default | Options | Description |
-|-------|---------|---------|-------------|
-| `I2C_CHECK_BUS_BUSY_CHECKS` | 8 | 1-255 | Number of bus busy checks before read/write |
-| `I2C_CHECK_CABLE_FLIPPED_CHECKS` | 128 | 1-255 | Number of checks for flipped cable detection |
-| `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT` | 1000 | 1-32767 | Debounce time (ms) for cable flip detection |
-### Feature Flags
-| Macro | Default | Options | Description |
-|-------|---------|---------|-------------|
-| `I2C_USE_HANDSHAKE` | 1 | 0, 1 | Enable handshake functionality |
-| `I2C_USE_MULTI_CONTROLLER` | 1 | 0, 1 | Enable multi-controller safety checks |
-| `I2C_USE_CHECK_CABLE_FLIPPED` | 1 (FX-C), 0 (Mini), None (Unknown) | 0, 1 | Enable flipped cable detection functionality |
-| `I2C_USE_SOFTWARE_PULLUPS` | 1 (FX-C), 0 (Mini), None (Unknown) | 0, 1 | Enable software pullups on SDA/SCL lines |
 
 ## Migrating from Wire Library
 | Wire API               | ArduboyI2C              |
@@ -119,14 +106,8 @@ If this doesn't fix your issue, make sure you haven't disabled any features that
 ### Why can't I use `delay()`, `Serial`, `millis()`, etc. inside `onReceive`/`onRequest` callbacks?
 Callbacks are executed inside the I2C interrupt handler, where interrupts are disabled. Functions that rely on interrupts (`delay`, `millis`, `Serial`, etc.) won't work. Keep callbacks short and only use `I2C::reply()` and `I2C::getBuffer()`. If you need to do extended processing or rely on interrupts, set a `volatile bool` flag, copy the data out of the buffer, and then poll the flag in your main loop.
 
-### My game sometimes freezes, what causes this?
-In multi-controller setups, two devices may try to control the bus simultaneously. Increase `I2C_MULTI_CONTROLLER_BUSY_CHECKS` (default: 16, max: 255) to add more pre-flight bus checks. Check `I2C::getError()` after writes/reads for `I2C_ERROR_ARB_LOST` and retry the operation. If this does not fix it or you're not in a multi-controller setup, please open an issue [here](https://github.com/sub1inear/ArduboyI2C/issues/new).
-
 ### Can I use ArduboyI2C in Ardens?
-[Ardens](https://github.com/tiberiusbrown/Ardens) currently doesn't simulate I2C hardware. Use `I2C::checkEmulator()` to detect this and print a message.
-
-### What does `I2C_HANDSHAKE_FULL` mean?
-It means the bus already has `numPlayers` devices connected, so there's no slot left for this device. You can print this message or just call `arduboy.exitToBootloader()`.
+[Ardens](https://github.com/tiberiusbrown/Ardens) will soon support I2C multiplayer; stay tuned.
 
 ### When should I use `I2C::write()` vs `I2C::reply()`?
 Use `I2C::write()` as the controller (master) to send data. Use `I2C::reply()` inside an `onRequest` callback to send data back when another device reads from you. Calling `write()` from a callback won't work correctly.
@@ -138,13 +119,7 @@ Writes and `reply()` are limited by `I2C_BUFFER_CAPACITY` (default: 32). Define 
 `arduboy.boot()` (called inside `arduboy.begin()`) disables the TWI (I2C) hardware as a side effect. Calling `I2C::begin()` afterwards re-initializes it.
 
 ### Why can't I use certain I2C addresses for my own address?
-Addresses 0–7 and 120–127 are reserved by the I2C spec (general call, broadcast, clock extension, etc.). `I2C::idToAddress()` maps IDs 0–111 to safe addresses 8–119.
-
-### Is `checkCableFlipped()` 100% reliable?
-No, it works by sampling which line looks more like a clock signal. Edge cases (very short cables, noisy lines, both devices idle) can cause false positives. Increase `I2C_CHECK_CABLE_FLIPPED_CHECKS` for more accuracy at the cost of a longer detection time.
-
-### How do I minimize memory usage?
-Disable unused features (`I2C_USE_HANDSHAKE` and `I2C_USE_CHECK_CABLE_FLIPPED`) and reduce `I2C_BUFFER_CAPACITY` to the smallest value that meets your needs. Always use `I2C_GENERAL_CALL_ADDR` and have every device be a controller/master. The [Configuration](#configuration) table lists all available toggles.
+Addresses 0–7 and 120–127 are reserved by the I2C spec (general call, etc.).
 
 ## Types of Multiplayer
 ### State Sync Multiplayer

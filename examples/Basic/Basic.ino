@@ -36,6 +36,8 @@ struct Player {
 Player localPlayer = { 0, 0 };
 Player remotePlayer = { 0, 0 };
 
+// whether this device is the controller (master) and can read/write
+// or the target (slave) and can only read/write when asked to
 bool isController = false;
 
 void drawMessage(const __FlashStringHelper *message) {
@@ -47,6 +49,7 @@ void drawMessage(const __FlashStringHelper *message) {
 }
 
 void onReceive() {
+    // copy the received data into the remote player struct
     remotePlayer = *reinterpret_cast<const Player *>(I2C::getBuffer());
 }
 
@@ -59,23 +62,24 @@ void setup() {
     // initialize arduboy hardware
     arduboy.begin();
 
-    // initialize I2C (twi) hardware
+    // initialize I2C hardware
     I2C::begin();
 
-    // check if the cable is flipped
-    // calls function to display message if it is flipped
-    // waits for it to be flipped back
+    // check if the cable is flipped and wait for it to be flipped back
     I2C::checkCableFlipped([]() {
-        // cable is flipped, display message
+        // cable is flipped, draw message
+        // F() macro ensures the string is stored in flash memory instead of RAM
         drawMessage(F("Please flip the cable\non this device."));
     });
 
-    // handshake with other devices and get a unique id for this device
-    // note: I2C::handshake enables general calls by default
+    // waits for other device and determines if this device is the controller (master) or target (slave)
     isController = I2C::handshake([]() {
+        // waiting for a handshake, display message
+        // F() macro ensures the string is stored in flash memory instead of RAM
         drawMessage(F("Waiting for other\nplayer..."));
     });
 
+    // if we're not the controller (master), set up the receive and request callbacks
     if (!isController) {
         I2C::onReceive(onReceive);
         I2C::onRequest(onRequest);
@@ -95,23 +99,28 @@ void loop() {
     if (arduboy.pressed(DOWN_BUTTON))  { localPlayer.y++; }
     if (arduboy.pressed(UP_BUTTON))    { localPlayer.y--; }
 
+    // limit our player to the screen bounds
+    // drawn from the top left corner, so the max x/y is the screen width/height minus the player size (8x8)
     localPlayer.x = constrain(localPlayer.x, 0, WIDTH - 8);
     localPlayer.y = constrain(localPlayer.y, 0, HEIGHT - 8);
 
+    // if we're the controller (master), ...
     if (isController) {
-        // send our player data to the other device
+        // read the remote player data from the other device
         I2C::read(I2C_TARGET_ADDRESS, remotePlayer);
+        // send our player data to the other device
         I2C::write(I2C_TARGET_ADDRESS, localPlayer, false);
-    }
+    } /* else {
+        // if we're the target (slave), onRequest() and onReceive() will send and receive our data
+    } */
 
     // draw the players
-    // isController -> filled, !isController -> outlined
+    // controller -> filled, target -> outlined
     Player &filledPlayer = (isController) ? localPlayer : remotePlayer;
     Player &outlinedPlayer = (isController) ? remotePlayer : localPlayer;
 
     arduboy.fillRect(filledPlayer.x, filledPlayer.y, 8, 8, WHITE);
     arduboy.drawRect(outlinedPlayer.x, outlinedPlayer.y, 8, 8, WHITE);
 
-    // display
     arduboy.display();
 }

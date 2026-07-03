@@ -112,10 +112,19 @@ SOFTWARE.
 
 /** \brief
  * The target address set by the handshake function.
+ * \details
+ * This is the address that the controller (master) should use to communicate with the target (slave) when using the handshake function.
+ * This is optional; the address can be changed to whatever you wish but is kept for convenience.
  */
 #define I2C_TARGET_ADDRESS 0x08
 
-#define I2C_NULL_ADDRESS 0x7F
+/** \brief
+ * The null address used to disable a target from responding.
+ * \details
+ * This is useful in lockstep multiplayer to soft-disable a target (slave) from responding to the controller (master) without having to call `I2C::end()`.
+ * This is only a convention and is optional; the address can be changed to whatever you wish but is kept for convenience.
+ */
+#define I2C_NULL_ADDRESS 0x09
 
 /** \brief
  * Target (slave) did not acknowledge its address during a write; it is not connected or is not responding.
@@ -216,23 +225,30 @@ public:
      */
     static void end();
 
+    /** \brief
+     * Sets the 7-bit address of this device.
+     * \param address The 7-bit address (0-127) to set.
+     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     */
     static void setAddress(uint8_t address);
+    /** \brief
+     * Gets the 7-bit address of this device.
+     * \return The 7-bit address of this device.
+     */
     static uint8_t getAddress();
 
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
-     * \param address The 7-bit address to send the data to. To send a general call, use `I2C_GENERAL_CALL_ADDRESS`.
+     * \param address The 7-bit address to send the data to.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param size The amount of data in bytes to send. This cannot be zero.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
-     * \details
      * \note
-     * Sending general calls will only function if the `generalCall` argument of `setAddress` is true on other devices.
-     * \note
-     * Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
-     * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
-     * must be defined before including to be larger.
+     * Internally, this function uses a buffer to enable asynchronous writes.
+     * The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY` and defaults to 32.
+     * If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
+     * must be defined before including ArduboyI2C.h to be greater.
      * \see transmit() read()
      */
     static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
@@ -258,6 +274,7 @@ public:
      * \tparam T The type of the array to send.
      * \tparam N The number of elements in the array.
      * \param address The 7-bit address to send the data to.
+     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A reference to the array to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \details
@@ -277,7 +294,6 @@ public:
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the buffer in which to store the data.
      * \param size The maximum amount of bytes to receive. This cannot be 0 or 255.
-     * \details
      * \note
      * Unlike the `write` function, this function is bufferless and is not limited to `I2C_BUFFER_CAPACITY` bytes.
      * \see write()
@@ -304,6 +320,7 @@ public:
      * \tparam T The type of the array to read.
      * \tparam N The number of elements in the array.
      * \param address The 7-bit address to receive the data from.
+     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A reference to the array in which to store the data.
      * \details
      * This function will automatically deduce the size of the array.
@@ -327,7 +344,7 @@ public:
      * \note
      * Internally, this function uses a buffer. The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY`
      * and defaults to 32. If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
-     * must be defined before including to be larger.
+     * must be defined before including ArduboyI2C.h to be greater.
      * \see write() onRequest()
      */
     static void reply(const void *buffer, uint8_t size);
@@ -363,7 +380,7 @@ public:
 
     /** \brief
      * Sets up/disables the callback to be called when data is requested from the device's address (a read).
-     * \param function The function to be called when data is requested, or nullptr to disable.
+     * \param function The function to be called when data is requested, or `nullptr` to disable.
      * \details
      * Example Callback and Usage:
      * \code{.cpp}
@@ -379,7 +396,7 @@ public:
      * \note
      * Interrupts are disabled during this callback.
      * Any functions called within it should not rely on interrupts (i.e. no `Serial`, `delay`, `millis`, etc.).
-     * To respond to the controller (master), use `reply` instead of `write`.
+     * To respond to the controller (master), use reply() instead of write().
      * \see onReceive() reply() read()
      */
     static void onRequest(void (*function)());
@@ -435,12 +452,11 @@ public:
 
     /** \brief
      * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
-     * \param function The function to be called if the cable is flipped.
+     * \param startFunction The function to be called if the cable is flipped. Pass `nullptr` to disable.
+     * \param loopFunction The function to be called while waiting for the cable to be flipped back. Pass `nullptr` to disable.
      * \details
-     * This function works by seeing which line behaves more like a clock (equal high and low) over a sampling period.
-     * It is by no means perfect, but it should suffice.
      * This is only needed on the FX-C, as the Arduboy Mini does not have a way to flip the cable.
-     * This method must be used with I2C::handshake.
+     * This method must be used with I2C::handshake or an equivalent handshaking method that sends `0b00000000` at a regular interval.
      * Example Usage:
      * \code{.cpp}
      * I2C::checkCableFlipped([] {
@@ -448,14 +464,18 @@ public:
      *     arduboy.print(F("Please flip the cable\non this device."));
      *     arduboy.display();
      * });
-     * uint8_t id = I2C::handshake();
+     * bool isController = I2C::handshake();
      * \endcode
      * \note
-     * In order to work with this function, custom handshaking functions must send data at a regular interval.
-     * Sending 0b00000000 is recommended as it will increase the chance of detection.
      */
     static void checkCableFlipped(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 
+    /** \brief
+     * Waits for another device and returns whether this device is the controller (master) or target (slave).
+     * \param startFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
+     * \param loopFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
+     * \return `true` if this device is the controller (master), `false` if it is the target (slave).
+     */
     static bool handshake(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 };
 
@@ -469,37 +489,57 @@ struct i2c_data_t {
     void (*onRequestFunction)() = nullptr;
     void (*onReceiveFunction)() = nullptr;
 
+
+    // pointer to the buffer for reads
+    // avoids copying into twiBuffer then to another buffer out
+    // safe because I2C::read blocks
     volatile uint8_t *readBuffer;
+    // buffer for writes and target (slave) operations
     uint8_t twiBuffer[I2C_BUFFER_CAPACITY];
+    // index into readBuffer or twiBuffer
     volatile uint8_t bufferIdx;
+    // size of data in readBuffer or twiBuffer
     volatile uint8_t bufferSize;
 
-    volatile uint8_t active;
+    // whether or not the controller (master) is currently transmitting or receiving data
+    // not active for target (slave) operations
+    volatile bool active;
 
+    // the address and read/write bit for a transmission (7-bit address << 1 | read/write bit)
     volatile uint8_t slaRW;
+    // the error code for the last transmission
     volatile uint8_t error;
 
 } data;
 
-bool checkCableFlippedCore(bool disconnectFlip = false) {
+// counts the number of edges on the SDA and SCL lines to determine if the cable is flipped
+// relies on I2C::handshake() sending 0b00000000 so that the SCL line is toggled and the SDA line is held low
+bool checkCableFlippedCore(bool disconnectFlip) {
     uint8_t prev = I2C_PIN;
     uint8_t sdaEdges = 0;
     uint8_t sclEdges = 0;
 
     for (uint8_t i = 0; i < 128; i++) {
         uint8_t cur = I2C_PIN;
+        // calculates the change between the current and previous pin states
         uint8_t diff = cur ^ prev;
 
+        // if the SDA line changed, increment the SDA edge counter
         if (diff & _BV(I2C_SDA_BIT)) { sdaEdges++; }
+        // if the SCL line changed, increment the SCL edge counter
         if (diff & _BV(I2C_SCL_BIT)) { sclEdges++; }
 
         prev = cur;
+        // half-period delay otherwise too fast
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
 
+    // if the total number of edges is very low (<= 2 to account for noise), the cable is disconnected or flipped
     if (sdaEdges + sclEdges <= 2) {
+        // returns flipped (true) if disconnect is a flip, otherwise returns not flipped (false)
         return disconnectFlip;
     }
+    // otherwise, if the number of SDA edges is greater than the number of SCL edges, the cable is flipped
     return sdaEdges > sclEdges;
 }
 
@@ -521,35 +561,46 @@ void waitActive() {
 }
 
 void sendStart() {
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWSTA) | _BV(TWINT);
 }
 
 }
 /// \endcond
 
 void I2C::begin() {
+    // power up TWI
+    // power_twi_disable() is called in arduboy.boot() (inside arduboy.begin())
     power_twi_enable();
+
+    // enable TWI, interrupts, ACKing
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
+    // set our clock frequency
     TWBR = (F_CPU / I2C_FREQUENCY - 16) / 2;
 
-    // enable software pullups
+    // enable software pullups (needed for Arduboy FX-C)
     I2C_DDR &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
     I2C_PORT |= _BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT);
 }
 
 void I2C::end() {
+    // disable TWI
     TWCR = 0;
+
+    // power down TWI
     power_twi_disable();
 
-    // disable software pullups
+    // disable software pullups (needed for Arduboy FX-C)
+    // no need to change DDR
     I2C_PORT &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
 }
 
 void I2C::setAddress(uint8_t address) {
+    // TWAR format: 7-bit address in bits 7-1, TWGCE in bit 0
     TWAR = address << 1;
 }
 
 uint8_t I2C::getAddress() {
+    // TWAR format: 7-bit address in bits 7-1, TWGCE in bit 0
     return TWAR >> 1;
 }
 
@@ -569,6 +620,8 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::waitActive();
 
+    // ISR: TWCR = i2c_detail::bufferIdx < i2c_detail::bufferSize ? REPLY_ACK : REPLY_NACK;
+    // so we must set the buffer size to size - 1 so that the last byte is NACKed (I2C standard)
     i2c_detail::startReadWrite(address, TW_READ, size - 1);
     i2c_detail::data.readBuffer = (uint8_t *)buffer;
 
@@ -578,6 +631,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
 }
 
 void I2C::reply(const void *buffer, uint8_t size) {
+    // save memory by not accumulating inside buffer (I2C::reply() may not be repeated)
     memcpy(i2c_detail::data.twiBuffer, buffer, size);
     i2c_detail::data.bufferSize = size;
 }
@@ -603,16 +657,22 @@ uint8_t I2C::getBufferSize() {
 }
 
 void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
-    // wait to finish ongoing operations
-    i2c_detail::waitActive();
-    TWCR = 0; // disable TWI
+    // disable TWI
+    TWCR = 0;
 
-    if (i2c_detail::checkCableFlippedCore()) {
-        // inform the user of the flipped cable
+    // check if cable is flipped
+    // pass false to indicate a disconnect is not a flip
+    // so it will return false and we will continue
+    if (i2c_detail::checkCableFlippedCore(false)) {
         if (startFunction) {
             startFunction();
         }
+        // wait for the cable to be flipped back
+        // debounce the cable flip detection by ensuring 64 counts of success
+        // putting the cable back it can generate noise
         for (uint8_t i = 0; i < 64; i++) {
+            // pass true to indicate a disconnect is a flip
+            // so we will wait while the cable is disconnected
             if (i2c_detail::checkCableFlippedCore(true)) {
                 i = 0;
             }
@@ -622,17 +682,28 @@ void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
         }
     }
 
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) |  _BV(TWINT); // re-enable TWI
+    // re-enable TWI
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 }
 
 bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
+    // check if the bus is free (SDA and SCL are high for 128 half-periods)
+    // if it is not, another controller (master) has gotten here before us
     for (uint8_t i = 0; i < 128; i++) {
         if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
             (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
+            // set our address to the target address
             I2C::setAddress(I2C_TARGET_ADDRESS);
+            // wait for twice the time it takes to send 18 bits
+            // (7 address bits + 1 RW + 1 ACK + 8 data bits + 1 ACK) to ensure we ACK the controller
+            // might have come across a controller that just started sending data,
+            // so we will NACK the first transmission and the ACK the second transmission
+            // so we need to wait for two transmissions
             _delay_us((1000000.0 / I2C_FREQUENCY * 18.0 + 25.0) * 2.0);
+            // return `false` to indicate that this device is the target (slave)
             return false;
         }
+        // half-period delay otherwise too fast
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
     uint8_t zeros = 0b00000000;
@@ -640,13 +711,15 @@ bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
         startFunction();
     }
     do {
+        // send all zeros to the target address to help with I2C::checkCableFlipped()
         I2C::write(I2C_TARGET_ADDRESS, zeros, true);
         if (loopFunction) {
             loopFunction();
         }
+        // repeat until the write is successful (no NACKs)
     } while (I2C::getError() != I2C_ERROR_NONE);
+    // return `true` to indicate that this device is the controller (master)
     return true;
-
 }
 
 #if 1
@@ -836,8 +909,6 @@ breq TW_ST_LAST_DATA
 rjmp default
 
 TW_SR_SLA_ACK:
-    ; i2c_detail::data.active = TWSR; (true)
-    std Y + %[active], r18 ; r18 holds TWSR
     ; i2c_detail::data.bufferIdx = 0;
     std Y + %[bufferIdx], __zero_reg__
     ; TWCR = REPLY_ACK;
@@ -879,8 +950,6 @@ TW_SR_STOP:
     rjmp active_false_reti;
 ; ----------------------------------------------------- ;
 TW_ST_SLA_ACK:
-    ; i2c_detail::data.active = TWSR; (true)
-    std Y + %[active], r18
     ; i2c_detail::data.bufferIdx = 0;
     std Y + %[bufferIdx], __zero_reg__
     ; default to sending 1 junk byte if the user does not fill buffer
@@ -1057,7 +1126,6 @@ ISR(TWI_vect) {
         break;
     // ST
     case TW_ST_SLA_ACK:
-        i2c_detail::data.active = true;
         i2c_detail::data.bufferIdx = 0;
         i2c_detail::data.bufferSize = 1; // default to sending 1 junk byte if the user does not fill buffer
         if (i2c_detail::data.onRequestFunction) {
@@ -1075,12 +1143,10 @@ ISR(TWI_vect) {
     case TW_ST_DATA_NACK:
     case TW_ST_LAST_DATA: // last interrupt cleared TWEA
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
-        i2c_detail::data.active = false;
         break;
     // SR
     case TW_SR_SLA_ACK:
         i2c_detail::data.bufferIdx = 0;
-        i2c_detail::data.active = true;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         break;
     case TW_SR_DATA_ACK:
@@ -1092,7 +1158,6 @@ ISR(TWI_vect) {
         if (i2c_detail::data.onReceiveFunction) {
             i2c_detail::data.onReceiveFunction();
         }
-        i2c_detail::data.active = false;
         break;
     default:
         i2c_detail::data.error = TWSR;
