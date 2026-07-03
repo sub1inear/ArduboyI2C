@@ -8,7 +8,8 @@
 The **ArduboyI2C** library provides I2C support for Arduboy multiplayer games. It includes standard I2C functionality, support for multi-controller (master) setups, and helpers for multiplayer handshakes while keeping PROGMEM and RAM usage low.
 
 ## Documentation
-See the [online documentation](https://sub1inear.github.io/ArduboyI2C/) for more information.
+See the [online documentation](https://sub1inear.github.io/ArduboyI2C/) for an API reference.
+See [An I2C Primer](./docs/AnI2CPrimer.md) for a more in-depth explanation of writing I2C games.
 
 ## Features
 - Controller (master) and target (slave) I2C support.
@@ -62,7 +63,6 @@ uint8_t id = I2C::handshake(numPlayers);
 I2C::write(I2C_TARGET_ADDRESS, data, /* wait = */true);
 I2C::read(I2C_TARGET_ADDRESS, data);
 ```
-> Write data to every device with the `I2C_GENERAL_CALL` address.
 ### 5. Callbacks
 ```cpp
 I2C::onReceive(onReceive);
@@ -120,18 +120,3 @@ Writes and `reply()` are limited by `I2C_BUFFER_CAPACITY` (default: 32). Define 
 
 ### Why can't I use certain I2C addresses for my own address?
 Addresses 0–7 and 120–127 are reserved by the I2C spec (general call, etc.).
-
-## Types of Multiplayer
-### State Sync Multiplayer
-State sync multiplayer is where every peer runs its own game logic and sends its state to the other peers.
-It is the **easiest** type of multiplayer to get working because each game does not have to be perfectly syncronized.
-Additionally, it is the most robust and can handle cable disconnects, but it is less efficient and requires more bandwidth.
-
-For a minimal implementation, see the [Basic Example](./examples/Basic/Basic.ino).
-
-### Lockstep Multiplayer
-Lockstep multiplayer is where every device runs the same game logic and only sends inputs to each other.
-It is **harder** to get working because every device must be perfectly syncronized, but it is more efficient and requires less bandwidth.
-Care must be taken to ensure that every device runs the same logic and that no random numbers are generated without a shared seed.
-
-For a minimal implementation, see the [Pong Example](./examples/Pong/Pong.ino).
