@@ -826,7 +826,8 @@ Options:<ul>
 
 <p>Gets a pointer to the internal buffer used for <a class="el" href="class_i2_c.html">I2C</a> communication. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the internal buffer.</dd></dl>
-<p>This function is intended to be used in the onReceive callback to get the data sent by the controller (master). </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">onReceive()</a> </dd></dl>
+<p>This function is intended to be used in the onReceive callback to get the data sent by the controller (master). </p><dl class="section note"><dt>Note</dt><dd>The returned pointer may be safely cast to <span class="tt">const</span> if needed as scratch space. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">onReceive()</a> </dd></dl>
 
 </div>
 </div>

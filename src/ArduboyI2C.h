@@ -44,7 +44,7 @@ SOFTWARE.
  */
 #define I2C_FREQUENCY 100000
 #elif I2C_FREQUENCY > 300000
-#error "I2C_FREQUENCY is too high."
+#error I2C_FREQUENCY is too high.
 #endif
 
 #ifndef I2C_BUFFER_CAPACITY
@@ -56,7 +56,7 @@ SOFTWARE.
  */
 #define I2C_BUFFER_CAPACITY 32
 #elif I2C_BUFFER_CAPACITY > 255
-#error "I2C_BUFFER_CAPACITY is too big."
+#error I2C_BUFFER_CAPACITY is too big.
 #endif
 
 #ifndef I2C_SDA_BIT
@@ -437,6 +437,8 @@ public:
      * \return A pointer to the internal buffer.
      * \details
      * This function is intended to be used in the onReceive callback to get the data sent by the controller (master).
+     * \note
+     * The returned pointer may be safely cast to `const` if needed as scratch space.
      * \see onReceive()
      */
     static const uint8_t *getBuffer();
