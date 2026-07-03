@@ -70,12 +70,11 @@ void setup() {
         drawMessage(F("Please flip the cable\non this device."));
     });
 
-    // display handshaking message, I2C::handshake blocks
-    drawMessage(F("Waiting for other\nplayer..."));
-
     // handshake with other devices and get a unique id for this device
     // note: I2C::handshake enables general calls by default
-    isController = I2C::handshake();
+    isController = I2C::handshake([]() {
+        drawMessage(F("Waiting for other\nplayer..."));
+    });
 
     if (!isController) {
         I2C::onReceive(onReceive);

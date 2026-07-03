@@ -59,28 +59,6 @@ SOFTWARE.
 #error "I2C_BUFFER_CAPACITY is too big."
 #endif
 
-#ifndef I2C_CHECK_CABLE_FLIPPED_CHECKS
-/** \brief
- * The total number of checks to perform when checking for a flipped cable.
- * \details
- * Defaults to 128, with a maximum of 255. Increase for a more accurate detection at the cost of a longer detection time.
- */
-#define I2C_CHECK_CABLE_FLIPPED_CHECKS 128
-#elif I2C_CHECK_CABLE_FLIPPED_CHECKS > 255
-#error "I2C_CHECK_CABLE_FLIPPED_CHECKS is too big."
-#endif
-
-#ifndef I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT
-/** \brief
- * The duration in milliseconds to debounce cable changes when checking for a flipped cable.
- * \details
- * Defaults to 1000 ms, with a maximum of 32767 ms. Increase for more stable detection at the cost of a longer wait time when flipping the cable.
- */
-#define I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT 1000
-#elif I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT > 32767
-#error "I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT is too big."
-#endif
-
 #ifndef I2C_SDA_BIT
 /** \brief
  * The bit of the pin on which the SDA line is connected.
@@ -181,11 +159,6 @@ SOFTWARE.
  * \details
  */
 #define I2C_ERROR_NONE 0xFF
-
-/** \brief
- * Error code returned by I2C::handshake, meaning a handshake has already been completed by the number of players specified.
- */
-#define I2C_HANDSHAKE_FULL 0xFE
 
 /** \brief
  * I2C library major version.
@@ -481,9 +454,9 @@ public:
      * In order to work with this function, custom handshaking functions must send data at a regular interval.
      * Sending 0b00000000 is recommended as it will increase the chance of detection.
      */
-    static void checkCableFlipped(void (*function)());
+    static void checkCableFlipped(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 
-    static bool handshake();
+    static bool handshake(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 };
 
 #ifdef I2C_IMPLEMENTATION
@@ -513,7 +486,7 @@ bool checkCableFlippedCore(bool disconnectFlip = false) {
     uint8_t sdaEdges = 0;
     uint8_t sclEdges = 0;
 
-    for (uint8_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_CHECKS; i++) {
+    for (uint8_t i = 0; i < 128; i++) {
         uint8_t cur = I2C_PIN;
         uint8_t diff = cur ^ prev;
 
@@ -567,6 +540,7 @@ void I2C::begin() {
 void I2C::end() {
     TWCR = 0;
     power_twi_disable();
+
     // disable software pullups
     I2C_PORT &= ~(_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT));
 }
@@ -574,7 +548,6 @@ void I2C::end() {
 void I2C::setAddress(uint8_t address) {
     TWAR = address << 1;
 }
-
 
 uint8_t I2C::getAddress() {
     return TWAR >> 1;
@@ -599,7 +572,7 @@ void I2C::read(uint8_t address, void *buffer, uint8_t size) {
     i2c_detail::startReadWrite(address, TW_READ, size - 1);
     i2c_detail::data.readBuffer = (uint8_t *)buffer;
 
-    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWSTA) | _BV(TWINT);
+    i2c_detail::sendStart();
 
     i2c_detail::waitActive();
 }
@@ -629,23 +602,22 @@ uint8_t I2C::getBufferSize() {
     return i2c_detail::data.bufferSize;
 }
 
-void I2C::checkCableFlipped(void (*function)()) {
+void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
     // wait to finish ongoing operations
     i2c_detail::waitActive();
     TWCR = 0; // disable TWI
 
     if (i2c_detail::checkCableFlippedCore()) {
         // inform the user of the flipped cable
-        function();
-        // wait for cable to be flipped back
-        // debounce cable changes
-        uint16_t start = i2c_detail::millisShort();
-        while (true) {
+        if (startFunction) {
+            startFunction();
+        }
+        for (uint8_t i = 0; i < 64; i++) {
             if (i2c_detail::checkCableFlippedCore(true)) {
-                start = i2c_detail::millisShort();
-            } else if (i2c_detail::millisShort() - start >
-                    I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT) {
-                break;
+                i = 0;
+            }
+            if (loopFunction) {
+                loopFunction();
             }
         }
     }
@@ -653,8 +625,8 @@ void I2C::checkCableFlipped(void (*function)()) {
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) |  _BV(TWINT); // re-enable TWI
 }
 
-bool I2C::handshake() {
-    for (uint8_t i = 0; i < 255; i++) {
+bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
+    for (uint8_t i = 0; i < 128; i++) {
         if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
             (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
             I2C::setAddress(I2C_TARGET_ADDRESS);
@@ -664,8 +636,14 @@ bool I2C::handshake() {
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
     }
     uint8_t zeros = 0b00000000;
+    if (startFunction) {
+        startFunction();
+    }
     do {
         I2C::write(I2C_TARGET_ADDRESS, zeros, true);
+        if (loopFunction) {
+            loopFunction();
+        }
     } while (I2C::getError() != I2C_ERROR_NONE);
     return true;
 
@@ -751,8 +729,6 @@ cpi r18, 0x18
 breq TW_MT_SLA_ACK
 cpi r18, 0x28
 breq TW_MT_DATA_ACK
-cpi r18, 0x38
-breq TW_MT_ARB_LOST ; same as TW_MR_ARB_LOST
 cpi r18, 0x40
 breq TW_MR_SLA_ACK
 cpi r18, 0x50
@@ -795,15 +771,6 @@ TW_MT_DATA_ACK:
     std Z + TWCR, r21
     ; return;
     rjmp pop_reti
-
-TW_MT_ARB_LOST:
-    ; TWCR = REPLY_ACK;
-    std Z + TWCR, r20
-    ; i2c_detail::data.error = TW_MT_ARB_LOST;
-    std Y + %[error], r18
-    ; i2c_detail::data.active = false;
-    ; return;
-    rjmp active_false_reti
 ; ----------------------------------------------------- ;
 
 TW_MR_DATA_NACK:
@@ -828,9 +795,7 @@ TW_MR_DATA_ACK:
     ; }
     ; r18 holds TWSR
     cpi r18, 0x58
-    brne 1f ; 64 instruction limit on branches
-    rjmp stop_reti
-    1:
+    breq stop_reti
 ; ------------------ fallthrough ---------------------- ;
 TW_MR_SLA_ACK:
     ; if (i2c_detail::data.bufferIdx < i2c_detail::data.bufferSize) {
@@ -855,12 +820,8 @@ TW_MR_SLA_ACK:
 SR_ST:
 cpi r18, 0x60
 breq TW_SR_SLA_ACK
-cpi r18, 0x70
-breq TW_SR_GCALL_ACK
 cpi r18, 0x80
 breq TW_SR_DATA_ACK
-cpi r18, 0x90
-breq TW_SR_GCALL_DATA_ACK
 cpi r18, 0xA0
 breq TW_SR_STOP
 cpi r18, 0xA8
@@ -875,7 +836,6 @@ breq TW_ST_LAST_DATA
 rjmp default
 
 TW_SR_SLA_ACK:
-TW_SR_GCALL_ACK:
     ; i2c_detail::data.active = TWSR; (true)
     std Y + %[active], r18 ; r18 holds TWSR
     ; i2c_detail::data.bufferIdx = 0;
@@ -886,7 +846,6 @@ TW_SR_GCALL_ACK:
     rjmp pop_reti
 
 TW_SR_DATA_ACK:
-TW_SR_GCALL_DATA_ACK:
     ; i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++] = TWDR;
     rcall get_buffer_addr
     ldd r19, Z + TWDR
@@ -1120,12 +1079,10 @@ ISR(TWI_vect) {
         break;
     // SR
     case TW_SR_SLA_ACK:
-    case TW_SR_GCALL_ACK:
         i2c_detail::data.bufferIdx = 0;
         i2c_detail::data.active = true;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
         break;
-    case TW_SR_GCALL_DATA_ACK:
     case TW_SR_DATA_ACK:
         i2c_detail::data.twiBuffer[i2c_detail::data.bufferIdx++] = TWDR;
         TWCR = _BV(TWINT) | _BV(TWEN) | _BV(TWIE) | _BV(TWEA);

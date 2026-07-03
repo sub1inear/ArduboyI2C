@@ -120,21 +120,10 @@ bool testBeginEnd() {
 	return true;
 }
 
-bool testAddressGeneralCall() {
-	I2C::setAddressGeneralCall(0x12, false);
-	assert_eq(TWAR, 0x12 << 1);
-	I2C::setAddressGeneralCall(0x12, true);
-	assert_eq(TWAR, (0x12 << 1 | 1));
-	I2C::setGeneralCall(false);
-	assert_eq(TWAR, (0x12 << 1));
-	I2C::setGeneralCall(true);
-	assert_eq(TWAR, (0x12 << 1 | 1));
+bool testAddress() {
 	I2C::setAddress(0x34);
-	assert_eq(TWAR, (0x34 << 1 | 1));
+	assert_eq(TWAR, 0x34 << 1);
 	assert_eq(I2C::getAddress(), 0x34);
-	assert_eq(I2C::getGeneralCall(), true);
-	// general calls must be off
-	I2C::setGeneralCall(false);
 	return true;
 }
 
@@ -213,7 +202,7 @@ void setup() {
 	arduboy.waitNoButtons();
 
 	displayTest(F("beginEnd"), testBeginEnd());
-	displayTest(F("setAddressGC"), testAddressGeneralCall());
+	displayTest(F("setAddress"), testAddress());
 	displayTest(F("ccFlipped"), testCheckCableFlipped());
 
 	bool isController = I2C::handshake();
