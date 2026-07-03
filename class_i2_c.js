@@ -2,7 +2,8 @@ var class_i2_c =
 [
     [ "begin", "class_i2_c.html#a700dc7d79a25b042b59846c0068a773a", null ],
     [ "end", "class_i2_c.html#a7977b9ae901f988109d03fafd8e96493", null ],
-    [ "setAddress", "class_i2_c.html#af348cda2e2eb1062da894fe45584f28c", null ],
+    [ "setAddress", "class_i2_c.html#a3e4840f60c47698e399901ba942ad2fa", null ],
+    [ "getAddress", "class_i2_c.html#a6793e79d781fd88ee18b5f8030007e95", null ],
     [ "write", "class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03", null ],
     [ "write", "class_i2_c.html#aa0054f1d24c4bab77b2a8c37700f56cc", null ],
     [ "write", "class_i2_c.html#ab34eb7608b7732f111832421372f138d", null ],
@@ -17,8 +18,6 @@ var class_i2_c =
     [ "getError", "class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41", null ],
     [ "getBuffer", "class_i2_c.html#a79aafb09ac49b31ac6eb1fecd6d9141e", null ],
     [ "getBufferSize", "class_i2_c.html#a6fbee6e90b41dfa087516e5f09b87176", null ],
-    [ "checkCableFlipped", "class_i2_c.html#a2146f1685988390f3674df95868e88e3", null ],
-    [ "checkEmulator", "class_i2_c.html#aa128e788ab8606c6d815e041151da71d", null ],
-    [ "idToAddress", "class_i2_c.html#a4f4062dba835e29f49d99aac3c3c3984", null ],
-    [ "handshake", "class_i2_c.html#a7f3455d4864527408a933da138f9756c", null ]
+    [ "checkCableFlipped", "class_i2_c.html#a2f6838a1bf488c4710481aa5fd07db1e", null ],
+    [ "handshake", "class_i2_c.html#aa61b835c3ebfd83dae60559c957c4318", null ]
 ];

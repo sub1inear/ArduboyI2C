@@ -104,10 +104,6 @@ Features</h2>
 <ul>
 <li>Controller (master) and target (slave) <a class="el" href="class_i2_c.html">I2C</a> support.</li>
 <li>Built-in handshake function for multiplayer games.</li>
-<li>Multi-controller support for easy peer-to-peer communication.<ul>
-<li>Optional bus busy checks to prevent freezes.</li>
-</ul>
-</li>
 <li>Built-in cable flip detection for FX-C.</li>
 <li>Bufferless reading.</li>
 <li>Minimal memory overhead.</li>
@@ -116,8 +112,8 @@ Features</h2>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
 Why ArduboyI2C over Wire?</h2>
 <ul>
-<li>Highly optimized (saves ~2KiB of PROGMEM and ~200 bytes of RAM).</li>
-<li>Adds functions for multiplayer games (handshake, multi-controller support).</li>
+<li>Highly optimized (saves ~1KiB of PROGMEM and ~200 bytes of RAM).</li>
+<li>Adds easy handshake functionality.</li>
 <li>Adds cable flip detection for FX-C.</li>
 <li>More customizable (see Configuration).</li>
 </ul>
@@ -139,7 +135,6 @@ Quick Start</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
 1. Include the library</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#define I2C_IMPLEMENTATION</span></div>
-<div class="line"><span class="preprocessor">#define I2C_PLATFORM ... </span><span class="comment">// see [Configuration](#configuration) for options</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="_arduboy_i2_c_8h.html">ArduboyI2C.h</a>&gt;</span></div>
 <div class="ttc" id="a_arduboy_i2_c_8h_html"><div class="ttname"><a href="_arduboy_i2_c_8h.html">ArduboyI2C.h</a></div><div class="ttdoc">An I2C library for Arduboy multiplayer games.</div></div>
 </div><!-- fragment --> <h3 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
@@ -152,12 +147,13 @@ Quick Start</h2>
 <div class="ttc" id="aclass_i2_c_html_a700dc7d79a25b042b59846c0068a773a"><div class="ttname"><a href="class_i2_c.html#a700dc7d79a25b042b59846c0068a773a">I2C::begin</a></div><div class="ttdeci">static void begin()</div><div class="ttdoc">Initializes I2C hardware.</div></div>
 </div><!-- fragment --> <h3 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
 3. Handshake</h3>
-<div class="fragment"><div class="line">uint8_t <span class="keywordtype">id</span> = <a class="code hl_function" href="class_i2_c.html#a7f3455d4864527408a933da138f9756c">I2C::handshake</a>(numPlayers);</div>
-<div class="ttc" id="aclass_i2_c_html_a7f3455d4864527408a933da138f9756c"><div class="ttname"><a href="class_i2_c.html#a7f3455d4864527408a933da138f9756c">I2C::handshake</a></div><div class="ttdeci">static uint8_t handshake(uint8_t numPlayers=2)</div><div class="ttdoc">Handshakes with other devices and returns a unique id once complete.</div></div>
+<div class="fragment"><div class="line">uint8_t <span class="keywordtype">id</span> = <a class="code hl_function" href="class_i2_c.html#aa61b835c3ebfd83dae60559c957c4318">I2C::handshake</a>(numPlayers);</div>
+<div class="ttc" id="aclass_i2_c_html_aa61b835c3ebfd83dae60559c957c4318"><div class="ttname"><a href="class_i2_c.html#aa61b835c3ebfd83dae60559c957c4318">I2C::handshake</a></div><div class="ttdeci">static bool handshake(void(*startFunction)()=nullptr, void(*loopFunction)()=nullptr)</div><div class="ttdoc">Waits for another device and returns whether this device is the controller (master) or target (slave)...</div></div>
 </div><!-- fragment --> <h3 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
 4. Read/Write</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a>(I2C_GENERAL_CALL, data, <span class="comment">/* wait = */</span><span class="keyword">true</span>);</div>
-<div class="line"><a class="code hl_function" href="class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0">I2C::read</a>(I2C::idtoAddress(<span class="keywordtype">id</span>), data);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a>(<a class="code hl_define" href="_arduboy_i2_c_8h.html#ae72038a5b7f1da6a2011d5f496ec456f">I2C_TARGET_ADDRESS</a>, data, <span class="comment">/* wait = */</span><span class="keyword">true</span>);</div>
+<div class="line"><a class="code hl_function" href="class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0">I2C::read</a>(<a class="code hl_define" href="_arduboy_i2_c_8h.html#ae72038a5b7f1da6a2011d5f496ec456f">I2C_TARGET_ADDRESS</a>, data);</div>
+<div class="ttc" id="a_arduboy_i2_c_8h_html_ae72038a5b7f1da6a2011d5f496ec456f"><div class="ttname"><a href="_arduboy_i2_c_8h.html#ae72038a5b7f1da6a2011d5f496ec456f">I2C_TARGET_ADDRESS</a></div><div class="ttdeci">#define I2C_TARGET_ADDRESS</div><div class="ttdoc">The target address set by the handshake function.</div><div class="ttdef"><b>Definition</b> ArduboyI2C.h:119</div></div>
 <div class="ttc" id="aclass_i2_c_html_a7fa12af5a3f24c3db496672a4d5c3fe0"><div class="ttname"><a href="class_i2_c.html#a7fa12af5a3f24c3db496672a4d5c3fe0">I2C::read</a></div><div class="ttdeci">static void read(uint8_t address, void *buffer, uint8_t size)</div><div class="ttdoc">Attempts to become the bus controller (master) and reads data over I2C from the specified address.</div></div>
 <div class="ttc" id="aclass_i2_c_html_afb38ec006200442dbdca3fecc9af0d03"><div class="ttname"><a href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03">I2C::write</a></div><div class="ttdeci">static void write(uint8_t address, const void *buffer, uint8_t size, bool wait)</div><div class="ttdoc">Attempts to become the bus controller (master) and sends data over I2C to the specified address.</div></div>
 </div><!-- fragment --> <blockquote class="doxtable">
@@ -165,56 +161,32 @@ Quick Start</h2>
 </blockquote>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
 5. Callbacks</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a>(receiveCallback);</div>
-<div class="line"><a class="code hl_function" href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a>(requestCallback);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="class_i2_c.html#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a>(onReceive);</div>
+<div class="line"><a class="code hl_function" href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a>(onRequest);</div>
 <div class="ttc" id="aclass_i2_c_html_a026eaad0ba8bb6a698d3eaca9dd9887d"><div class="ttname"><a href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d">I2C::onRequest</a></div><div class="ttdeci">static void onRequest(void(*function)())</div><div class="ttdoc">Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).</div></div>
 <div class="ttc" id="aclass_i2_c_html_aba82f80b86f08e2caf0f6cab4860728d"><div class="ttname"><a href="class_i2_c.html#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a></div><div class="ttdeci">static void onReceive(void(*function)())</div><div class="ttdoc">Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).</div></div>
-</div><!-- fragment --> <div class="fragment"><div class="line"><span class="keywordtype">void</span> requestCallback() {</div>
-<div class="line">  <a class="code hl_function" href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1">I2C::reply</a>(data);</div>
+</div><!-- fragment --> <div class="fragment"><div class="line"><span class="keywordtype">void</span> onReceive() {</div>
+<div class="line">    <span class="keyword">const</span> uint8_t *data = <a class="code hl_function" href="class_i2_c.html#a79aafb09ac49b31ac6eb1fecd6d9141e">I2C::getBuffer</a>();</div>
+<div class="line">    ...</div>
+<div class="line">}</div>
+<div class="line"><span class="keywordtype">void</span> onRequest() {</div>
+<div class="line">    <a class="code hl_function" href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1">I2C::reply</a>(data);</div>
 <div class="line">}</div>
 <div class="ttc" id="aclass_i2_c_html_a0039ed613883e9203aa3ebac7b467aa1"><div class="ttname"><a href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1">I2C::reply</a></div><div class="ttdeci">static void reply(const void *buffer, uint8_t size)</div><div class="ttdoc">Replies back to the controller (master).</div></div>
+<div class="ttc" id="aclass_i2_c_html_a79aafb09ac49b31ac6eb1fecd6d9141e"><div class="ttname"><a href="class_i2_c.html#a79aafb09ac49b31ac6eb1fecd6d9141e">I2C::getBuffer</a></div><div class="ttdeci">static const uint8_t * getBuffer()</div><div class="ttdoc">Gets a pointer to the internal buffer used for I2C communication.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
 Configuration</h2>
-<p>Define before <span class="tt">#include &lt;<a class="el" href="_arduboy_i2_c_8h.html" title="An I2C library for Arduboy multiplayer games.">ArduboyI2C.h</a>&gt;</span>. </p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
-Core Settings</h3>
-<table class="markdownTable">
+<p>Define before <span class="tt">#include &lt;<a class="el" href="_arduboy_i2_c_8h.html" title="An I2C library for Arduboy multiplayer games.">ArduboyI2C.h</a>&gt;</span>. </p><table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Macro  </th><th class="markdownTableHeadNone">Default  </th><th class="markdownTableHeadNone">Options  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a621319d4e6b913f077d3c8339eb9b93b" title="The platform being used.">I2C_PLATFORM</a></span>  </td><td class="markdownTableBodyNone">None  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a87c420b46c32c47fd27003f610622f9f" title="Constant for the Arduboy Mini platform.">I2C_PLATFORM_MINI</a></span>, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a5e9cf5cf07df5ab333b78df30cfc54dd" title="Constant for the Arduboy FX-C platform.">I2C_PLATFORM_FX_C</a></span>, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a7135a08961de38f77d684704bd51b2f3" title="Constant for an unknown platform.">I2C_PLATFORM_UNKNOWN</a></span>  </td><td class="markdownTableBodyNone">Platform presets  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">I2C_IMPLEMENTATION</span>  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Must be defined in <b>one</b> source file to include the implementation.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222" title="The initial I2C frequency in Hz.">I2C_FREQUENCY</a></span>  </td><td class="markdownTableBodyNone">100000  </td><td class="markdownTableBodyNone">0-400000  </td><td class="markdownTableBodyNone">Bus frequency (Hz)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">I2C_BUFFER_SIZE</span>  </td><td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone">1-255  </td><td class="markdownTableBodyNone">Transaction buffer size  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
-Reliability</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Macro  </th><th class="markdownTableHeadNone">Default  </th><th class="markdownTableHeadNone">Options  </th><th class="markdownTableHeadNone">Description  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">I2C_CHECK_BUS_BUSY_CHECKS</span>  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">1-255  </td><td class="markdownTableBodyNone">Number of bus busy checks before read/write  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57" title="The total number of checks to perform when checking for a flipped cable.">I2C_CHECK_CABLE_FLIPPED_CHECKS</a></span>  </td><td class="markdownTableBodyNone">128  </td><td class="markdownTableBodyNone">1-255  </td><td class="markdownTableBodyNone">Number of checks for flipped cable detection  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a196ccf6b40cc40bef1769ec2835ca6d0" title="The duration in milliseconds to debounce cable changes when checking for a flipped cable.">I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_TIMEOUT</a></span>  </td><td class="markdownTableBodyNone">1000  </td><td class="markdownTableBodyNone">1-32767  </td><td class="markdownTableBodyNone">Debounce time (ms) for cable flip detection  </td></tr>
-</table>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
-Feature Flags</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Macro  </th><th class="markdownTableHeadNone">Default  </th><th class="markdownTableHeadNone">Options  </th><th class="markdownTableHeadNone">Description  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650" title="Whether or not to enable handshake functionality.">I2C_USE_HANDSHAKE</a></span>  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">0, 1  </td><td class="markdownTableBodyNone">Enable handshake functionality  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a78f76a3fafb4f758fa43d7a9b0782914" title="Whether or not to enable multi-controller (master) safety checks.">I2C_USE_MULTI_CONTROLLER</a></span>  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">0, 1  </td><td class="markdownTableBodyNone">Enable multi-controller safety checks  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4" title="Whether or not to enable flipped cable detection functionality.">I2C_USE_CHECK_CABLE_FLIPPED</a></span>  </td><td class="markdownTableBodyNone">1 (FX-C), 0 (Mini), None (Unknown)  </td><td class="markdownTableBodyNone">0, 1  </td><td class="markdownTableBodyNone">Enable flipped cable detection functionality  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac318e96bb22b8d5710db448875fef550" title="Whether or not to enable software pullups on the SDA and SCL lines.">I2C_USE_SOFTWARE_PULLUPS</a></span>  </td><td class="markdownTableBodyNone">1 (FX-C), 0 (Mini), None (Unknown)  </td><td class="markdownTableBodyNone">0, 1  </td><td class="markdownTableBodyNone">Enable software pullups on SDA/SCL lines  </td></tr>
-</table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
 Migrating from Wire Library</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -234,48 +206,36 @@ Migrating from Wire Library</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Wire.setClock()</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#afd74d0ddc5d78f0d7957c5bbe90eb222" title="The initial I2C frequency in Hz.">I2C_FREQUENCY</a></span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
 FAQ</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
 Why am I getting linker errors about ArduboyI2C functions?</h3>
-<p>First, make sure you define <span class="tt">I2C_IMPLEMENTATION</span> in <b>one</b> source file before including <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html" title="An I2C library for Arduboy multiplayer games.">ArduboyI2C.h</a></span>. If this doesn't fix your issue, make sure you haven't disabled any features that you are using (e.g. disabling <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650" title="Whether or not to enable handshake functionality.">I2C_USE_HANDSHAKE</a></span> will remove the <span class="tt"><a class="el" href="class_i2_c.html#a7f3455d4864527408a933da138f9756c" title="Handshakes with other devices and returns a unique id once complete.">I2C::handshake()</a></span> function, disabling <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4" title="Whether or not to enable flipped cable detection functionality.">I2C_USE_CHECK_CABLE_FLIPPED</a></span> or defining <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a621319d4e6b913f077d3c8339eb9b93b" title="The platform being used.">I2C_PLATFORM</a></span> as <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a87c420b46c32c47fd27003f610622f9f" title="Constant for the Arduboy Mini platform.">I2C_PLATFORM_MINI</a></span> will remove the <span class="tt"><a class="el" href="class_i2_c.html#a2146f1685988390f3674df95868e88e3" title="Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back...">I2C::checkCableFlipped()</a></span> function, etc.).</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
+<p>First, make sure you define <span class="tt">I2C_IMPLEMENTATION</span> in <b>one</b> source file before including <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html" title="An I2C library for Arduboy multiplayer games.">ArduboyI2C.h</a></span>. If this doesn't fix your issue, make sure you haven't disabled any features that you are using (e.g. disabling <span class="tt">I2C_USE_HANDSHAKE</span> will remove the <span class="tt"><a class="el" href="class_i2_c.html#aa61b835c3ebfd83dae60559c957c4318" title="Waits for another device and returns whether this device is the controller (master) or target (slave)...">I2C::handshake()</a></span> function, disabling <span class="tt">I2C_USE_CHECK_CABLE_FLIPPED</span> or defining <span class="tt">I2C_PLATFORM</span> as <span class="tt">I2C_PLATFORM_MINI</span> will remove the <span class="tt"><a class="el" href="class_i2_c.html#a2f6838a1bf488c4710481aa5fd07db1e" title="Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back...">I2C::checkCableFlipped()</a></span> function, etc.).</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
 Why can't I use <span class="tt">delay()</span>, <span class="tt">Serial</span>, <span class="tt">millis()</span>, etc. inside <span class="tt">onReceive</span>/<span class="tt">onRequest</span> callbacks?</h3>
 <p>Callbacks are executed inside the <a class="el" href="class_i2_c.html">I2C</a> interrupt handler, where interrupts are disabled. Functions that rely on interrupts (<span class="tt">delay</span>, <span class="tt">millis</span>, <span class="tt">Serial</span>, etc.) won't work. Keep callbacks short and only use <span class="tt"><a class="el" href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1" title="Replies back to the controller (master).">I2C::reply()</a></span> and <span class="tt"><a class="el" href="class_i2_c.html#a79aafb09ac49b31ac6eb1fecd6d9141e" title="Gets a pointer to the internal buffer used for I2C communication.">I2C::getBuffer()</a></span>. If you need to do extended processing or rely on interrupts, set a <span class="tt">volatile bool</span> flag, copy the data out of the buffer, and then poll the flag in your main loop.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
-My game sometimes freezes, what causes this?</h3>
-<p>In multi-controller setups, two devices may try to control the bus simultaneously. Increase <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#a19f4a62ac3e2dfb317f31cac267b8490" title="The amount of times the bus is checked before continuing with a read/write operation.">I2C_MULTI_CONTROLLER_BUSY_CHECKS</a></span> (default: 16, max: 255) to add more pre-flight bus checks. Check <span class="tt"><a class="el" href="class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41" title="Gets the hardware error which happened in a previous read or write.">I2C::getError()</a></span> after writes/reads for <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#aef7eb8156a252e04e0f1fb9dd52d5f12" title="This device lost arbitration while trying to become the controller (master); another device is alread...">I2C_ERROR_ARB_LOST</a></span> and retry the operation. If this does not fix it or you're not in a multi-controller setup, please open an issue <a href="https://github.com/sub1inear/ArduboyI2C/issues/new">here</a>.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
 Can I use ArduboyI2C in Ardens?</h3>
-<p><a href="https://github.com/tiberiusbrown/Ardens">Ardens</a> currently doesn't simulate <a class="el" href="class_i2_c.html">I2C</a> hardware. Use <span class="tt"><a class="el" href="class_i2_c.html#aa128e788ab8606c6d815e041151da71d" title="Checks if an emulator without I2C support is being used to run the code.">I2C::checkEmulator()</a></span> to detect this and print a message.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
-What does <span class="tt">I2C_HANDSHAKE_FULL</span> mean?</h3>
-<p>It means the bus already has <span class="tt">numPlayers</span> devices connected, so there's no slot left for this device. You can print this message or just call <span class="tt">arduboy.exitToBootloader()</span>.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
+<p><a href="https://github.com/tiberiusbrown/Ardens">Ardens</a> will soon support <a class="el" href="class_i2_c.html">I2C</a> multiplayer; stay tuned.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
 When should I use <span class="tt">I2C::write()</span> vs <span class="tt">I2C::reply()</span>?</h3>
 <p>Use <span class="tt"><a class="el" href="class_i2_c.html#afb38ec006200442dbdca3fecc9af0d03" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">I2C::write()</a></span> as the controller (master) to send data. Use <span class="tt"><a class="el" href="class_i2_c.html#a0039ed613883e9203aa3ebac7b467aa1" title="Replies back to the controller (master).">I2C::reply()</a></span> inside an <span class="tt">onRequest</span> callback to send data back when another device reads from you. Calling <span class="tt">write()</span> from a callback won't work correctly.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
 How do I send/receive more than 32 bytes at once?</h3>
 <p>Writes and <span class="tt">reply()</span> are limited by <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> (default: 32). Define it before including the header (e.g., <span class="tt">#define <a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a> 64</span>). Reads have no such buffer limit.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md26"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
 Why must <span class="tt">I2C::begin()</span> be called after <span class="tt">arduboy.begin()</span>?</h3>
 <p><span class="tt">arduboy.boot()</span> (called inside <span class="tt">arduboy.begin()</span>) disables the TWI (<a class="el" href="class_i2_c.html">I2C</a>) hardware as a side effect. Calling <span class="tt"><a class="el" href="class_i2_c.html#a700dc7d79a25b042b59846c0068a773a" title="Initializes I2C hardware.">I2C::begin()</a></span> afterwards re-initializes it.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md27"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
 Why can't I use certain I2C addresses for my own address?</h3>
-<p>Addresses 0–7 and 120–127 are reserved by the <a class="el" href="class_i2_c.html">I2C</a> spec (general call, broadcast, clock extension, etc.). <span class="tt"><a class="el" href="class_i2_c.html#a4f4062dba835e29f49d99aac3c3c3984" title="Gets the address from a provided id.">I2C::idToAddress()</a></span> maps IDs 0–111 to safe addresses 8–119.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md28"></a>
-Is <span class="tt">checkCableFlipped()</span> 100% reliable?</h3>
-<p>No, it works by sampling which line looks more like a clock signal. Edge cases (very short cables, noisy lines, both devices idle) can cause false positives. Increase <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#afecd6be59c3d3d809937b074f2f5fd57" title="The total number of checks to perform when checking for a flipped cable.">I2C_CHECK_CABLE_FLIPPED_CHECKS</a></span> for more accuracy at the cost of a longer detection time.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md29"></a>
-How do I minimize memory usage?</h3>
-<p>Disable unused features (<span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#af78725d267e97bdc10ee21e78c798650" title="Whether or not to enable handshake functionality.">I2C_USE_HANDSHAKE</a></span> and <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ad9778e6e274898472e7b5fab6efa13c4" title="Whether or not to enable flipped cable detection functionality.">I2C_USE_CHECK_CABLE_FLIPPED</a></span>) and reduce <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> to the smallest value that meets your needs. Always use <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac637ca58cc3535ed0e85eb8878718815" title="The address used for general calls.">I2C_GENERAL_CALL_ADDR</a></span> and have every device be a controller/master. The Configuration table lists all available toggles.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md30"></a>
+<p>Addresses 0–7 and 120–127 are reserved by the <a class="el" href="class_i2_c.html">I2C</a> spec (general call, etc.).</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
 Types of Multiplayer</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md31"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
 State Sync Multiplayer</h3>
 <p>State sync multiplayer is where every peer runs its own game logic and sends its state to the other peers. It is the <b>easiest</b> type of multiplayer to get working because each game does not have to be perfectly syncronized. Additionally, it is the most robust and can handle cable disconnects, but it is less efficient and requires more bandwidth.</p>
 <p>For a minimal implementation, see the <a href="./examples/Basic/Basic.ino">Basic Example</a>.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md32"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
 Lockstep Multiplayer</h3>
 <p>Lockstep multiplayer is where every device runs the same game logic and only sends inputs to each other. It is <b>harder</b> to get working because every device must be perfectly syncronized, but it is more efficient and requires less bandwidth. Care must be taken to ensure that every device runs the same logic and that no random numbers are generated without a shared seed.</p>
 <p>For a minimal implementation, see the <a href="./examples/Pong/Pong.ino">Pong Example</a>. </p>
