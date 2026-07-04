@@ -488,34 +488,57 @@ public:
  */
 namespace i2c_detail {
 struct i2c_data_t {
+    /** \brief
+     * The function to be called when data is requested from the device's address (a read).
+     */
     void (*onRequestFunction)() = nullptr;
+
+    /** \brief
+     * The function to be called when data is sent to the device's address (a write).
+     */
     void (*onReceiveFunction)() = nullptr;
 
-
-    // pointer to the buffer for reads
-    // avoids copying into twiBuffer then to another buffer out
-    // safe because I2C::read blocks
+    /** \brief
+     * A pointer to the buffer for reads.
+     * This avoids copy into twiBuffer then to another buffer out, and is safe because I2C::read blocks.
+     */
     volatile uint8_t *readBuffer;
-    // buffer for writes and target (slave) operations
+
+    /** \brief
+     * A buffer for storing data to be sent.
+     */
     uint8_t twiBuffer[I2C_BUFFER_CAPACITY];
-    // index into readBuffer or twiBuffer
+
+    /** \brief
+     * The index into the readBuffer or twiBuffer.
+     */
     volatile uint8_t bufferIdx;
-    // size of data in readBuffer or twiBuffer
+    /** \brief
+     * The size of data in readBuffer or twiBuffer.
+     */
     volatile uint8_t bufferSize;
 
-    // whether or not the controller (master) is currently transmitting or receiving data
-    // not active for target (slave) operations
+    /** \brief
+     * Whether or not the controller (master) is currently transmitting or receiving data.
+     * Not active for target (slave) operations.
+     */
     volatile bool active;
 
-    // the address and read/write bit for a transmission (7-bit address << 1 | read/write bit)
+    /** \brief
+     * The address and read/write bit for a transmission (7-bit address << 1 | read/write bit).
+     */
     volatile uint8_t slaRW;
-    // the error code for the last transmission
-    volatile uint8_t error;
 
+    /** \brief
+     * The error code for the last transmission.
+     */
+    volatile uint8_t error;
 } data;
 
-// counts the number of edges on the SDA and SCL lines to determine if the cable is flipped
-// relies on I2C::handshake() sending 0b00000000 so that the SCL line is toggled and the SDA line is held low
+/** \brief
+ * Counts the number of edges on the SDA and SCL lines to determine if the cable is flipped.
+ * Relies on I2C::handshake() sending 0b00000000 so that the SCL line is toggled and the SDA line is held low.
+ */
 bool checkCableFlippedCore(bool disconnectFlip) {
     uint8_t prev = I2C_PIN;
     uint8_t sdaEdges = 0;
