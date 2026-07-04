@@ -712,7 +712,9 @@ const uint8_t *I2C::getBuffer() {
 }
 
 uint8_t I2C::getBufferSize() {
-    return i2c_detail::data.bufferSize;
+    // i2c_detail::data.bufferSize is undefined during a target (slave) receive
+    // i2c_detail::data.bufferIdx is incremented and therefore represents the current size in the buffer
+    return i2c_detail::data.bufferIdx;
 }
 
 void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
