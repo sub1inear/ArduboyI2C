@@ -86,8 +86,7 @@ Ball ball;
 Player leftPlayer;
 Player rightPlayer;
 
-// right player is the controller (master) and left player is the target (slave)
-bool isRightPlayer = false;
+I2C::Role role;
 
 bool serveRight = true;
 bool serveDown = false;
@@ -308,20 +307,20 @@ void setup() {
         drawMessage(F("Please flip the cable\non this device."));
     });
 
-    isRightPlayer = I2C::handshake([]() {
+    role = I2C::handshake([]() {
         // waiting for a handshake, display message
         // F() macro ensures the string is stored in flash memory instead of RAM
         drawMessage(F("Waiting for other\nplayer..."));
     });
 
     // if we're the target (slave), ...
-    if (!isRightPlayer) {
+    if (role == I2C::Role::Target) {
         // set up the I2C callbacks
         I2C::onReceive(onReceive);
         I2C::onRequest(onRequest);
         // set our address to the null address
         // so we won't respond to any requests until we want to
-        I2C::setAddress(I2C_NULL_ADDRESS);
+        I2C::setAddress(I2C::nullAddress);
     }
 
     reset();
@@ -334,21 +333,23 @@ void loop() {
     uint8_t localInput = arduboy.buttonsState();
     uint8_t leftInput, rightInput;
 
-    if (isRightPlayer) {
+    if (role == I2C::Role::Controller) {
+        // controller is right player
         rightInput = localInput;
         // send our input to the other device and wait for it to be received
         do {
-            I2C::write(I2C_TARGET_ADDRESS, rightInput, true);
-        } while (I2C::getError() != I2C_ERROR_NONE);
+            I2C::write(I2C::targetAddress, rightInput, I2C::Mode::Sync);
+        } while (I2C::getError() != I2C::Error::None);
         // read the other device's input and wait for it to be received
         do {
-            I2C::read(I2C_TARGET_ADDRESS, leftInput);
-        } while (I2C::getError() != I2C_ERROR_NONE);
+            I2C::read(I2C::targetAddress, leftInput);
+        } while (I2C::getError() != I2C::Error::None);
     } else {
         // let the onReceive() callback get our input through targetInput
+        // target is left player
         targetInput = leftInput = localInput;
-        // set our address to I2C_TARGET_ADDRESS; we're ready
-        I2C::setAddress(I2C_TARGET_ADDRESS);
+        // set our address to I2C::targetAddress; we're ready
+        I2C::setAddress(I2C::targetAddress);
         // wait for the controller (master) to send us its input
         while (!controllerReceived) { }
         // store the controller's input and reset the flag
@@ -362,7 +363,7 @@ void loop() {
         // set our address to the null address; we're done
         // otherwise the controller may get ahead of us and request our input again before we have a chance to update it
         // thus destroying our synchronization
-        I2C::setAddress(I2C_NULL_ADDRESS);
+        I2C::setAddress(I2C::nullAddress);
     }
 
     update(leftInput, rightInput);

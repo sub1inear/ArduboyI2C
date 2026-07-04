@@ -36,9 +36,7 @@ struct Player {
 Player localPlayer = { 0, 0 };
 Player remotePlayer = { 0, 0 };
 
-// whether this device is the controller (master) and can read/write
-// or the target (slave) and can only read/write when asked to
-bool isController = false;
+I2C::Role role = I2C::Role::None;
 
 void drawMessage(const __FlashStringHelper *message) {
     // __FlashStringHelper ensures message is stored in flash memory (with the F() macro)
@@ -73,14 +71,14 @@ void setup() {
     });
 
     // waits for other device and determines if this device is the controller (master) or target (slave)
-    isController = I2C::handshake([]() {
+    role = I2C::handshake([]() {
         // waiting for a handshake, display message
         // F() macro ensures the string is stored in flash memory instead of RAM
         drawMessage(F("Waiting for other\nplayer..."));
     });
 
-    // if we're not the controller (master), set up the receive and request callbacks
-    if (!isController) {
+    // if we're the target (slave), set up the receive and request callbacks
+    if (role == I2C::Role::Target) {
         I2C::onReceive(onReceive);
         I2C::onRequest(onRequest);
     }
@@ -105,19 +103,20 @@ void loop() {
     localPlayer.y = constrain(localPlayer.y, 0, HEIGHT - 8);
 
     // if we're the controller (master), ...
-    if (isController) {
+    if (role == I2C::Role::Controller) {
         // read the remote player data from the other device
-        I2C::read(I2C_TARGET_ADDRESS, remotePlayer);
+        I2C::read(I2C::targetAddress, remotePlayer);
         // send our player data to the other device
-        I2C::write(I2C_TARGET_ADDRESS, localPlayer, false);
+        // no point in waiting for the write to complete, so we send asynchronously
+        I2C::write(I2C::targetAddress, localPlayer, I2C::Mode::Async);
     } /* else {
         // if we're the target (slave), onRequest() and onReceive() will send and receive our data
     } */
 
     // draw the players
     // controller -> filled, target -> outlined
-    Player &filledPlayer = (isController) ? localPlayer : remotePlayer;
-    Player &outlinedPlayer = (isController) ? remotePlayer : localPlayer;
+    Player &filledPlayer = (role == I2C::Role::Controller) ? localPlayer : remotePlayer;
+    Player &outlinedPlayer = (role == I2C::Role::Controller) ? remotePlayer : localPlayer;
 
     arduboy.fillRect(filledPlayer.x, filledPlayer.y, 8, 8, WHITE);
     arduboy.drawRect(outlinedPlayer.x, outlinedPlayer.y, 8, 8, WHITE);
