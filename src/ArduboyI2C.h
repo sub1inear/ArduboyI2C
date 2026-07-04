@@ -59,6 +59,18 @@ SOFTWARE.
 #error I2C_BUFFER_CAPACITY is too big.
 #endif
 
+#ifndef I2C_HANDSHAKE_BUSY_CHECKS
+/** \brief
+ * Number of times to check for a busy bus during a handshake.
+ * \details
+ * Defaults to 128, with a maximum of 65535. Increase for a more accurate detection at the cost of a longer detection time,
+ * especially when a custom loop function is provided to the handshake function.
+ */
+#define I2C_HANDSHAKE_BUSY_CHECKS 128
+#elif I2C_HANDSHAKE_BUSY_CHECKS > 65535
+#error I2C_HANDSHAKE_BUSY_CHECKS is too big.
+#endif
+
 #ifndef I2C_CHECK_CABLE_FLIPPED_CHECKS
 /** \brief
  * The total number of checks to perform when checking for a flipped cable.
@@ -72,7 +84,7 @@ SOFTWARE.
 
 #ifndef I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS
 /** \brief
- * The number of checks to perform when debouncing the cable flip detection.
+ * The number of consecutive cable flip checks that pass before confirming the cable has been flipped back.
  * \details
  * Defaults to 128, with a maximum of 65535.
  * Increase for more accurate debouncing at the cost of a longer detection time.
@@ -80,18 +92,6 @@ SOFTWARE.
 #define I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS 128
 #elif I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS > 65535
 #error I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS is too big.
-#endif
-
-#ifndef I2C_HANDSHAKE_BUSY_CHECKS
-/** \brief
- * The total number of busy checks to perform when waiting for a handshake.
- * \details
- * Defaults to 128, with a maximum of 65535. Increase for a more accurate detection at the cost of a longer detection time,
- * especially when a custom loop function is provided to the handshake function.
- */
-#define I2C_HANDSHAKE_BUSY_CHECKS 128
-#elif I2C_HANDSHAKE_BUSY_CHECKS > 65535
-#error I2C_HANDSHAKE_BUSY_CHECKS is too big.
 #endif
 
 #ifndef I2C_SDA_BIT

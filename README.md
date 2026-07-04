@@ -79,6 +79,11 @@ void onRequest() {
 }
 ```
 
+## 6. Follow the 3 Great Rules of ArduboyI2C:
+1. One controller (master) and one or more targets (slaves) at all times.
+2. Define `I2C_IMPLEMENTATION` in **one** source file before including `ArduboyI2C.h`.
+3. In callbacks, use `I2C::reply()` and `I2C::getBuffer()`. Do not use `delay()`, `Serial`, `millis()`, etc.
+
 ## Configuration
 Define before `#include <ArduboyI2C.h>`.
 | Macro | Default | Options | Description |
@@ -86,6 +91,9 @@ Define before `#include <ArduboyI2C.h>`.
 | `I2C_IMPLEMENTATION` | - | - | Must be defined in **one** source file to include the implementation. |
 | `I2C_FREQUENCY` | 100000 | 0-400000 | Bus frequency (Hz) |
 | `I2C_BUFFER_SIZE` | 32 | 1-255 | Transaction buffer size |
+| `I2C_HANDSHAKE_BUSY_CHECKS` | 128 | 1-65535 | Number of times to check for a busy bus during a handshake. |
+| `I2C_CHECK_CABLE_FLIPPED_CHECKS` | 128 | 1-65535 | Number of checks to perform during cable flip detection. |
+| `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS` | 16 | 1-65535 |  Number of passing flip checks before confirming cable is flipped back. |
 
 ## Migrating from Wire Library
 | Wire API               | ArduboyI2C              |
@@ -100,8 +108,7 @@ Define before `#include <ArduboyI2C.h>`.
 
 ## FAQ
 ### Why am I getting linker errors about ArduboyI2C functions?
-First, make sure you define `I2C_IMPLEMENTATION` in **one** source file before including `ArduboyI2C.h`.
-If this doesn't fix your issue, make sure you haven't disabled any features that you are using (e.g. disabling `I2C_USE_HANDSHAKE` will remove the `I2C::handshake()` function, disabling `I2C_USE_CHECK_CABLE_FLIPPED` or defining `I2C_PLATFORM` as `I2C_PLATFORM_MINI` will remove the `I2C::checkCableFlipped()` function, etc.).
+Make sure you define `I2C_IMPLEMENTATION` in **one** source file before including `ArduboyI2C.h`.
 
 ### Why can't I use `delay()`, `Serial`, `millis()`, etc. inside `onReceive`/`onRequest` callbacks?
 Callbacks are executed inside the I2C interrupt handler, where interrupts are disabled. Functions that rely on interrupts (`delay`, `millis`, `Serial`, etc.) won't work. Keep callbacks short and only use `I2C::reply()` and `I2C::getBuffer()`. If you need to do extended processing or rely on interrupts, set a `volatile bool` flag, copy the data out of the buffer, and then poll the flag in your main loop.
@@ -120,3 +127,6 @@ Writes and `reply()` are limited by `I2C_BUFFER_CAPACITY` (default: 32). Define 
 
 ### Why can't I use certain I2C addresses for my own address?
 Addresses 0–7 and 120–127 are reserved by the I2C spec (general call, etc.).
+
+### I've passed my own loop function to `I2C::handshake()` or `I2C::checkCableFlipped()`, and it breaks handshaking/cable flip detection. Why?
+The loop function disrupts the careful timing of the handshake/cable flip detection. You must experimentally redefine the `I2C_*_CHECKS` macros; see [Network of the Damned](./ports/NetworkOfTheDamned/Arduboy3D.ino) for an example of how to do this. Most likely, you want to increase `I2C_HANDSHAKE_CHECKS` and `I2C_CHECK_CABLE_FLIPPED_CHECKS` while decreasing `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS`.
