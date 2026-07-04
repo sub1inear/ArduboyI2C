@@ -79,7 +79,7 @@ void onRequest() {
 }
 ```
 
-## 6. Follow the 3 Great Rules of ArduboyI2C:
+## 6. Follow these Rules:
 1. One controller (master) and one or more targets (slaves) at all times.
 2. Define `I2C_IMPLEMENTATION` in **one** source file before including `ArduboyI2C.h`.
 3. In callbacks, use `I2C::reply()` and `I2C::getBuffer()`. Do not use `delay()`, `Serial`, `millis()`, etc.
