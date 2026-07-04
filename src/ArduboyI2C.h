@@ -59,6 +59,41 @@ SOFTWARE.
 #error I2C_BUFFER_CAPACITY is too big.
 #endif
 
+#ifndef I2C_CHECK_CABLE_FLIPPED_CHECKS
+/** \brief
+ * The total number of checks to perform when checking for a flipped cable.
+ * \details
+ * Defaults to 128, with a maximum of 65535. Increase for a more accurate detection at the cost of a longer detection time.
+ */
+#define I2C_CHECK_CABLE_FLIPPED_CHECKS 128
+#elif I2C_CHECK_CABLE_FLIPPED_CHECKS > 65535
+#error I2C_CHECK_CABLE_FLIPPED_CHECKS is too big.
+#endif
+
+#ifndef I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS
+/** \brief
+ * The number of checks to perform when debouncing the cable flip detection.
+ * \details
+ * Defaults to 128, with a maximum of 65535.
+ * Increase for more accurate debouncing at the cost of a longer detection time.
+ */
+#define I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS 128
+#elif I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS > 65535
+#error I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS is too big.
+#endif
+
+#ifndef I2C_HANDSHAKE_BUSY_CHECKS
+/** \brief
+ * The total number of busy checks to perform when waiting for a handshake.
+ * \details
+ * Defaults to 128, with a maximum of 65535. Increase for a more accurate detection at the cost of a longer detection time,
+ * especially when a custom loop function is provided to the handshake function.
+ */
+#define I2C_HANDSHAKE_BUSY_CHECKS 128
+#elif I2C_HANDSHAKE_BUSY_CHECKS > 65535
+#error I2C_HANDSHAKE_BUSY_CHECKS is too big.
+#endif
+
 #ifndef I2C_SDA_BIT
 /** \brief
  * The bit of the pin on which the SDA line is connected.
@@ -468,7 +503,8 @@ public:
      * });
      * bool isController = I2C::handshake();
      * \endcode
-     * \note
+     * \note Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.
+     * Loop functions should be as fast as possible; it is not recommended to use `arduboy.nextFrame()` within a loop function.
      */
     static void checkCableFlipped(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 
@@ -477,6 +513,8 @@ public:
      * \param startFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
      * \param loopFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
      * \return `true` if this device is the controller (master), `false` if it is the target (slave).
+     * \note Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.
+     * Loop functions should be as fast as possible; it is not recommended to use `arduboy.nextFrame()` within a loop function.
      */
     static bool handshake(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 };
@@ -544,7 +582,8 @@ bool checkCableFlippedCore(bool disconnectFlip) {
     uint8_t sdaEdges = 0;
     uint8_t sclEdges = 0;
 
-    for (uint8_t i = 0; i < 128; i++) {
+    // uint16_t will optimize to a uint8_t if I2C_CHECK_CABLE_FLIPPED_CHECKS < 256
+    for (uint16_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_CHECKS; i++) {
         uint8_t cur = I2C_PIN;
         // calculates the change between the current and previous pin states
         uint8_t diff = cur ^ prev;
@@ -690,7 +729,8 @@ void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
         // wait for the cable to be flipped back
         // debounce the cable flip detection by ensuring 64 counts of success
         // putting the cable back it can generate noise
-        for (uint8_t i = 0; i < 64; i++) {
+        // uint16_t will optimize to a uint8_t if I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS < 256
+        for (uint16_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS; i++) {
             // pass true to indicate a disconnect is a flip
             // so we will wait while the cable is disconnected
             if (i2c_detail::checkCableFlippedCore(true)) {
@@ -709,7 +749,8 @@ void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
 bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
     // check if the bus is free (SDA and SCL are high for 128 half-periods)
     // if it is not, another controller (master) has gotten here before us
-    for (uint8_t i = 0; i < 128; i++) {
+    // uint16_t will optimize to a uint8_t if I2C_HANDSHAKE_BUSY_CHECKS < 256
+    for (uint16_t i = 0; i < I2C_HANDSHAKE_BUSY_CHECKS; i++) {
         if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
             (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
             // set our address to the target address

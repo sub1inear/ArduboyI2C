@@ -2,6 +2,9 @@
 #include <ArduboyTones.h>
 #define I2C_IMPLEMENTATION
 #define I2C_FREQUENCY 200000
+#define I2C_HANDSHAKE_BUSY_CHECKS 2000
+#define I2C_CHECK_CABLE_FLIPPED_CHECKS 1500
+#define I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS 4
 #include <ArduboyI2C.h>
 #include "Game.h"
 #include "Draw.h"
@@ -196,15 +199,16 @@ static void PlatformNet::Init()
   I2C::begin();
 
 
-  I2C::checkCableFlipped([]() {
+  I2C::checkCableFlipped(nullptr, []() {
     Game::menu.DrawHandshaking(PSTR("Please flip the cable"), 4, CENTER_STR("Please flip the cable", 4));
     arduboy.display(CLEAR_BUFFER);
   });
 
-  Game::menu.DrawHandshaking(PSTR("Waiting..."), 4, CENTER_STR("Waiting...", 4));
-  arduboy.display(CLEAR_BUFFER);
 
-  bool isController = I2C::handshake();
+  bool isController = I2C::handshake(nullptr, [] {
+    Game::menu.DrawHandshaking(PSTR("Waiting..."), 4, CENTER_STR("Waiting...", 4));
+    arduboy.display(CLEAR_BUFFER);
+  });
   if (!isController)
   {
     I2C::setAddress(I2C_NULL_ADDRESS);
@@ -251,7 +255,6 @@ void setup()
 
 //  SeedRandom((uint16_t) arduboy.generateRandomSeed());
   Game::Init();
-  PlatformNet::Init();
 
   lastTimingSample = millis();
   lastGoodTickTime = millis();

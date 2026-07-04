@@ -15,8 +15,8 @@ void Menu::Init()
 void Menu::Draw()
 {
 	Platform::FillScreen(COLOUR_BLACK);
-	Font::PrintString(PSTR("CATACOMBS OF THE DAMNED"), 2, 18, COLOUR_WHITE);
-	Font::PrintString(PSTR("by @jameshhoward"), 7, 32, COLOUR_WHITE);
+	Font::PrintString(PSTR("NETWORK OF THE DAMNED"), 2, 22, COLOUR_WHITE);
+	Font::PrintString(PSTR("by @jameshhoward and @sublinear"), 7, 2, COLOUR_WHITE);
 	Font::PrintString(PSTR("Start"), 4, 24, COLOUR_WHITE);
 	Font::PrintString(PSTR("Sound:"), 5, 24, COLOUR_WHITE);
 
@@ -97,15 +97,15 @@ void Menu::DrawEnteringLevel()
 
 void Menu::DrawHandshaking(const char *str, uint8_t line, uint8_t x)
 {
-	Platform::FillScreen(COLOUR_BLACK);
-
 	Font::PrintString(str, line, x, COLOUR_WHITE);
 
-	Font::PrintString(PSTR("CATACOMBS OF THE DAMNED"), 2, 18, COLOUR_WHITE);
-	Font::PrintString(PSTR("by @jameshhoward"), 7, 32, COLOUR_WHITE);
+	Font::PrintString(PSTR("NETWORK OF THE DAMNED"), 2, 22, COLOUR_WHITE);
+	Font::PrintString(PSTR("by @jameshhoward and @sublinear"), 7, 2, COLOUR_WHITE);
 
-	Renderer::DrawScaled(torchSpriteData1, 0, 10, 9, 255);
-	Renderer::DrawScaled(torchSpriteData1, DISPLAY_WIDTH - 18, 10, 9, 255);
+	static uint8_t tick = 0;
+	const uint16_t* torchSprite = (tick++) & 16 ? torchSpriteData1 : torchSpriteData2;
+	Renderer::DrawScaled(torchSprite, 0, 10, 9, 255);
+	Renderer::DrawScaled(torchSprite, DISPLAY_WIDTH - 18, 10, 9, 255);
 }
 
 void Menu::TickGameOver()

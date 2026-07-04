@@ -35,6 +35,7 @@ void Game::Init()
 
 void Game::StartGame()
 {
+  	PlatformNet::Init();
 	globalTickFrame = 0;
 	SeedRandom(0);
 	floor = 1;
