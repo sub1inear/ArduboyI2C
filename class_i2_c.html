@@ -133,6 +133,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a79aafb09ac49b31ac6eb1fecd6d9141e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a pointer to the internal buffer used for <a class="el" href="class_i2_c.html">I2C</a> communication.  <br /></td></tr>
 <tr class="memitem:a6fbee6e90b41dfa087516e5f09b87176" id="r_a6fbee6e90b41dfa087516e5f09b87176"><td class="memItemLeft">static uint8_t&#160;</td><td class="memItemRight"><a class="el" href="#a6fbee6e90b41dfa087516e5f09b87176">getBufferSize</a> ()</td></tr>
 <tr class="memdesc:a6fbee6e90b41dfa087516e5f09b87176"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the size of the data in the internal buffer.  <br /></td></tr>
+<tr class="memitem:ab90b7b0e1fc4d6ca6ee60fea4ca0817f" id="r_ab90b7b0e1fc4d6ca6ee60fea4ca0817f"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#ab90b7b0e1fc4d6ca6ee60fea4ca0817f">getActive</a> ()</td></tr>
+<tr class="memdesc:ab90b7b0e1fc4d6ca6ee60fea4ca0817f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets whether or not the controller (master) is currently transmitting or receiving data.  <br /></td></tr>
 <tr class="memitem:a2f6838a1bf488c4710481aa5fd07db1e" id="r_a2f6838a1bf488c4710481aa5fd07db1e"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a2f6838a1bf488c4710481aa5fd07db1e">checkCableFlipped</a> (void(*startFunction)()=nullptr, void(*loopFunction)()=nullptr)</td></tr>
 <tr class="memdesc:a2f6838a1bf488c4710481aa5fd07db1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the <a class="el" href="class_i2_c.html">I2C</a> cable is flipped, calling a function if it is and waiting for it to be flipped back.  <br /></td></tr>
 <tr class="memitem:aa61b835c3ebfd83dae60559c957c4318" id="r_aa61b835c3ebfd83dae60559c957c4318"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#aa61b835c3ebfd83dae60559c957c4318">handshake</a> (void(*startFunction)()=nullptr, void(*loopFunction)()=nullptr)</td></tr>
@@ -193,7 +195,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Deinitializes <a class="el" href="class_i2_c.html">I2C</a> hardware. </p>
-<p>This function powers off and deinitializes the TWI hardware. It may be reinitialized by calling <span class="tt"><a class="el" href="#a700dc7d79a25b042b59846c0068a773a" title="Initializes I2C hardware.">I2C::begin()</a></span> again. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#a700dc7d79a25b042b59846c0068a773a" title="Initializes I2C hardware.">begin()</a> </dd></dl>
+<p>This function powers off and deinitializes the TWI hardware. It may be reinitialized by calling <a class="el" href="#a700dc7d79a25b042b59846c0068a773a" title="Initializes I2C hardware.">begin()</a> again. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#a700dc7d79a25b042b59846c0068a773a" title="Initializes I2C hardware.">begin()</a> </dd></dl>
 
 </div>
 </div>
@@ -227,6 +229,7 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a6793e79d781fd88ee18b5f8030007e95" title="Gets the 7-bit address of this device.">getAddress()</a> </dd></dl>
 
 </div>
 </div>
@@ -255,6 +258,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Gets the 7-bit address of this device. </p>
 <dl class="section return"><dt>Returns</dt><dd>The 7-bit address of this device. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a3e4840f60c47698e399901ba942ad2fa" title="Sets the 7-bit address of this device.">setAddress()</a> </dd></dl>
 
 </div>
 </div>
@@ -305,8 +309,12 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> and defaults to 32. If the program needs to send more than 32 bytes at a time, <span class="tt"><a class="el" href="_arduboy_i2_c_8h.html#ac73f85d176e73ac821bf6c21abee83b3" title="The capacity of the buffer used for writes/target (slave) operations.">I2C_BUFFER_CAPACITY</a></span> must be defined before including <a class="el" href="_arduboy_i2_c_8h.html" title="An I2C library for Arduboy multiplayer games.">ArduboyI2C.h</a> to be greater. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd>transmit() <a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">read()</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Internally, this function uses a buffer to enable asynchronous writes. The buffer size is controlled by the macro I2C_BUFFER_CAPACITY and defaults to 32. If the program needs to send more than 32 bytes at a time, I2C_BUFFER_CAPACITY must be defined before including <a class="el" href="_arduboy_i2_c_8h.html" title="An I2C library for Arduboy multiplayer games.">ArduboyI2C.h</a> to be greater. </dd>
+<dd>
+To poll whether asynchronous writes have completed, see if <a class="el" href="#ab90b7b0e1fc4d6ca6ee60fea4ca0817f" title="Gets whether or not the controller (master) is currently transmitting or receiving data.">getActive()</a> returns false. </dd>
+<dd>
+This function will not work inside the <a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">onRequest()</a> callback. Send data with <a class="el" href="#a0039ed613883e9203aa3ebac7b467aa1" title="Replies back to the controller (master).">reply()</a> instead. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a0039ed613883e9203aa3ebac7b467aa1" title="Replies back to the controller (master).">reply()</a> <a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">read()</a> <a class="el" href="#ab90b7b0e1fc4d6ca6ee60fea4ca0817f" title="Gets whether or not the controller (master) is currently transmitting or receiving data.">getActive()</a> </dd></dl>
 
 </div>
 </div>
@@ -351,7 +359,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object to send. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
   </table>
@@ -756,7 +764,8 @@ template&lt;typename T, size_t N&gt; </div>
 <div class="line">}</div>
 <div class="ttc" id="aclass_i2_c_html_a79aafb09ac49b31ac6eb1fecd6d9141e"><div class="ttname"><a href="#a79aafb09ac49b31ac6eb1fecd6d9141e">I2C::getBuffer</a></div><div class="ttdeci">static const uint8_t * getBuffer()</div><div class="ttdoc">Gets a pointer to the internal buffer used for I2C communication.</div></div>
 <div class="ttc" id="aclass_i2_c_html_aba82f80b86f08e2caf0f6cab4860728d"><div class="ttname"><a href="#aba82f80b86f08e2caf0f6cab4860728d">I2C::onReceive</a></div><div class="ttdeci">static void onReceive(void(*function)())</div><div class="ttdoc">Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).</div></div>
-</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">onRequest()</a> <a class="el" href="#a0039ed613883e9203aa3ebac7b467aa1" title="Replies back to the controller (master).">reply()</a> <a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">read()</a> </dd></dl>
+</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>Interrupts are disabled during this callback. Any functions called within it should not rely on interrupts (i.e. no <span class="tt">Serial</span>, <span class="tt">delay</span>, <span class="tt">millis</span>, etc.). </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">onRequest()</a> <a class="el" href="#a7fa12af5a3f24c3db496672a4d5c3fe0" title="Attempts to become the bus controller (master) and reads data over I2C from the specified address.">read()</a> </dd></dl>
 
 </div>
 </div>
@@ -826,7 +835,7 @@ Options:<ul>
 
 <p>Gets a pointer to the internal buffer used for <a class="el" href="class_i2_c.html">I2C</a> communication. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the internal buffer.</dd></dl>
-<p>This function is intended to be used in the onReceive callback to get the data sent by the controller (master). </p><dl class="section note"><dt>Note</dt><dd>The returned pointer may be safely cast to <span class="tt">const</span> if needed as scratch space. </dd></dl>
+<p>This function is intended to be used in the onReceive callback to get the data sent by the controller (master). </p><dl class="section note"><dt>Note</dt><dd>The returned pointer may be safely cast to remove the <span class="tt">const</span> if needed as scratch space. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">onReceive()</a> </dd></dl>
 
 </div>
@@ -857,6 +866,35 @@ Options:<ul>
 <p>Gets the size of the data in the internal buffer. </p>
 <dl class="section return"><dt>Returns</dt><dd>The size of the data in the internal buffer.</dd></dl>
 <p>This function is intended to be used in the onReceive callback to get the size of the data sent by the controller (master). </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#aba82f80b86f08e2caf0f6cab4860728d" title="Sets up/disables the callback to be called when data is sent to the device&#39;s address (a write).">onReceive()</a> </dd></dl>
+
+</div>
+</div>
+<a id="ab90b7b0e1fc4d6ca6ee60fea4ca0817f" name="ab90b7b0e1fc4d6ca6ee60fea4ca0817f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab90b7b0e1fc4d6ca6ee60fea4ca0817f">&#9670;&#160;</a></span>getActive()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool I2C::getActive </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets whether or not the controller (master) is currently transmitting or receiving data. </p>
+<dl class="section return"><dt>Returns</dt><dd><span class="tt">true</span> if the controller (master) is currently transmitting or receiving data, <span class="tt">false</span> otherwise.</dd></dl>
+<p>This function is intended to be used to check if an asynchronous write has completed. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="#afb38ec006200442dbdca3fecc9af0d03" title="Attempts to become the bus controller (master) and sends data over I2C to the specified address.">write()</a> </dd></dl>
 
 </div>
 </div>
@@ -903,7 +941,7 @@ Options:<ul>
 <div class="line"><span class="keywordtype">bool</span> isController = <a class="code hl_function" href="#aa61b835c3ebfd83dae60559c957c4318">I2C::handshake</a>();</div>
 <div class="ttc" id="aclass_i2_c_html_a2f6838a1bf488c4710481aa5fd07db1e"><div class="ttname"><a href="#a2f6838a1bf488c4710481aa5fd07db1e">I2C::checkCableFlipped</a></div><div class="ttdeci">static void checkCableFlipped(void(*startFunction)()=nullptr, void(*loopFunction)()=nullptr)</div><div class="ttdoc">Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back...</div></div>
 <div class="ttc" id="aclass_i2_c_html_aa61b835c3ebfd83dae60559c957c4318"><div class="ttname"><a href="#aa61b835c3ebfd83dae60559c957c4318">I2C::handshake</a></div><div class="ttdeci">static bool handshake(void(*startFunction)()=nullptr, void(*loopFunction)()=nullptr)</div><div class="ttdoc">Waits for another device and returns whether this device is the controller (master) or target (slave)...</div></div>
-</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd></dd></dl>
+</div><!-- fragment --> <dl class="section note"><dt>Note</dt><dd>Custom functions should not call <a class="el" href="class_i2_c.html">I2C</a> functions. They may rely on interrupts. Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably. Loop functions should be as fast as possible; it is not recommended to use arduboy.nextFrame() within a loop function. </dd></dl>
 
 </div>
 </div>
@@ -943,6 +981,7 @@ Options:<ul>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><span class="tt">true</span> if this device is the controller (master), <span class="tt">false</span> if it is the target (slave). </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Custom functions should not call <a class="el" href="class_i2_c.html">I2C</a> functions. They may rely on interrupts. Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably. Loop functions should be as fast as possible; it is not recommended to use <span class="tt">arduboy.nextFrame()</span> within a loop function. </dd></dl>
 
 </div>
 </div>

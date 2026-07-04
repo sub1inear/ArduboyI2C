@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['handshake_0',['3. Handshake',['../index.html#autotoc_md10',1,'']]],
-  ['handshake_1',['handshake',['../class_i2_c.html#aa61b835c3ebfd83dae60559c957c4318',1,'I2C']]],
-  ['how_20do_20i_20send_20receive_20more_20than_2032_20bytes_20at_20once_2',['How do I send/receive more than 32 bytes at once?',['../index.html#autotoc_md20',1,'']]]
+  ['getactive_0',['getActive',['../class_i2_c.html#ab90b7b0e1fc4d6ca6ee60fea4ca0817f',1,'I2C']]],
+  ['getaddress_1',['getAddress',['../class_i2_c.html#a6793e79d781fd88ee18b5f8030007e95',1,'I2C']]],
+  ['getbuffer_2',['getBuffer',['../class_i2_c.html#a79aafb09ac49b31ac6eb1fecd6d9141e',1,'I2C']]],
+  ['getbuffersize_3',['getBufferSize',['../class_i2_c.html#a6fbee6e90b41dfa087516e5f09b87176',1,'I2C']]],
+  ['geterror_4',['getError',['../class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41',1,'I2C']]],
+  ['getting_20linker_20errors_20about_20arduboyi2c_20functions_5',['Why am I getting linker errors about ArduboyI2C functions?',['../index.html#autotoc_md17',1,'']]]
 ];
