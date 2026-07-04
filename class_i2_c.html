@@ -225,7 +225,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Sets the 7-bit address of this device. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address (0-127) to set. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address (0-127) to set. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
   </table>
   </dd>
 </dl>
@@ -302,7 +302,7 @@ Static Public Member Functions</h2></td></tr>
 <p>Attempts to become the bus controller (master) and sends data over <a class="el" href="class_i2_c.html">I2C</a> to the specified address. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A pointer to the data to send. </td></tr>
     <tr><td class="paramname">size</td><td>The amount of data in bytes to send. This cannot be zero. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts. </td></tr>
@@ -359,7 +359,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object to send. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
   </table>
@@ -411,7 +411,7 @@ template&lt;typename T, size_t N&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A reference to the array to send. </td></tr>
     <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
   </table>
@@ -456,7 +456,7 @@ template&lt;typename T, size_t N&gt; </div>
 <p>Attempts to become the bus controller (master) and reads data over <a class="el" href="class_i2_c.html">I2C</a> from the specified address. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A pointer to the buffer in which to store the data. </td></tr>
     <tr><td class="paramname">size</td><td>The maximum amount of bytes to receive. This cannot be 0 or 255. </td></tr>
   </table>
@@ -503,7 +503,7 @@ template&lt;typename T&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object in which to store the data.</td></tr>
   </table>
   </dd>
@@ -549,7 +549,7 @@ template&lt;typename T, size_t N&gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 1-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
+    <tr><td class="paramname">address</td><td>The 7-bit address to receive the data from. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A reference to the array in which to store the data.</td></tr>
   </table>
   </dd>
