@@ -255,7 +255,7 @@ public:
      * Deinitializes I2C hardware.
      * \details
      * This function powers off and deinitializes the TWI hardware.
-     * It may be reinitialized by calling `I2C::begin()` again.
+     * It may be reinitialized by calling begin() again.
      * \see begin()
      */
     static void end();
@@ -264,11 +264,14 @@ public:
      * Sets the 7-bit address of this device.
      * \param address The 7-bit address (0-127) to set.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * \see getAddress()
      */
     static void setAddress(uint8_t address);
+
     /** \brief
      * Gets the 7-bit address of this device.
      * \return The 7-bit address of this device.
+     * \see setAddress()
      */
     static uint8_t getAddress();
 
@@ -281,16 +284,20 @@ public:
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \note
      * Internally, this function uses a buffer to enable asynchronous writes.
-     * The buffer size is controlled by the macro `I2C_BUFFER_CAPACITY` and defaults to 32.
-     * If the program needs to send more than 32 bytes at a time, `I2C_BUFFER_CAPACITY`
+     * The buffer size is controlled by the macro I2C_BUFFER_CAPACITY and defaults to 32.
+     * If the program needs to send more than 32 bytes at a time, I2C_BUFFER_CAPACITY
      * must be defined before including ArduboyI2C.h to be greater.
-     * \see transmit() read()
+     * \note
+     * To poll whether asynchronous writes have completed, see if getActive() returns false.
+     * \note
+     * This function will not work inside the onRequest() callback. Send data with reply() instead.
+     * \see reply() read() getActive()
      */
     static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
 
     /** \overload
      * \tparam T The type of the object to send. To prevent bugs, T cannot be a pointer.
-     * \param address The 7-bit address to receive the data from.
+     * \param address The 7-bit address to send the data to.
      * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
@@ -454,8 +461,7 @@ public:
      * \note
      * Interrupts are disabled during this callback.
      * Any functions called within it should not rely on interrupts (i.e. no `Serial`, `delay`, `millis`, etc.).
-     * To respond to the controller (master), use reply() instead of write().
-     * \see onRequest() reply() read()
+     * \see onRequest() read()
      */
     static void onReceive(void (*function)());
 
@@ -477,7 +483,7 @@ public:
      * \details
      * This function is intended to be used in the onReceive callback to get the data sent by the controller (master).
      * \note
-     * The returned pointer may be safely cast to `const` if needed as scratch space.
+     * The returned pointer may be safely cast to remove the `const` if needed as scratch space.
      * \see onReceive()
      */
     static const uint8_t *getBuffer();
@@ -490,6 +496,15 @@ public:
      * \see onReceive()
      */
     static uint8_t getBufferSize();
+
+    /** \brief
+     * Gets whether or not the controller (master) is currently transmitting or receiving data.
+     * \return `true` if the controller (master) is currently transmitting or receiving data, `false` otherwise.
+     * \details
+     * This function is intended to be used to check if an asynchronous write has completed.
+     * \see write()
+     */
+    static bool getActive();
 
     /** \brief
      * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
@@ -507,8 +522,10 @@ public:
      * });
      * bool isController = I2C::handshake();
      * \endcode
-     * \note Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.
-     * Loop functions should be as fast as possible; it is not recommended to use `arduboy.nextFrame()` within a loop function.
+     * \note
+     * Custom functions should not call I2C functions. They may rely on interrupts.
+     * Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.
+     * Loop functions should be as fast as possible; it is not recommended to use arduboy.nextFrame() within a loop function.
      */
     static void checkCableFlipped(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 
@@ -517,7 +534,9 @@ public:
      * \param startFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
      * \param loopFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
      * \return `true` if this device is the controller (master), `false` if it is the target (slave).
-     * \note Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.
+     * \note
+     * Custom functions should not call I2C functions. They may rely on interrupts.
+     * Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.
      * Loop functions should be as fast as possible; it is not recommended to use `arduboy.nextFrame()` within a loop function.
      */
     static bool handshake(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
@@ -555,6 +574,7 @@ struct i2c_data_t {
      * The index into the readBuffer or twiBuffer.
      */
     volatile uint8_t bufferIdx;
+
     /** \brief
      * The size of data in readBuffer or twiBuffer.
      */
@@ -719,6 +739,10 @@ uint8_t I2C::getBufferSize() {
     // i2c_detail::data.bufferSize is undefined during a target (slave) receive
     // i2c_detail::data.bufferIdx is incremented and therefore represents the current size in the buffer
     return i2c_detail::data.bufferIdx;
+}
+
+bool I2C::getActive() {
+    return i2c_detail::data.active;
 }
 
 void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
