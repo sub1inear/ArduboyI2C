@@ -108,10 +108,9 @@ with larger game state, lockstep multiplayer is the better option.
 
 ## Lockstep Multiplayer
 
-In **lockstep multiplayer**, both devices run the exact same simulation from the same inputs, n the s
-ame frame order.
+In **lockstep multiplayer**, both devices run the exact same simulation from the same inputs, in the same frame order.
 Neither device advances until both have exchanged inputs for the current frame.
-This guarantees that both devices see exactly the same game state at all times — no rediction, no reconciliation, no drift.
+This guarantees that both devices see exactly the same game state at all times — no prediction, no reconciliation, no drift.
 
 This is how the [Pong example](./examples/Pong/Pong.ino) works.
 The right player (controller) and left player (target) must both advance together, one frame at a time:
@@ -208,20 +207,11 @@ Lockstep multiplayer is the best for games that have a large amount of game stat
 ## Sending Larger Data
 
 Both `I2C::write()` and `I2C::reply()` use an internal buffer that holds 32 bytes by default.
-If you need to transfer more than that at once, define `I2C_BUFFER_CAPACITY` before including he libr
-ary:
+If you need to transfer more than that at once, define `I2C_BUFFER_CAPACITY` before including the library:
 
 ```cpp
-#define I2C_BUFFER_CAPACITY 64
 #define I2C_IMPLEMENTATION
-## Sending Larger Data
-
-Both `I2C::write()` and `I2C::reply()` use an internal buffer that holds 32 bytes by default.
-If you need to transfer more than that at once, define `I2C_BUFFER_CAPACITY` before including he library:
-
-```cpp
 #define I2C_BUFFER_CAPACITY 64
-#define I2C_IMPLEMENTATION
 #include <ArduboyI2C.h>
 ```
 
@@ -260,8 +250,8 @@ void onReceive() {
 `I2C::getError()` returns the status of the last read or write:
 
 - `I2C::Error::None`: no error.
-- `I2C::Error::WriteAddrNACK`: the target did not acknowledge during a write; it is not ready or not connected.
-- `I2C::Error::ReadAddrNACK`: the target did not acknowledge during a read; same cause.
+- `I2C::Error::WriteAddrNack`: the target did not acknowledge during a write; it is not ready or not connected.
+- `I2C::Error::ReadAddrNack`: the target did not acknowledge during a read; same cause.
 - `I2C::Error::WriteDataNACK`: the target acknowledged its address but stopped responding during transfer.
 - `I2C::Error::Bus`: an illegal start or stop condition was detected on the bus.
 

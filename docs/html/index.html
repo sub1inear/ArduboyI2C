@@ -212,7 +212,7 @@ Migrating from Wire Library</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Wire.onRequest()</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="class_i2_c.html#a026eaad0ba8bb6a698d3eaca9dd9887d" title="Sets up/disables the callback to be called when data is requested from the device&#39;s address (a read).">I2C::onRequest()</a></span>  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">Wire.beginTransmission(addr)</span> -&gt; <span class="tt">Wire.write(...)</span> -&gt; <span class="tt">Wire.endTransmission()</span>  </td><td class="markdownTableBodyNone"><span class="tt">I2C::write(address, data, wait)</span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">Wire.beginTransmission(addr)</span> -&gt; <span class="tt">Wire.write(...)</span> -&gt; <span class="tt">Wire.endTransmission()</span>  </td><td class="markdownTableBodyNone"><span class="tt">I2C::write(address, data, mode)</span>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Wire.requestFrom(address, quantity)</span> -&gt; <span class="tt">Wire.read()</span>  </td><td class="markdownTableBodyNone"><span class="tt">I2C::read(address, data, wait)</span>  </td></tr>
 <tr class="markdownTableRowOdd">

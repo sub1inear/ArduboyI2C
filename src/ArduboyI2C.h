@@ -258,7 +258,7 @@ public:
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param size The amount of data in bytes to send. This cannot be zero.
-     * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
+     * \param mode The mode of the write operation. `I2C::Mode::Sync` blocks until the write is complete; `I2C::Mode::Async` returns immediately and completes in the background.
      * \note
      * Internally, this function uses a buffer to enable asynchronous writes.
      * The buffer size is controlled by the macro I2C_BUFFER_CAPACITY and defaults to 32.
@@ -277,7 +277,7 @@ public:
      * \param address The 7-bit address to send the data to.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object to send.
-     * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
+     * \param mode The mode of the write operation. `I2C::Mode::Sync` blocks until the write is complete; `I2C::Mode::Async` returns immediately and completes in the background.
      * \details
      * This function will automatically deduce the size of the object.
      * Objects with sizes greater than or equal to 255 should not be used with this function.
@@ -295,7 +295,7 @@ public:
      * \param address The 7-bit address to send the data to.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A reference to the array to send.
-     * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
+     * \param mode The mode of the write operation. `I2C::Mode::Sync` blocks until the write is complete; `I2C::Mode::Async` returns immediately and completes in the background.
      * \details
      * This function will automatically deduce the size of the array.
      * Arrays with sizes greater than or equal to 255 should not be used with this function.
@@ -502,7 +502,7 @@ public:
      * Waits for another device and returns whether this device is the controller (master) or target (slave).
      * \param startFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
      * \param loopFunction The function to be called while waiting for another device. Pass `nullptr` to disable.
-     * \return `true` if this device is the controller (master), `false` if it is the target (slave).
+     * \return `I2C::Role::Controller` if this device is the controller (master), `I2C::Role::Target` if it is the target (slave).
      * \note
      * Custom functions should not call I2C functions. They may rely on interrupts.
      * Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.

@@ -431,7 +431,7 @@ static constexpr uint8_t&#160;</td><td class="memItemRight"><b>targetAddress</b>
     <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A pointer to the data to send. </td></tr>
     <tr><td class="paramname">size</td><td>The amount of data in bytes to send. This cannot be zero. </td></tr>
-    <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts. </td></tr>
+    <tr><td class="paramname">mode</td><td>The mode of the write operation. <span class="tt"><a class="el" href="#a18e3ec2d8876fd8337a03365b674a04dad8e87c0927539672f54462c837be0b7f" title="Synchronous write. The function will block until the write is complete.">I2C::Mode::Sync</a></span> blocks until the write is complete; <span class="tt"><a class="el" href="#a18e3ec2d8876fd8337a03365b674a04da24aa4117da86c41684ad25742832dfa6" title="Asynchronous write. The function will return immediately, and the write will be completed in the back...">I2C::Mode::Async</a></span> returns immediately and completes in the background. </td></tr>
   </table>
   </dd>
 </dl>
@@ -487,7 +487,7 @@ template&lt;typename T&gt; </div>
   <table class="params">
     <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">object</td><td>A reference to the object to send. </td></tr>
-    <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
+    <tr><td class="paramname">mode</td><td>The mode of the write operation. <span class="tt"><a class="el" href="#a18e3ec2d8876fd8337a03365b674a04dad8e87c0927539672f54462c837be0b7f" title="Synchronous write. The function will block until the write is complete.">I2C::Mode::Sync</a></span> blocks until the write is complete; <span class="tt"><a class="el" href="#a18e3ec2d8876fd8337a03365b674a04da24aa4117da86c41684ad25742832dfa6" title="Asynchronous write. The function will return immediately, and the write will be completed in the back...">I2C::Mode::Async</a></span> returns immediately and completes in the background.</td></tr>
   </table>
   </dd>
 </dl>
@@ -539,7 +539,7 @@ template&lt;typename T, size_t N&gt; </div>
   <table class="params">
     <tr><td class="paramname">address</td><td>The 7-bit address to send the data to. Addresses 0-7 and 120-127 are reserved by the standard and should not be used. </td></tr>
     <tr><td class="paramname">buffer</td><td>A reference to the array to send. </td></tr>
-    <tr><td class="paramname">wait</td><td>Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.</td></tr>
+    <tr><td class="paramname">mode</td><td>The mode of the write operation. <span class="tt"><a class="el" href="#a18e3ec2d8876fd8337a03365b674a04dad8e87c0927539672f54462c837be0b7f" title="Synchronous write. The function will block until the write is complete.">I2C::Mode::Sync</a></span> blocks until the write is complete; <span class="tt"><a class="el" href="#a18e3ec2d8876fd8337a03365b674a04da24aa4117da86c41684ad25742832dfa6" title="Asynchronous write. The function will return immediately, and the write will be completed in the back...">I2C::Mode::Async</a></span> returns immediately and completes in the background.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1093,7 +1093,7 @@ template&lt;typename T, size_t N&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><span class="tt">true</span> if this device is the controller (master), <span class="tt">false</span> if it is the target (slave). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><span class="tt"><a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25" title="The device is the controller (master) and can read/write to the target (slave).">I2C::Role::Controller</a></span> if this device is the controller (master), <span class="tt"><a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71ac41a31890959544c6523af684561abe5" title="The device is the target (slave) and can only read/write when requested by the controller (master).">I2C::Role::Target</a></span> if it is the target (slave). </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Custom functions should not call <a class="el" href="class_i2_c.html">I2C</a> functions. They may rely on interrupts. Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably. Loop functions should be as fast as possible; it is not recommended to use <span class="tt">arduboy.nextFrame()</span> within a loop function. </dd></dl>
 
 </div>
