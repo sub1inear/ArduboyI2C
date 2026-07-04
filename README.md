@@ -56,7 +56,7 @@ void setup() {
 ```
 ### 3. Handshake
 ```cpp
-uint8_t id = I2C::handshake(numPlayers);
+bool isController = I2C::handshake();
 ```
 ### 4. Read/Write
 ```cpp
@@ -89,11 +89,11 @@ Define before `#include <ArduboyI2C.h>`.
 | Macro | Default | Options | Description |
 |-------|---------|---------|-------------|
 | `I2C_IMPLEMENTATION` | - | - | Must be defined in **one** source file to include the implementation. |
-| `I2C_FREQUENCY` | 100000 | 0-400000 | Bus frequency (Hz) |
-| `I2C_BUFFER_SIZE` | 32 | 1-255 | Transaction buffer size |
+| `I2C_FREQUENCY` | 100000 | 0-300000 | Bus frequency (Hz) |
+| `I2C_BUFFER_CAPACITY` | 32 | 1-255 | Transaction buffer size |
 | `I2C_HANDSHAKE_BUSY_CHECKS` | 128 | 1-65535 | Number of times to check for a busy bus during a handshake. |
 | `I2C_CHECK_CABLE_FLIPPED_CHECKS` | 128 | 1-65535 | Number of checks to perform during cable flip detection. |
-| `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS` | 16 | 1-65535 |  Number of passing flip checks before confirming cable is flipped back. |
+| `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS` | 128 | 1-65535 |  Number of passing flip checks before confirming cable is flipped back. |
 
 ## Migrating from Wire Library
 | Wire API               | ArduboyI2C              |
@@ -129,4 +129,4 @@ Writes and `reply()` are limited by `I2C_BUFFER_CAPACITY` (default: 32). Define 
 Addresses 0–7 and 120–127 are reserved by the I2C spec (general call, etc.).
 
 ### I've passed my own loop function to `I2C::handshake()` or `I2C::checkCableFlipped()`, and it breaks handshaking/cable flip detection. Why?
-The loop function disrupts the careful timing of the handshake/cable flip detection. You must experimentally redefine the `I2C_*_CHECKS` macros; see [Network of the Damned](./ports/NetworkOfTheDamned/Arduboy3D.ino) for an example of how to do this. Most likely, you want to increase `I2C_HANDSHAKE_CHECKS` and `I2C_CHECK_CABLE_FLIPPED_CHECKS` while decreasing `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS`.
+The loop function disrupts the careful timing of the handshake/cable flip detection. You must experimentally redefine the `I2C_*_CHECKS` macros; see [Network of the Damned](./ports/NetworkOfTheDamned/Arduboy3D.ino) for an example of how to do this. Most likely, you want to increase `I2C_HANDSHAKE_BUSY_CHECKS` and `I2C_CHECK_CABLE_FLIPPED_CHECKS` while decreasing `I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS`.

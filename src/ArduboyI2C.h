@@ -263,7 +263,7 @@ public:
     /** \brief
      * Sets the 7-bit address of this device.
      * \param address The 7-bit address (0-127) to set.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \see getAddress()
      */
     static void setAddress(uint8_t address);
@@ -278,7 +278,7 @@ public:
     /** \brief
      * Attempts to become the bus controller (master) and sends data over I2C to the specified address.
      * \param address The 7-bit address to send the data to.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the data to send.
      * \param size The amount of data in bytes to send. This cannot be zero.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
@@ -298,7 +298,7 @@ public:
     /** \overload
      * \tparam T The type of the object to send. To prevent bugs, T cannot be a pointer.
      * \param address The 7-bit address to send the data to.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \details
@@ -316,7 +316,7 @@ public:
      * \tparam T The type of the array to send.
      * \tparam N The number of elements in the array.
      * \param address The 7-bit address to send the data to.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A reference to the array to send.
      * \param wait Whether or not to wait for the write to complete. If this is false, it will proceed with interrupts.
      * \details
@@ -333,7 +333,7 @@ public:
     /** \brief
      * Attempts to become the bus controller (master) and reads data over I2C from the specified address.
      * \param address The 7-bit address to receive the data from.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A pointer to the buffer in which to store the data.
      * \param size The maximum amount of bytes to receive. This cannot be 0 or 255.
      * \note
@@ -345,7 +345,7 @@ public:
     /** \overload
      * \tparam T The type of the object to read. To prevent bugs, T cannot be a pointer.
      * \param address The 7-bit address to receive the data from.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param object A reference to the object in which to store the data.
      * \details
      * This function will automatically deduce the size of the object.
@@ -362,7 +362,7 @@ public:
      * \tparam T The type of the array to read.
      * \tparam N The number of elements in the array.
      * \param address The 7-bit address to receive the data from.
-     * Addresses 1-7 and 120-127 are reserved by the standard and should not be used.
+     * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \param buffer A reference to the array in which to store the data.
      * \details
      * This function will automatically deduce the size of the array.
