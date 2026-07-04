@@ -11,11 +11,9 @@
 Arduboy2 arduboy;
 
 // Define player role (1 for Player 1, 2 for Player 2)
-int playerRole = 0; // 1 for Player 1 (controller), 2 for Player 2 (target)
+I2C::Role playerRole; // 1 for Player 1 (controller), 2 for Player 2 (target)
 
 bool isSinglePlayer = false; // Add a flag to determine if it's single-player mode
-
-bool isController = false;
 
 // Command Types
 const uint8_t CMD_UPDATE = 0;
@@ -113,12 +111,12 @@ void onRequest() {
 
 // Function to receive data (target only; called by I2C::onReceive interrupt)
 void receiveData() {
-  const uint8_t *buf = I2C::getBuffer();
+  uint8_t *buf = I2C::getBuffer();
   uint8_t idx = 0;
   uint8_t commandType = buf[idx++];
   if (commandType == CMD_UPDATE) {
     // Receive regular update
-    Player& remotePlayer = (playerRole == 1) ? player2 : player1;
+    Player& remotePlayer = (playerRole == I2C::Role::Controller) ? player2 : player1;
     remotePlayer.x = ((int16_t)buf[idx] << 8) | buf[idx + 1]; idx += 2;
     remotePlayer.y = ((int16_t)buf[idx] << 8) | buf[idx + 1]; idx += 2;
     remotePlayer.velX = (int8_t)buf[idx++];
@@ -135,11 +133,11 @@ void receiveData() {
     int health = buf[idx++];
 
     // Apply attack to local defender
-    Player& defender = (playerRole == 1) ? player1 : player2;
+    Player& defender = (playerRole == I2C::Role::Controller) ? player1 : player2;
     defender.velX = velX;
     defender.velY = velY;
     defender.health = health;
-    Player& attacker = (playerRole == 2) ? player1 : player2;
+    Player& attacker = (playerRole == I2C::Role::Target) ? player1 : player2;
     attacker.attackDisplay = 5;
 
   } else if (commandType == CMD_PLATFORM_UPDATE) {
@@ -164,7 +162,7 @@ void receiveData() {
 
 // Controller reads player2 state + any pending attack notification from target
 void readFromTarget() {
-  I2C::read(I2C_TARGET_ADDRESS, targetReply);
+  I2C::read(I2C::targetAddress, targetReply);
   player2.x = targetReply.x;
   player2.y = targetReply.y;
   player2.velX = targetReply.velX;
@@ -369,21 +367,19 @@ void setup() {
       arduboy.display();
       arduboy.clear();
     });
-    arduboy.print(F("Waiting for other\nplayer..."));
-    arduboy.display();
 
-    isController = I2C::handshake();
-    playerRole = isController ? 1 : 2;
+    playerRole = I2C::handshake([]() {
+      arduboy.print(F("Waiting for other\nplayer..."));
+      arduboy.display();
+    });
 
-    if (!isController) {
-      I2C::setAddress(I2C_TARGET_ADDRESS);
+    if (playerRole == I2C::Role::Target) {
       I2C::onReceive(receiveData);
       I2C::onRequest(onRequest);
     }
   } else {
     // Single-player: No I2C
-    playerRole = 1;
-    isController = true;
+    playerRole = I2C::Role::Controller; // Default to controller for single-player
   }
 
   resetPlayers();
@@ -407,7 +403,7 @@ void loop() {
     sendPlatformUpdate(); // Only in multiplayer mode
   }
   // Handle input and physics
-  if (playerRole == 1) {
+  if (playerRole == I2C::Role::Controller) {
     handleInput(player1);
   } else {
     handleInput(player2);
@@ -420,21 +416,13 @@ void loop() {
   } else {
     // Multiplayer mode: Handle Player 2 as remote player
     sendPlayerUpdate(); // Only in multiplayer mode
-    if (isController) {
+    if (playerRole == I2C::Role::Controller) {
       readFromTarget();
     }
   }
 
   applyPhysics(player1);
   applyPhysics(player2);
-
-
-
-
-  if (!isSinglePlayer) {
-    // Send regular updates
-    sendPlayerUpdate();
-  }
 
   // Player 1 checks for attacks
   if (player1.attacking && player1.attackTimer > 0) {
@@ -646,7 +634,7 @@ void applyPhysics(Player& player) {
 
 // Function to update platforms
 void updatePlatforms() {
-  if (playerRole == 1) {  // Only Player 1 updates the platforms
+  if (playerRole == I2C::Role::Controller) {  // Only Player 1 updates the platforms
     for (int i = 0; i < PLATFORM_COUNT; i++) {
       if (platforms[i].moving) {
         int prevX = platforms[i].x;  // Save previous x position
@@ -671,7 +659,7 @@ void updatePlatforms() {
 
 // Function to send platform updates from Player 1 to Player 2
 void sendPlatformUpdate() {
-  if (playerRole != 1) return;  // Only Player 1 sends platform updates
+  if (playerRole != I2C::Role::Controller) return;  // Only Player 1 sends platform updates
 
   uint8_t buf[29]; // CMD byte + 4 platforms * 7 bytes each
   uint8_t idx = 0;
@@ -689,7 +677,7 @@ void sendPlatformUpdate() {
     buf[idx++] = (int8_t)platform.direction;
   }
 
-  I2C::write(I2C_TARGET_ADDRESS, buf, idx, true);
+  I2C::write(I2C::targetAddress, buf, idx, I2C::Mode::Sync);
 }
 
 
@@ -769,8 +757,8 @@ void processAttack(Player& attacker, Player& defender) {
 
 // Function to send regular player updates
 void sendPlayerUpdate() {
-  Player& player = (playerRole == 1) ? player1 : player2;
-  if (isController) {
+  Player& player = (playerRole == I2C::Role::Controller) ? player1 : player2;
+  if (playerRole == I2C::Role::Controller) {
     uint8_t buf[11];
     uint8_t idx = 0;
     buf[idx++] = CMD_UPDATE;
@@ -784,7 +772,7 @@ void sendPlayerUpdate() {
     buf[idx++] = player.chargedAttack;
     buf[idx++] = player.health;
     buf[idx++] = player.idle;
-    I2C::write(I2C_TARGET_ADDRESS, buf, idx, true);
+    I2C::write(I2C::targetAddress, buf, idx, I2C::Mode::Sync);
   } else {
     // Store in reply struct for onRequest
     targetReply.x = player.x;
@@ -800,7 +788,7 @@ void sendPlayerUpdate() {
 
 // Function to send attack notification
 void sendAttackNotification(Player& attacker, Player& defender) {
-  if (isController) {
+  if (playerRole == I2C::Role::Controller) {
     uint8_t buf[5];
     uint8_t idx = 0;
     buf[idx++] = CMD_ATTACK;
@@ -808,7 +796,7 @@ void sendAttackNotification(Player& attacker, Player& defender) {
     buf[idx++] = (int8_t)defender.velX;
     buf[idx++] = (int8_t)defender.velY;
     buf[idx++] = defender.health;
-    I2C::write(I2C_TARGET_ADDRESS, buf, idx, true);
+    I2C::write(I2C::targetAddress, buf, idx, I2C::Mode::Sync);
   } else {
     // Store pending attack in reply struct for onRequest
     targetReply.hasAttack = 1;

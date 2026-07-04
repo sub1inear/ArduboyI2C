@@ -2,6 +2,7 @@
 
 #include <avr/pgmspace.h>
 #include <Arduboy2.h>
+#include <ArduboyI2C.h>
 
 #include "Platform.h"
 
@@ -17,9 +18,6 @@ inline void clearDisplay(uint8_t colour)
 	//memset(_displayBuffer, data, LCDWIDTH * LCDHEIGHT / 8);
 }
 
-
-constexpr uint8_t deviceIdNull = 0xff;
-
 class ArduboyPlatform : public PlatformBase
 {
 public:
@@ -31,8 +29,7 @@ public:
 	void updateInput();
 
 private:
-	bool isController = false;
-	bool multiplayerConnected = false;
+	I2C::Role role = I2C::Role::None;
 };
 
 void ERROR(const char* msg);

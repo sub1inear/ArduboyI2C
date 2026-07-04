@@ -39,11 +39,11 @@ SOFTWARE.
 /** \brief
  * The initial I2C frequency in Hz.
  * \details
- * Defaults to 100000 Hz, with a maximum of 300000 Hz.
- * The Arduboy FX-C only has software pullups, so the I2C frequency must be < 300000 Hz to ensure reliability.
+ * Defaults to 100000 Hz, with a maximum of 200000 Hz.
+ * The Arduboy FX-C only has software pullups, so the I2C frequency must be < 200000 Hz to ensure reliability.
  */
 #define I2C_FREQUENCY 100000
-#elif I2C_FREQUENCY > 300000
+#elif I2C_FREQUENCY > 200000
 #error I2C_FREQUENCY is too high.
 #endif
 
@@ -146,65 +146,6 @@ SOFTWARE.
 #endif
 
 /** \brief
- * The target address set by the handshake function.
- * \details
- * This is the address that the controller (master) should use to communicate with the target (slave) when using the handshake function.
- * This is optional; the address can be changed to whatever you wish but is kept for convenience.
- */
-#define I2C_TARGET_ADDRESS 0x08
-
-/** \brief
- * The null address used to disable a target from responding.
- * \details
- * This is useful in lockstep multiplayer to soft-disable a target (slave) from responding to the controller (master) without having to call `I2C::end()`.
- * This is only a convention and is optional; the address can be changed to whatever you wish but is kept for convenience.
- */
-#define I2C_NULL_ADDRESS 0x09
-
-/** \brief
- * Target (slave) did not acknowledge its address during a write; it is not connected or is not responding.
- * \details
- * Error code returned by I2C::getError().
- */
-#define I2C_ERROR_WRITE_ADDR_NACK TW_MT_SLA_NACK
-
-/** \brief
- * Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving.
- * \details
- * Error code returned by I2C::getError().
- */
-#define I2C_ERROR_WRITE_DATA_NACK TW_MT_DATA_NACK
-
-/** \brief
- * Target (slave) did not acknowledge its address during a read; it is not connected or is not responding.
- * \details
- * Error code returned by I2C::getError().
- */
-#define I2C_ERROR_READ_ADDR_NACK TW_MR_SLA_NACK
-
-/** \brief
- * This device lost arbitration while trying to become the controller (master); another device is already the controller (master).
- * \details
- * Error code returned by I2C::getError().
- * \note
- * This code has no distinction between reads and writes (hardware constraint).
- */
-#define I2C_ERROR_ARB_LOST TW_MT_ARB_LOST
-
-/** \brief
- * An illegal start or stop condition was detected on the bus.
- * \details
- * Error code returned by I2C::getError().
- */
-#define I2C_ERROR_BUS TW_BUS_ERROR
-
-/** \brief
- * No error has occurred.
- * \details
- */
-#define I2C_ERROR_NONE 0xFF
-
-/** \brief
  * I2C library major version.
  */
 #define I2C_VERSION_MAJOR 3
@@ -242,6 +183,42 @@ template <typename T> struct is_pointer<T *> { static const bool value = true;  
  */
 class I2C {
 public:
+    /** \brief
+     * The mode of an I2C write operation.
+     */
+    enum class Mode : uint8_t {
+        Async = 0, ///< Asynchronous write. The function will return immediately, and the write will be completed in the background. isActive() checks if the write is still in progress.
+        Sync = 1 ///< Synchronous write. The function will block until the write is complete.
+    };
+
+    /** \brief
+     * The error code of the last I2C controller (master) operation.
+     */
+    enum class Error : uint8_t {
+        WriteAddrNack = TW_MT_SLA_NACK, ///< The controller (master) sent a write address and the target (slave) did not acknowledge it.
+        WriteDataNack = TW_MT_DATA_NACK, ///< The controller (master) sent data and the target (slave) did not acknowledge it.
+        ReadAddrNack = TW_MR_SLA_NACK, ///< The controller (master) sent a read address and the target (slave) did not acknowledge it.
+        Bus = TW_BUS_ERROR, ///< An illegal start or stop condition was detected on the bus.
+        None = 0xFF ///< No error. The last operation was successful.
+    };
+
+    enum class Role : uint8_t {
+        Controller = 0, ///< The device is the controller (master) and can read/write to the target (slave).
+        Target = 1, ///< The device is the target (slave) and can only read/write when requested by the controller (master).
+        None = 0xFF, ///< The device has not yet determined its role. Not returned by I2C::handshake() but provided for convenience.
+    };
+
+    /** \brief
+     * The 7-bit address of the target (slave) device, set by I2C::handshake().
+     */
+    static constexpr uint8_t targetAddress = 0x08;
+    /** \brief
+     * The 7-bit address used to indicate a null or invalid address.
+     * \details
+     * This is provided for convenience to let a target (slave) soft disconnect from the bus.
+     */
+    static constexpr uint8_t nullAddress = 0x09;
+
     /** \brief
      * Initializes I2C hardware.
      * \details
@@ -288,12 +265,12 @@ public:
      * If the program needs to send more than 32 bytes at a time, I2C_BUFFER_CAPACITY
      * must be defined before including ArduboyI2C.h to be greater.
      * \note
-     * To poll whether asynchronous writes have completed, see if getActive() returns false.
+     * To poll whether asynchronous writes have completed, see if isActive() returns false.
      * \note
      * This function will not work inside the onRequest() callback. Send data with reply() instead.
-     * \see reply() read() getActive()
+     * \see reply() read() isActive()
      */
-    static void write(uint8_t address, const void *buffer, uint8_t size, bool wait);
+    static void write(uint8_t address, const void *buffer, uint8_t size, I2C::Mode mode);
 
     /** \overload
      * \tparam T The type of the object to send. To prevent bugs, T cannot be a pointer.
@@ -306,10 +283,10 @@ public:
      * Objects with sizes greater than or equal to 255 should not be used with this function.
      */
     template<typename T>
-    static void write(uint8_t address, const T &object, bool wait) {
+    static void write(uint8_t address, const T &object, I2C::Mode mode) {
         static_assert(!i2c_detail::is_pointer<T>::value, "T cannot be a pointer.");
         static_assert(sizeof(T) <= I2C_BUFFER_CAPACITY, "Size of T must be less than or equal to I2C_BUFFER_CAPACITY.");
-        I2C::write(address, (const void *)&object, sizeof(T), wait);
+        I2C::write(address, (const void *)&object, sizeof(T), mode);
     }
 
     /** \overload
@@ -324,10 +301,10 @@ public:
      * Arrays with sizes greater than or equal to 255 should not be used with this function.
      */
     template<typename T, size_t N>
-    static void write(uint8_t address, const T (&buffer)[N], bool wait) {
+    static void write(uint8_t address, const T (&buffer)[N], I2C::Mode mode) {
         // N must be size_t otherwise const T & variant captures overload with N > 255
         static_assert(sizeof(T) * N <= I2C_BUFFER_CAPACITY, "Size of T * N must be less than or equal to I2C_BUFFER_CAPACITY.");
-        I2C::write(address, (const void *)buffer, sizeof(T) * N, wait);
+        I2C::write(address, (const void *)buffer, sizeof(T) * N, mode);
     }
 
     /** \brief
@@ -467,26 +444,18 @@ public:
 
     /** \brief
      * Gets the hardware error which happened in a previous read or write.
-     * \return A byte indicating the error. \n
-     * Options:
-     * - `I2C_ERROR_WRITE_ADDR_NACK`: Target (slave) did not acknowledge its address during a write; it is not connected or is not responding. \n
-     * - `I2C_ERROR_WRITE_DATA_NACK`: Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving. \n
-     * - `I2C_ERROR_READ_ADDR_NACK`: Target (slave) did not acknowledge its address during a read; it is not connected or is not responding. \n
-     * - `I2C_ERROR_BUS`: An illegal start or stop condition was detected on the bus. \n
-     * - `I2C_ERROR_NONE`: No error has occurred. \n
+     * \return An enum value indicating the error. \n
      */
-    static uint8_t getError();
+    static Error getError();
 
     /** \brief
      * Gets a pointer to the internal buffer used for I2C communication.
      * \return A pointer to the internal buffer.
      * \details
      * This function is intended to be used in the onReceive callback to get the data sent by the controller (master).
-     * \note
-     * The returned pointer may be safely cast to remove the `const` if needed as scratch space.
      * \see onReceive()
      */
-    static const uint8_t *getBuffer();
+    static uint8_t *getBuffer();
 
     /** \brief
      * Gets the size of the data in the internal buffer.
@@ -504,7 +473,7 @@ public:
      * This function is intended to be used to check if an asynchronous write has completed.
      * \see write()
      */
-    static bool getActive();
+    static bool isActive();
 
     /** \brief
      * Checks if the I2C cable is flipped, calling a function if it is and waiting for it to be flipped back.
@@ -539,7 +508,7 @@ public:
      * Setting a custom loop function is advanced and requires careful tuning of the I2C_*_CHECKS macros to ensure everything works reliably.
      * Loop functions should be as fast as possible; it is not recommended to use `arduboy.nextFrame()` within a loop function.
      */
-    static bool handshake(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
+    static I2C::Role handshake(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
 };
 
 #ifdef I2C_IMPLEMENTATION
@@ -548,7 +517,7 @@ public:
  * Not officially part of the library.
  */
 namespace i2c_detail {
-struct i2c_data_t {
+struct I2CData {
     /** \brief
      * The function to be called when data is requested from the device's address (a read).
      */
@@ -594,7 +563,7 @@ struct i2c_data_t {
     /** \brief
      * The error code for the last transmission.
      */
-    volatile uint8_t error;
+    volatile I2C::Error error;
 } data;
 
 /** \brief
@@ -633,7 +602,7 @@ bool checkCableFlippedCore(bool disconnectFlip) {
 
 void startReadWrite(uint8_t address, bool readWrite, uint8_t bufferSize) {
     i2c_detail::data.active = true;
-    i2c_detail::data.error = I2C_ERROR_NONE;
+    i2c_detail::data.error = I2C::Error::None;
     i2c_detail::data.slaRW = address << 1 | readWrite;
     i2c_detail::data.bufferIdx = 0;
     i2c_detail::data.bufferSize = bufferSize;
@@ -687,7 +656,7 @@ uint8_t I2C::getAddress() {
     return TWAR >> 1;
 }
 
-void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
+void I2C::write(uint8_t address, const void *buffer, uint8_t size, I2C::Mode mode) {
     i2c_detail::waitActive();
 
     i2c_detail::startReadWrite(address, TW_WRITE, size);
@@ -695,7 +664,7 @@ void I2C::write(uint8_t address, const void *buffer, uint8_t size, bool wait) {
 
     i2c_detail::sendStart();
 
-    if (wait) {
+    if (mode == I2C::Mode::Sync) {
         i2c_detail::waitActive();
     }
 }
@@ -727,11 +696,11 @@ void I2C::onReceive(void (*function)()) {
     i2c_detail::data.onReceiveFunction = function;
 }
 
-uint8_t I2C::getError() {
+I2C::Error I2C::getError() {
     return i2c_detail::data.error;
 }
 
-const uint8_t *I2C::getBuffer() {
+uint8_t *I2C::getBuffer() {
     return i2c_detail::data.twiBuffer;
 }
 
@@ -741,7 +710,7 @@ uint8_t I2C::getBufferSize() {
     return i2c_detail::data.bufferIdx;
 }
 
-bool I2C::getActive() {
+bool I2C::isActive() {
     return i2c_detail::data.active;
 }
 
@@ -757,7 +726,8 @@ void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
             startFunction();
         }
         // wait for the cable to be flipped back
-        // debounce the cable flip detection by ensuring 64 counts of success
+        // debounce the cable flip detection
+        // by ensuring I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS successive counts of success
         // putting the cable back it can generate noise
         // uint16_t will optimize to a uint8_t if I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS < 256
         for (uint16_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS; i++) {
@@ -776,7 +746,7 @@ void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 }
 
-bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
+I2C::Role I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
     // check if the bus is free (SDA and SCL are high for 128 half-periods)
     // if it is not, another controller (master) has gotten here before us
     // uint16_t will optimize to a uint8_t if I2C_HANDSHAKE_BUSY_CHECKS < 256
@@ -784,7 +754,7 @@ bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
         if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
             (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
             // set our address to the target address
-            I2C::setAddress(I2C_TARGET_ADDRESS);
+            I2C::setAddress(I2C::targetAddress);
             // wait for twice the time it takes to send 18 bits
             // (7 address bits + 1 RW + 1 ACK + 8 data bits + 1 ACK) to ensure we ACK the controller
             // might have come across a controller that just started sending data,
@@ -792,7 +762,7 @@ bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
             // so we need to wait for two transmissions
             _delay_us((1000000.0 / I2C_FREQUENCY * 18.0 + 25.0) * 2.0);
             // return `false` to indicate that this device is the target (slave)
-            return false;
+            return I2C::Role::Target;
         }
         // half-period delay otherwise too fast
         _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
@@ -803,14 +773,13 @@ bool I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
     }
     do {
         // send all zeros to the target address to help with I2C::checkCableFlipped()
-        I2C::write(I2C_TARGET_ADDRESS, zeros, true);
+        I2C::write(I2C::targetAddress, zeros, I2C::Mode::Sync);
         if (loopFunction) {
             loopFunction();
         }
         // repeat until the write is successful (no NACKs)
-    } while (I2C::getError() != I2C_ERROR_NONE);
-    // return `true` to indicate that this device is the controller (master)
-    return true;
+    } while (I2C::getError() != I2C::Error::None);
+    return I2C::Role::Controller;
 }
 
 #if 1
@@ -1030,15 +999,14 @@ TW_SR_STOP:
 
     cp r30, __zero_reg__
     cpc r31, __zero_reg__
-    breq active_false_reti
+    breq pop_reti
 
     icall
     ; TW register pointer may be clobbered, do not use
     ; r20, r21, and r22 may be clobbered, do not use
 
-    ; i2c_detail::data.active = false;
     ; return;
-    rjmp active_false_reti;
+    rjmp pop_reti
 ; ----------------------------------------------------- ;
 TW_ST_SLA_ACK:
     ; i2c_detail::data.bufferIdx = 0;
@@ -1086,9 +1054,8 @@ TW_ST_LAST_DATA:
     ; TWCR = REPLY_ACK;
     ldi r26, REPLY_ACK
     std Z + TWCR, r26
-    ; i2c_detail::data.active = false;
     ; return;
-    rjmp active_false_reti
+    rjmp pop_reti
 ; ----------------------------------------------------- ;
 default:
     ; i2c_detail::data.error = TWSR;
@@ -1107,8 +1074,6 @@ default:
     rjmp 1b
 
     active_false_reti:
-    ; Z pointer may be clobbered, do not use
-    ; r20, r21, and r22 may be clobbered, do not use
 
     ; i2c_detail::data.active = false;
     std Y + %[active], __zero_reg__
@@ -1168,14 +1133,14 @@ debug_blue:
         [data]             "=m" (i2c_detail::data),
         [twiBuffer]        "=m" (i2c_detail::data.twiBuffer)
         : // Input Operands
-        [error]             "i" (offsetof(i2c_detail::i2c_data_t, error)),
-        [active]            "i" (offsetof(i2c_detail::i2c_data_t, active)),
-        [bufferIdx]         "i" (offsetof(i2c_detail::i2c_data_t, bufferIdx)),
-        [readBuffer]        "i" (offsetof(i2c_detail::i2c_data_t, readBuffer)),
-        [onRequestFunction] "i" (offsetof(i2c_detail::i2c_data_t, onRequestFunction)),
-        [onReceiveFunction] "i" (offsetof(i2c_detail::i2c_data_t, onReceiveFunction)),
-        [bufferSize]        "i" (offsetof(i2c_detail::i2c_data_t, bufferSize)),
-        [slaRW]             "i" (offsetof(i2c_detail::i2c_data_t, slaRW))
+        [error]             "i" (offsetof(i2c_detail::I2CData, error)),
+        [active]            "i" (offsetof(i2c_detail::I2CData, active)),
+        [bufferIdx]         "i" (offsetof(i2c_detail::I2CData, bufferIdx)),
+        [readBuffer]        "i" (offsetof(i2c_detail::I2CData, readBuffer)),
+        [onRequestFunction] "i" (offsetof(i2c_detail::I2CData, onRequestFunction)),
+        [onReceiveFunction] "i" (offsetof(i2c_detail::I2CData, onReceiveFunction)),
+        [bufferSize]        "i" (offsetof(i2c_detail::I2CData, bufferSize)),
+        [slaRW]             "i" (offsetof(i2c_detail::I2CData, slaRW))
     );
 }
 #else

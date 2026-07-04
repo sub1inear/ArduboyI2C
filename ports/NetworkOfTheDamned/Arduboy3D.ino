@@ -183,7 +183,7 @@ volatile uint8_t targetInput = 0;
 
 static void onReceive()
 {
-  const uint8_t *buffer = I2C::getBuffer();
+  uint8_t *buffer = I2C::getBuffer();
   controllerInput = buffer[0];
   controllerReceived = true;
 }
@@ -204,42 +204,41 @@ static void PlatformNet::Init()
     arduboy.display(CLEAR_BUFFER);
   });
 
-
-  bool isController = I2C::handshake(nullptr, [] {
+  I2C::Role role = I2C::handshake(nullptr, [] {
     Game::menu.DrawHandshaking(PSTR("Waiting..."), 4, CENTER_STR("Waiting...", 4));
     arduboy.display(CLEAR_BUFFER);
   });
-  if (!isController)
+  if (role == I2C::Role::Target)
   {
-    I2C::setAddress(I2C_NULL_ADDRESS);
+    I2C::setAddress(I2C::nullAddress);
     I2C::onReceive(onReceive);
     I2C::onRequest(onRequest);
   }
-  Game::localPlayerId = isController ? 1 : 0;
+  Game::localPlayerId = role == I2C::Role::Controller ? 1 : 0;
 }
 
 static void PlatformNet::RunController(uint8_t localInput, uint8_t &remoteInput)
 {
   do {
-      I2C::write(I2C_TARGET_ADDRESS, localInput, true);
-  } while (I2C::getError() != I2C_ERROR_NONE);
+      I2C::write(I2C::targetAddress, localInput, I2C::Mode::Sync);
+  } while (I2C::getError() != I2C::Error::None);
   do {
-      I2C::read(I2C_TARGET_ADDRESS, remoteInput);
-  } while (I2C::getError() != I2C_ERROR_NONE);
+      I2C::read(I2C::targetAddress, remoteInput);
+  } while (I2C::getError() != I2C::Error::None);
 }
 
 static void PlatformNet::RunTarget(uint8_t localInput, uint8_t &remoteInput)
 {
   targetInput = localInput;
 
-  I2C::setAddress(I2C_TARGET_ADDRESS);
+  I2C::setAddress(I2C::targetAddress);
   while (!controllerReceived) { }
   remoteInput = controllerInput;
   controllerReceived = false;
 
   while (!controllerRequested) { }
   controllerRequested = false;
-  I2C::setAddress(I2C_NULL_ADDRESS);
+  I2C::setAddress(I2C::nullAddress);
 }
 void setup()
 {

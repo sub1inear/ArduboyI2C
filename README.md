@@ -56,12 +56,12 @@ void setup() {
 ```
 ### 3. Handshake
 ```cpp
-bool isController = I2C::handshake();
+I2C::Role role = I2C::handshake();
 ```
 ### 4. Read/Write
 ```cpp
-I2C::write(I2C_TARGET_ADDRESS, data, /* wait = */true);
-I2C::read(I2C_TARGET_ADDRESS, data);
+I2C::write(I2C::targetAddress, data, I2C::Mode::Sync);
+I2C::read(I2C::targetAddress, data);
 ```
 ### 5. Callbacks
 ```cpp
@@ -89,7 +89,7 @@ Define before `#include <ArduboyI2C.h>`.
 | Macro | Default | Options | Description |
 |-------|---------|---------|-------------|
 | `I2C_IMPLEMENTATION` | - | - | Must be defined in **one** source file to include the implementation. |
-| `I2C_FREQUENCY` | 100000 | 0-300000 | Bus frequency (Hz) |
+| `I2C_FREQUENCY` | 100000 | 1-200000 | Bus frequency (Hz) |
 | `I2C_BUFFER_CAPACITY` | 32 | 1-255 | Transaction buffer size |
 | `I2C_HANDSHAKE_BUSY_CHECKS` | 128 | 1-65535 | Number of times to check for a busy bus during a handshake. |
 | `I2C_CHECK_CABLE_FLIPPED_CHECKS` | 128 | 1-65535 | Number of checks to perform during cable flip detection. |

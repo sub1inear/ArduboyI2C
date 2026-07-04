@@ -37,10 +37,10 @@ I2C::checkCableFlipped([]() {
 });
 ```
 
-`I2C::handshake()` waits for the other device and determines which one becomes the controller. It has the same API as `I2C::checkCableFlipped()`. It returns whether this device is the controller (master) or not.
+`I2C::handshake()` waits for the other device and determines which one becomes the controller. It has the same API as `I2C::checkCableFlipped()`. It returns whether this device is the controller (master) or the target (slave). Here, we draw a message while waiting for the other device to respond:
 
 ```cpp
-bool isController = I2C::handshake([]() {
+I2C::Role role = I2C::handshake([]() {
     drawMessage(F("Waiting for other\nplayer..."));
 });
 ```
@@ -67,13 +67,13 @@ On the controller side, sending and receiving is straightforward:
 
 ```cpp
 // read the remote player's position from the target
-I2C::read(I2C_TARGET_ADDRESS, remotePlayer);
+I2C::read(I2C::targetAddress, remotePlayer);
 // send our position to the target (non-blocking)
-I2C::write(I2C_TARGET_ADDRESS, localPlayer, false);
+I2C::write(I2C::targetAddress, localPlayer, I2C::Mode::Async);
 ```
 
 `I2C::read()` and `I2C::write()` accept any object and automatically determine its size from its type.
-The `false` argument to `write()` makes it non-blocking; the library handles the transfer in the background using interrupts while your game logic continues.
+The `I2C::Mode::Async` argument to `write()` makes it non-blocking; the library handles the transfer in the background using interrupts while your game logic continues.
 
 On the target side, the controller is the one initiating everything.
 The target registers callbacks to respond when the controller writes to it or reads from it:
@@ -130,18 +130,17 @@ uint8_t leftInput;
 
 // send our input and retry until acknowledged
 do {
-    I2C::write(I2C_TARGET_ADDRESS, rightInput, true);
-} while (I2C::getError() != I2C_ERROR_NONE);
+    I2C::write(I2C::targetAddress, rightInput, I2C::Mode::Sync);
+} while (I2C::getError() != I2C::Error::None);
 
 // read the target's input and retry until acknowledged
 do {
-    I2C::read(I2C_TARGET_ADDRESS, leftInput);
-} while (I2C::getError() != I2C_ERROR_NONE);
+    I2C::read(I2C::targetAddress, leftInput);
+} while (I2C::getError() != I2C::Error::None);
 ```
 
-The `true` in `write()` makes it blocking; the function does not return until the transfer s complet
-e.
-The `do`/`while` loop keeps retrying if the target is not yet ready, which is expected when he target needs a moment to set up for the new frame.
+The `I2C::Mode::Sync` in `write()` makes it blocking; the function does not return until the transfer has completed.
+The `do`/`while` loop keeps retrying if the target is not yet ready, which is expected when the target needs a moment to set up for the new frame.
 
 The target side is more involved.
 It uses `volatile` variables to communicate between the main loop and the interrupt callbacks:
@@ -165,7 +164,7 @@ void onRequest() {
 ```
 
 The `volatile` keyword is essential here.
-Without it, the compiler may notice that `controllerReceived` is never written to from the ain loop's point of view and assume it will never change, turning `while (!controllerReceived) { }` into an infi nite loop.
+Without it, the compiler may notice that `controllerReceived` is never written to from the main loop's point of view and assume it will never change, turning `while (!controllerReceived) { }` into an infinite loop.
 `volatile` tells the compiler to always re-read the variable from memory, even if it does not appear to change.
 
 The target then steps through a specific sequence each frame:
@@ -175,7 +174,7 @@ The target then steps through a specific sequence each frame:
 targetInput = arduboy.buttonsState();
 
 // become visible on the bus — we are ready
-I2C::setAddress(I2C_TARGET_ADDRESS);
+I2C::setAddress(I2C::targetAddress);
 
 // wait for the controller to send its input
 while (!controllerReceived) { }
@@ -187,11 +186,11 @@ while (!controllerRequested) { }
 controllerRequested = false;
 
 // go invisible again — done for this frame
-I2C::setAddress(I2C_NULL_ADDRESS);
+I2C::setAddress(I2C::nullAddress);
 ```
 
-The `I2C_NULL_ADDRESS` trick is the key to keeping both devices in sync.
-When the target sets its address to `I2C_NULL_ADDRESS`, it stops responding on the bus entirely.
+The `I2C::nullAddress` trick is the key to keeping both devices in sync.
+When the target sets its address to `I2C::nullAddress`, it stops responding on the bus entirely.
 This prevents the controller from accidentally reading ahead into the next frame and getting stale input before the target has had a chance to update it.
 The target only becomes reachable once it is actually ready to participate in the new frame.
 
@@ -239,7 +238,7 @@ struct GameState {
 GameState localState;
 
 // controller side
-I2C::write(I2C_TARGET_ADDRESS, localState, false);
+I2C::write(I2C::targetAddress, localState, I2C::Mode::Async);
 
 // target side
 void onRequest() {
@@ -260,11 +259,11 @@ void onReceive() {
 
 `I2C::getError()` returns the status of the last read or write:
 
-- `I2C_ERROR_NONE`: no error.
-- `I2C_ERROR_WRITE_ADDR_NACK`: the target did not acknowledge during a write; it is not eady or not connected.
-- `I2C_ERROR_READ_ADDR_NACK`: the target did not acknowledge during a read; same cause.
-- `I2C_ERROR_WRITE_DATA_NACK`: the target acknowledged its address but stopped responding id-transfer.
-- `I2C_ERROR_BUS`: an illegal start or stop condition was detected on the bus.
+- `I2C::Error::None`: no error.
+- `I2C::Error::WriteAddrNACK`: the target did not acknowledge during a write; it is not ready or not connected.
+- `I2C::Error::ReadAddrNACK`: the target did not acknowledge during a read; same cause.
+- `I2C::Error::WriteDataNACK`: the target acknowledged its address but stopped responding during transfer.
+- `I2C::Error::Bus`: an illegal start or stop condition was detected on the bus.
 
 In a state-sync game you can often ignore errors and simply skip the update for that frame; the last known state will do.
 In lockstep, you need to retry until success, as the Pong example shows.

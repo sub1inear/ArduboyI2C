@@ -89,13 +89,13 @@ void displayTest(const __FlashStringHelper *name, bool result) {
 	arduboy.display();
 }
 
-void displayIsController(bool isController) {
+void displayRole(I2C::Role role) {
 	int16_t cursorX = arduboy.getCursorX();
 	int16_t cursorY = arduboy.getCursorY();
 
 	arduboy.setCursor(WIDTH - 1 * 5, 0);
 
-	if (isController) {
+	if (role == I2C::Role::Controller) {
 		arduboy.print(F("C"));
 	} else {
 		arduboy.print(F("T"));
@@ -132,11 +132,11 @@ void testReadCallback() {
 	readCallbackCalled = true;
 }
 
-bool testRead(bool isController) {
-	if (isController) {
+bool testRead(I2C::Role role) {
+	if (role == I2C::Role::Controller) {
 		uint8_t buffer[16];
-		I2C::read(I2C_TARGET_ADDRESS, buffer);
-		assert_eq(I2C::getError(), I2C_ERROR_NONE);
+		I2C::read(I2C::targetAddress, buffer);
+		assert_eq((uint8_t)I2C::getError(), (uint8_t)I2C::Error::None);
 		assert_eq(memcmp(buffer, bufferExpected, 16), 0);
 	} else {
 		uint32_t start = millis();
@@ -161,10 +161,10 @@ void testWriteCallback() {
 	memcpy(debugBuffer, I2C::getBuffer(), 16);
 }
 
-bool testWrite(bool isController) {
-	if (isController) {
-		I2C::write(I2C_TARGET_ADDRESS, bufferExpected, 16, true);
-		assert_eq(I2C::getError(), I2C_ERROR_NONE);
+bool testWrite(I2C::Role role) {
+	if (role == I2C::Role::Controller) {
+		I2C::write(I2C::targetAddress, bufferExpected, I2C::Mode::Sync);
+		assert_eq((uint8_t)I2C::getError(), (uint8_t)I2C::Error::None);
 	} else {
 		uint32_t start = millis();
 		while (!writeCallbackCalled) {
@@ -205,16 +205,16 @@ void setup() {
 	displayTest(F("setAddress"), testAddress());
 	displayTest(F("ccFlipped"), testCheckCableFlipped());
 
-	bool isController = I2C::handshake();
+	I2C::Role role = I2C::handshake();
 	I2C::onReceive(testWriteCallback);
 	I2C::onRequest(testReadCallback);
 
-	displayIsController(isController);
+	displayRole(role);
 
 	displayTest(F("handshake"), testHandshake());
 
-	displayTest(F("read"), testRead(isController));
-	displayTest(F("write"), testWrite(isController));
+	displayTest(F("read"), testRead(role));
+	displayTest(F("write"), testWrite(role));
 
 	if (allTestsPassed) {
 		arduboy.digitalWriteRGB(GREEN_LED, RGB_ON);
