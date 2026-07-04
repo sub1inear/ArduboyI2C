@@ -451,6 +451,10 @@ public:
      *   I2C::onReceive(dataReceive);
      * }
      * \endcode
+     * \note
+     * Interrupts are disabled during this callback.
+     * Any functions called within it should not rely on interrupts (i.e. no `Serial`, `delay`, `millis`, etc.).
+     * To respond to the controller (master), use reply() instead of write().
      * \see onRequest() reply() read()
      */
     static void onReceive(void (*function)());
