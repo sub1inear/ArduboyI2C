@@ -132,23 +132,6 @@ Macros</h2></td></tr>
 <tr class="memdesc:ad9ecf80e1eac083d16ec47f9d3aeb39f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The port on which the SDA and SCL lines are connected.  <br /></td></tr>
 <tr class="memitem:ab4386d053f69f39963bebf5f03b6eeee" id="r_ab4386d053f69f39963bebf5f03b6eeee"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab4386d053f69f39963bebf5f03b6eeee">I2C_DDR</a>&#160;&#160;&#160;DDRD</td></tr>
 <tr class="memdesc:ab4386d053f69f39963bebf5f03b6eeee"><td class="mdescLeft">&#160;</td><td class="mdescRight">The data direction register for the SDA and SCL lines.  <br /></td></tr>
-<tr class="memitem:ae72038a5b7f1da6a2011d5f496ec456f" id="r_ae72038a5b7f1da6a2011d5f496ec456f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae72038a5b7f1da6a2011d5f496ec456f">I2C_TARGET_ADDRESS</a>&#160;&#160;&#160;0x08</td></tr>
-<tr class="memdesc:ae72038a5b7f1da6a2011d5f496ec456f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The target address set by the handshake function.  <br /></td></tr>
-<tr class="memitem:a78012d027cb5161789d31825b92e64ef" id="r_a78012d027cb5161789d31825b92e64ef"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a78012d027cb5161789d31825b92e64ef">I2C_NULL_ADDRESS</a>&#160;&#160;&#160;0x09</td></tr>
-<tr class="memdesc:a78012d027cb5161789d31825b92e64ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">The null address used to disable a target from responding.  <br /></td></tr>
-<tr class="memitem:a30ba63d11f50aa3c0cbc36f0ee1bab1e" id="r_a30ba63d11f50aa3c0cbc36f0ee1bab1e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a30ba63d11f50aa3c0cbc36f0ee1bab1e">I2C_ERROR_WRITE_ADDR_NACK</a>&#160;&#160;&#160;TW_MT_SLA_NACK</td></tr>
-<tr class="memdesc:a30ba63d11f50aa3c0cbc36f0ee1bab1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Target (slave) did not acknowledge its address during a write; it is not connected or is not responding.  <br /></td></tr>
-<tr class="memitem:a542726c381aaa517a3c1a2a624ef0952" id="r_a542726c381aaa517a3c1a2a624ef0952"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a542726c381aaa517a3c1a2a624ef0952">I2C_ERROR_WRITE_DATA_NACK</a>&#160;&#160;&#160;TW_MT_DATA_NACK</td></tr>
-<tr class="memdesc:a542726c381aaa517a3c1a2a624ef0952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving.  <br /></td></tr>
-<tr class="memitem:ade8812a776582b1ad88a48084a687bf3" id="r_ade8812a776582b1ad88a48084a687bf3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ade8812a776582b1ad88a48084a687bf3">I2C_ERROR_READ_ADDR_NACK</a>&#160;&#160;&#160;TW_MR_SLA_NACK</td></tr>
-<tr class="memdesc:ade8812a776582b1ad88a48084a687bf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Target (slave) did not acknowledge its address during a read; it is not connected or is not responding.  <br /></td></tr>
-<tr class="memitem:aef7eb8156a252e04e0f1fb9dd52d5f12" id="r_aef7eb8156a252e04e0f1fb9dd52d5f12"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aef7eb8156a252e04e0f1fb9dd52d5f12">I2C_ERROR_ARB_LOST</a>&#160;&#160;&#160;TW_MT_ARB_LOST</td></tr>
-<tr class="memdesc:aef7eb8156a252e04e0f1fb9dd52d5f12"><td class="mdescLeft">&#160;</td><td class="mdescRight">This device lost arbitration while trying to become the controller (master); another device is already the controller (master).  <br /></td></tr>
-<tr class="memitem:a5fde78ef00c458e3bdd93879e0dc2980" id="r_a5fde78ef00c458e3bdd93879e0dc2980"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5fde78ef00c458e3bdd93879e0dc2980">I2C_ERROR_BUS</a>&#160;&#160;&#160;TW_BUS_ERROR</td></tr>
-<tr class="memdesc:a5fde78ef00c458e3bdd93879e0dc2980"><td class="mdescLeft">&#160;</td><td class="mdescRight">An illegal start or stop condition was detected on the bus.  <br /></td></tr>
-<tr class="memitem:a3b85237fbd089b6ea90cf512d8e3c9df" id="r_a3b85237fbd089b6ea90cf512d8e3c9df"><td class="memItemLeft"><a id="a3b85237fbd089b6ea90cf512d8e3c9df" name="a3b85237fbd089b6ea90cf512d8e3c9df"></a>
-#define&#160;</td><td class="memItemRight"><b>I2C_ERROR_NONE</b>&#160;&#160;&#160;0xFF</td></tr>
-<tr class="memdesc:a3b85237fbd089b6ea90cf512d8e3c9df"><td class="mdescLeft">&#160;</td><td class="mdescRight">No error has occurred. <br /></td></tr>
 <tr class="memitem:af39e2a48363339e93f433abab9d97a1f" id="r_af39e2a48363339e93f433abab9d97a1f"><td class="memItemLeft"><a id="af39e2a48363339e93f433abab9d97a1f" name="af39e2a48363339e93f433abab9d97a1f"></a>
 #define&#160;</td><td class="memItemRight"><b>I2C_VERSION_MAJOR</b>&#160;&#160;&#160;3</td></tr>
 <tr class="memdesc:af39e2a48363339e93f433abab9d97a1f"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_i2_c.html">I2C</a> library major version. <br /></td></tr>
@@ -177,7 +160,7 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 
 <p>The initial <a class="el" href="class_i2_c.html">I2C</a> frequency in Hz. </p>
-<p>Defaults to 100000 Hz, with a maximum of 300000 Hz. The Arduboy FX-C only has software pullups, so the <a class="el" href="class_i2_c.html">I2C</a> frequency must be &lt; 300000 Hz to ensure reliability. </p>
+<p>Defaults to 100000 Hz, with a maximum of 200000 Hz. The Arduboy FX-C only has software pullups, so the <a class="el" href="class_i2_c.html">I2C</a> frequency must be &lt; 200000 Hz to ensure reliability. </p>
 
 </div>
 </div>
@@ -331,125 +314,6 @@ Macros</h2></td></tr>
 
 <p>The data direction register for the SDA and SCL lines. </p>
 <p>Defaults to DDRD. </p><dl class="section note"><dt>Note</dt><dd>There can be only one data direction register for the SDA and SCL lines to increase optimization. </dd></dl>
-
-</div>
-</div>
-<a id="ae72038a5b7f1da6a2011d5f496ec456f" name="ae72038a5b7f1da6a2011d5f496ec456f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae72038a5b7f1da6a2011d5f496ec456f">&#9670;&#160;</a></span>I2C_TARGET_ADDRESS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define I2C_TARGET_ADDRESS&#160;&#160;&#160;0x08</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The target address set by the handshake function. </p>
-<p>This is the address that the controller (master) should use to communicate with the target (slave) when using the handshake function. This is optional; the address can be changed to whatever you wish but is kept for convenience. </p>
-
-</div>
-</div>
-<a id="a78012d027cb5161789d31825b92e64ef" name="a78012d027cb5161789d31825b92e64ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78012d027cb5161789d31825b92e64ef">&#9670;&#160;</a></span>I2C_NULL_ADDRESS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define I2C_NULL_ADDRESS&#160;&#160;&#160;0x09</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The null address used to disable a target from responding. </p>
-<p>This is useful in lockstep multiplayer to soft-disable a target (slave) from responding to the controller (master) without having to call <span class="tt"><a class="el" href="class_i2_c.html#a7977b9ae901f988109d03fafd8e96493" title="Deinitializes I2C hardware.">I2C::end()</a></span>. This is only a convention and is optional; the address can be changed to whatever you wish but is kept for convenience. </p>
-
-</div>
-</div>
-<a id="a30ba63d11f50aa3c0cbc36f0ee1bab1e" name="a30ba63d11f50aa3c0cbc36f0ee1bab1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a30ba63d11f50aa3c0cbc36f0ee1bab1e">&#9670;&#160;</a></span>I2C_ERROR_WRITE_ADDR_NACK</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define I2C_ERROR_WRITE_ADDR_NACK&#160;&#160;&#160;TW_MT_SLA_NACK</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Target (slave) did not acknowledge its address during a write; it is not connected or is not responding. </p>
-<p>Error code returned by <a class="el" href="class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41" title="Gets the hardware error which happened in a previous read or write.">I2C::getError()</a>. </p>
-
-</div>
-</div>
-<a id="a542726c381aaa517a3c1a2a624ef0952" name="a542726c381aaa517a3c1a2a624ef0952"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a542726c381aaa517a3c1a2a624ef0952">&#9670;&#160;</a></span>I2C_ERROR_WRITE_DATA_NACK</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define I2C_ERROR_WRITE_DATA_NACK&#160;&#160;&#160;TW_MT_DATA_NACK</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Target (slave) did not acknowledge the data sent to it during a write; it disconnected or hung in the middle of receiving. </p>
-<p>Error code returned by <a class="el" href="class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41" title="Gets the hardware error which happened in a previous read or write.">I2C::getError()</a>. </p>
-
-</div>
-</div>
-<a id="ade8812a776582b1ad88a48084a687bf3" name="ade8812a776582b1ad88a48084a687bf3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade8812a776582b1ad88a48084a687bf3">&#9670;&#160;</a></span>I2C_ERROR_READ_ADDR_NACK</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define I2C_ERROR_READ_ADDR_NACK&#160;&#160;&#160;TW_MR_SLA_NACK</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Target (slave) did not acknowledge its address during a read; it is not connected or is not responding. </p>
-<p>Error code returned by <a class="el" href="class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41" title="Gets the hardware error which happened in a previous read or write.">I2C::getError()</a>. </p>
-
-</div>
-</div>
-<a id="aef7eb8156a252e04e0f1fb9dd52d5f12" name="aef7eb8156a252e04e0f1fb9dd52d5f12"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef7eb8156a252e04e0f1fb9dd52d5f12">&#9670;&#160;</a></span>I2C_ERROR_ARB_LOST</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define I2C_ERROR_ARB_LOST&#160;&#160;&#160;TW_MT_ARB_LOST</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>This device lost arbitration while trying to become the controller (master); another device is already the controller (master). </p>
-<p>Error code returned by <a class="el" href="class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41" title="Gets the hardware error which happened in a previous read or write.">I2C::getError()</a>. </p><dl class="section note"><dt>Note</dt><dd>This code has no distinction between reads and writes (hardware constraint). </dd></dl>
-
-</div>
-</div>
-<a id="a5fde78ef00c458e3bdd93879e0dc2980" name="a5fde78ef00c458e3bdd93879e0dc2980"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fde78ef00c458e3bdd93879e0dc2980">&#9670;&#160;</a></span>I2C_ERROR_BUS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define I2C_ERROR_BUS&#160;&#160;&#160;TW_BUS_ERROR</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>An illegal start or stop condition was detected on the bus. </p>
-<p>Error code returned by <a class="el" href="class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41" title="Gets the hardware error which happened in a previous read or write.">I2C::getError()</a>. </p>
 
 </div>
 </div>

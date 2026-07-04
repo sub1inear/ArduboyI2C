@@ -14,5 +14,6 @@ var searchData=
   ['arduboyi2c_20over_20wire_11',['Why ArduboyI2C over Wire?',['../index.html#autotoc_md3',1,'']]],
   ['arduboyi2c_2eh_12',['ArduboyI2C.h',['../_arduboy_i2_c_8h.html',1,'']]],
   ['arduino_20ide_13',['Arduino IDE',['../index.html#autotoc_md5',1,'']]],
-  ['at_20once_14',['How do I send/receive more than 32 bytes at once?',['../index.html#autotoc_md21',1,'']]]
+  ['async_14',['Async',['../class_i2_c.html#a18e3ec2d8876fd8337a03365b674a04da24aa4117da86c41684ad25742832dfa6',1,'I2C']]],
+  ['at_20once_15',['How do I send/receive more than 32 bytes at once?',['../index.html#autotoc_md21',1,'']]]
 ];
