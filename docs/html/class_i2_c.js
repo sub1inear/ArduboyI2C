@@ -18,6 +18,7 @@ var class_i2_c =
     [ "getError", "class_i2_c.html#a738a5a8165a791cdb308d99a8abf2c41", null ],
     [ "getBuffer", "class_i2_c.html#a79aafb09ac49b31ac6eb1fecd6d9141e", null ],
     [ "getBufferSize", "class_i2_c.html#a6fbee6e90b41dfa087516e5f09b87176", null ],
+    [ "getActive", "class_i2_c.html#ab90b7b0e1fc4d6ca6ee60fea4ca0817f", null ],
     [ "checkCableFlipped", "class_i2_c.html#a2f6838a1bf488c4710481aa5fd07db1e", null ],
     [ "handshake", "class_i2_c.html#aa61b835c3ebfd83dae60559c957c4318", null ]
 ];

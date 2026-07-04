@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['t_20i_20use_20certain_20i2c_20addresses_20for_20my_20own_20address_0',['Why can&apos;t I use certain I2C addresses for my own address?',['../index.html#autotoc_md22',1,'']]],
-  ['t_20i_20use_20delay_20serial_20millis_20etc_20inside_20onreceive_20onrequest_20callbacks_1',['Why can&apos;t I use &lt;span class=&quot;tt&quot;&gt;delay()&lt;/span&gt;, &lt;span class=&quot;tt&quot;&gt;Serial&lt;/span&gt;, &lt;span class=&quot;tt&quot;&gt;millis()&lt;/span&gt;, etc. inside &lt;span class=&quot;tt&quot;&gt;onReceive&lt;/span&gt;/&lt;span class=&quot;tt&quot;&gt;onRequest&lt;/span&gt; callbacks?',['../index.html#autotoc_md17',1,'']]],
-  ['than_2032_20bytes_20at_20once_2',['How do I send/receive more than 32 bytes at once?',['../index.html#autotoc_md20',1,'']]],
-  ['the_20library_3',['1. Include the library',['../index.html#autotoc_md8',1,'']]],
-  ['types_20of_20multiplayer_4',['Types of Multiplayer',['../index.html#autotoc_md23',1,'']]]
+  ['send_20receive_20more_20than_2032_20bytes_20at_20once_0',['How do I send/receive more than 32 bytes at once?',['../index.html#autotoc_md21',1,'']]],
+  ['serial_20millis_20etc_20inside_20onreceive_20onrequest_20callbacks_1',['Why can&apos;t I use &lt;span class=&quot;tt&quot;&gt;delay()&lt;/span&gt;, &lt;span class=&quot;tt&quot;&gt;Serial&lt;/span&gt;, &lt;span class=&quot;tt&quot;&gt;millis()&lt;/span&gt;, etc. inside &lt;span class=&quot;tt&quot;&gt;onReceive&lt;/span&gt;/&lt;span class=&quot;tt&quot;&gt;onRequest&lt;/span&gt; callbacks?',['../index.html#autotoc_md18',1,'']]],
+  ['setaddress_2',['setAddress',['../class_i2_c.html#a3e4840f60c47698e399901ba942ad2fa',1,'I2C']]],
+  ['should_20i_20use_20i2c_3a_3awrite_20vs_20i2c_3a_3areply_3',['When should I use &lt;span class=&quot;tt&quot;&gt;I2C::write()&lt;/span&gt; vs &lt;span class=&quot;tt&quot;&gt;I2C::reply()&lt;/span&gt;?',['../index.html#autotoc_md20',1,'']]],
+  ['start_4',['Quick Start',['../index.html#autotoc_md7',1,'']]]
 ];

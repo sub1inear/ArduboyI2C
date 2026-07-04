@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['handshake_0',['3. Handshake',['../index.html#autotoc_md10',1,'']]],
-  ['how_20do_20i_20send_20receive_20more_20than_2032_20bytes_20at_20once_1',['How do I send/receive more than 32 bytes at once?',['../index.html#autotoc_md20',1,'']]]
+  ['getting_20linker_20errors_20about_20arduboyi2c_20functions_0',['Why am I getting linker errors about ArduboyI2C functions?',['../index.html#autotoc_md17',1,'']]]
 ];
