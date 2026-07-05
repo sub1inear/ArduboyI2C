@@ -238,7 +238,7 @@ public:
 
     /** \brief
      * Sets the 7-bit address of this device.
-     * \param address The 7-bit address (0-127) to set.
+     * \param address The 7-bit address to set.
      * Addresses 0-7 and 120-127 are reserved by the standard and should not be used.
      * \see getAddress()
      */
