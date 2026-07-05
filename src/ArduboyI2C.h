@@ -203,9 +203,9 @@ public:
     };
 
     enum class Role : uint8_t {
-        Controller = 0, ///< The device is the controller (master) and can read/write to the target (slave).
-        Target = 1, ///< The device is the target (slave) and can only read/write when requested by the controller (master).
-        None = 0xFF, ///< The device has not yet determined its role. Not returned by I2C::handshake() but provided for convenience.
+        None = 0, ///< The device has not yet determined its role. Not returned by I2C::handshake() but provided for convenience.
+        Controller = 1, ///< The device is the controller (master) and can read/write to the target (slave).
+        Target = 2, ///< The device is the target (slave) and can only read/write when requested by the controller (master).
     };
 
     /** \brief
