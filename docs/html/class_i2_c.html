@@ -111,9 +111,8 @@ Public Types</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="memdesc:aba8a1edcb115147e6533fc73057a4c83"><td class="mdescLeft">&#160;</td><td class="mdescRight">The error code of the last <a class="el" href="class_i2_c.html">I2C</a> controller (master) operation.  <a href="#aba8a1edcb115147e6533fc73057a4c83">More...</a><br /></td></tr>
-<tr class="memitem:ae6925af980882cb59a4fa4443d3c2e71" id="r_ae6925af980882cb59a4fa4443d3c2e71"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71">Role</a> : uint8_t { <a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71a6adf97f83acf6453d4a6a4b1070f3754">None</a> = 0
-, <a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25">Controller</a> = 1
-, <a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71ac41a31890959544c6523af684561abe5">Target</a> = 2
+<tr class="memitem:ae6925af980882cb59a4fa4443d3c2e71" id="r_ae6925af980882cb59a4fa4443d3c2e71"><td class="memItemLeft">enum class &#160;</td><td class="memItemRight"><a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71">Role</a> : uint8_t { <a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25">Controller</a> = 0
+, <a class="el" href="#ae6925af980882cb59a4fa4443d3c2e71ac41a31890959544c6523af684561abe5">Target</a> = 1
  }</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
@@ -258,9 +257,7 @@ static constexpr uint8_t&#160;</td><td class="memItemRight"><b>targetAddress</b>
 </table>
 </div><div class="memdoc">
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae6925af980882cb59a4fa4443d3c2e71a6adf97f83acf6453d4a6a4b1070f3754" name="ae6925af980882cb59a4fa4443d3c2e71a6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>The device has not yet determined its role. Not returned by <a class="el" href="#ad7c4736e1de96d7e14d1d8bea83c1c10" title="Waits for another device and returns whether this device is the controller (master) or target (slave)...">I2C::handshake()</a> but provided for convenience. </p>
-</td></tr>
-<tr><td class="fieldname"><a id="ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25" name="ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25"></a>Controller&#160;</td><td class="fielddoc"><p>The device is the controller (master) and can read/write to the target (slave). </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25" name="ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25"></a>Controller&#160;</td><td class="fielddoc"><p>The device is the controller (master) and can read/write to the target (slave). </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ae6925af980882cb59a4fa4443d3c2e71ac41a31890959544c6523af684561abe5" name="ae6925af980882cb59a4fa4443d3c2e71ac41a31890959544c6523af684561abe5"></a>Target&#160;</td><td class="fielddoc"><p>The device is the target (slave) and can only read/write when requested by the controller (master). </p>
 </td></tr>

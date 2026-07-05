@@ -12,7 +12,6 @@ var class_i2_c =
       [ "None", "class_i2_c.html#aba8a1edcb115147e6533fc73057a4c83a6adf97f83acf6453d4a6a4b1070f3754", null ]
     ] ],
     [ "Role", "class_i2_c.html#ae6925af980882cb59a4fa4443d3c2e71", [
-      [ "None", "class_i2_c.html#ae6925af980882cb59a4fa4443d3c2e71a6adf97f83acf6453d4a6a4b1070f3754", null ],
       [ "Controller", "class_i2_c.html#ae6925af980882cb59a4fa4443d3c2e71a9bbf373797bf7cf7ba62c80023682e25", null ],
       [ "Target", "class_i2_c.html#ae6925af980882cb59a4fa4443d3c2e71ac41a31890959544c6523af684561abe5", null ]
     ] ],
