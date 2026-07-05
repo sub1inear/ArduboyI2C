@@ -38,9 +38,9 @@ var NAVTREE =
         [ "2. Initialize", "index.html#autotoc_md9", null ],
         [ "3. Handshake", "index.html#autotoc_md10", null ],
         [ "4. Read/Write", "index.html#autotoc_md11", null ],
-        [ "5. Callbacks", "index.html#autotoc_md12", null ]
+        [ "5. Callbacks", "index.html#autotoc_md12", null ],
+        [ "6. Follow these Rules:", "index.html#autotoc_md13", null ]
       ] ],
-      [ "6. Follow these Rules:", "index.html#autotoc_md13", null ],
       [ "Configuration", "index.html#autotoc_md14", null ],
       [ "Migrating from Wire Library", "index.html#autotoc_md15", null ],
       [ "FAQ", "index.html#autotoc_md16", [
