@@ -29,7 +29,8 @@ public:
 	void updateInput();
 
 private:
-	I2C::Role role = I2C::Role::None;
+	I2C::Role role;
+	bool multiplayerConnected = false;
 };
 
 void ERROR(const char* msg);

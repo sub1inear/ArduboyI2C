@@ -36,7 +36,7 @@ struct Player {
 Player localPlayer = { 0, 0 };
 Player remotePlayer = { 0, 0 };
 
-I2C::Role role = I2C::Role::None;
+I2C::Role role;
 
 void drawMessage(const __FlashStringHelper *message) {
     // __FlashStringHelper ensures message is stored in flash memory (with the F() macro)

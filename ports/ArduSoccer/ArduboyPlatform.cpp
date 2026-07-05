@@ -72,36 +72,34 @@ void ArduboyPlatform::update()
 		}
     }
 	updateInput();
-	if (role == I2C::Role::Controller)
+	if (multiplayerConnected)
 	{
-		do {
-			I2C::write(I2C::targetAddress, inputState[LOCAL_PLAYER], I2C::Mode::Sync);
-		} while (I2C::getError() != I2C::Error::None);
+		if (role == I2C::Role::Controller)
+		{
+			do {
+				I2C::write(I2C::targetAddress, inputState[LOCAL_PLAYER], I2C::Mode::Sync);
+			} while (I2C::getError() != I2C::Error::None);
 
-		lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
-		do {
-			I2C::read(I2C::targetAddress, inputState[REMOTE_PLAYER]);
-		} while (I2C::getError() != I2C::Error::None);
-	}
-	else if (role == I2C::Role::Target)
-	{
-		I2C::setAddress(I2C::targetAddress);
-		while (!controllerReceived) { }
-		controllerReceived = false;
-		while (!controllerRequested) { }
-		controllerRequested = false;
-		I2C::setAddress(I2C::nullAddress);
-	}
-	else if (role == I2C::Role::None)
-	{
-		// no multiplayer connected, nothing to do...
+			lastInputState[REMOTE_PLAYER] = inputState[REMOTE_PLAYER];
+			do {
+				I2C::read(I2C::targetAddress, inputState[REMOTE_PLAYER]);
+			} while (I2C::getError() != I2C::Error::None);
+		}
+		else
+		{
+			I2C::setAddress(I2C::targetAddress);
+			while (!controllerReceived) { }
+			controllerReceived = false;
+			while (!controllerRequested) { }
+			controllerRequested = false;
+			I2C::setAddress(I2C::nullAddress);
+		}
 	}
 }
 
 void ArduboyPlatform::disconnectMultiplayer()
 {
-	role = I2C::Role::None;
-	I2C::setAddress(I2C::nullAddress);
+	multiplayerConnected = false;
 }
 
 bool ArduboyPlatform::connectMultiplayer()
@@ -123,6 +121,8 @@ bool ArduboyPlatform::connectMultiplayer()
 		I2C::onReceive(onReceive);
 		I2C::onRequest(onRequest);
 	}
+
+	multiplayerConnected = true;
 
 	return role == I2C::Role::Controller;
 }
