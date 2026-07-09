@@ -114,7 +114,7 @@ Make sure you define `I2C_IMPLEMENTATION` in **one** source file before includin
 Callbacks are executed inside the I2C interrupt handler, where interrupts are disabled. Functions that rely on interrupts (`delay`, `millis`, `Serial`, etc.) won't work. Keep callbacks short and only use `I2C::reply()` and `I2C::getBuffer()`. If you need to do extended processing or rely on interrupts, set a `volatile bool` flag, copy the data out of the buffer, and then poll the flag in your main loop.
 
 ### Can I use ArduboyI2C in Ardens?
-[Ardens](https://github.com/tiberiusbrown/Ardens) will soon support I2C multiplayer; stay tuned.
+Yes, [Ardens](https://github.com/tiberiusbrown/Ardens) supports I2C multiplayer!
 
 ### When should I use `I2C::write()` vs `I2C::reply()`?
 Use `I2C::write()` as the controller (master) to send data. Use `I2C::reply()` inside an `onRequest` callback to send data back when another device reads from you. Calling `write()` from a callback won't work correctly.
