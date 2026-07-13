@@ -205,6 +205,17 @@ public:
     enum class Role : uint8_t {
         Controller = 0, ///< The device is the controller (master) and can read/write to the target (slave).
         Target = 1, ///< The device is the target (slave) and can only read/write when requested by the controller (master).
+        None = 2 ///< The device is neither a controller nor a target.
+    };
+
+    enum class CallbackAction : uint8_t {
+        Continue = 0, ///< Continue the handshake/check cable flipped loop.
+        Exit = 1 ///< Exit the handshake/check cable flipped loop.
+    };
+
+    enum class CallbackOutcome : uint8_t {
+        Completed = 0, ///< The operation completed successfully.
+        Exited = 1, ///< The operation exited early due to a callback returning I2C::CallbackAction::Exit.
     };
 
     /** \brief
@@ -496,6 +507,8 @@ public:
      * Loop functions should be as fast as possible; it is not recommended to use arduboy.nextFrame() within a loop function.
      */
     static void checkCableFlipped(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
+    static I2C::CallbackOutcome checkCableFlippedUntil(I2C::CallbackAction (*startFunction)() = nullptr,
+                                                       I2C::CallbackAction (*loopFunction)() = nullptr);
 
     /** \brief
      * Waits for another device and returns whether this device is the controller (master) or target (slave).
@@ -508,6 +521,8 @@ public:
      * Loop functions should be as fast as possible; it is not recommended to use `arduboy.nextFrame()` within a loop function.
      */
     static I2C::Role handshake(void (*startFunction)() = nullptr, void (*loopFunction)() = nullptr);
+    static I2C::Role handshakeUntil(I2C::CallbackAction (*startFunction)() = nullptr,
+                                    I2C::CallbackAction (*loopFunction)() = nullptr);
 };
 
 #ifdef I2C_IMPLEMENTATION
@@ -745,6 +760,32 @@ void I2C::checkCableFlipped(void (*startFunction)(), void (*loopFunction)()) {
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 }
 
+I2C::CallbackOutcome I2C::checkCableFlippedUntil(I2C::CallbackAction (*startFunction)(),
+                                 I2C::CallbackAction (*loopFunction)()) {
+    TWCR = 0;
+    if (i2c_detail::checkCableFlippedCore(false)) {
+        if (startFunction) {
+            I2C::CallbackAction action = startFunction();
+            if (action == I2C::CallbackAction::Exit) {
+                TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
+                return I2C::CallbackOutcome::Exited;
+            }
+        }
+        for (uint16_t i = 0; i < I2C_CHECK_CABLE_FLIPPED_DEBOUNCE_CHECKS; i++) {
+            if (i2c_detail::checkCableFlippedCore(true)) {
+                i = 0;
+            }
+            I2C::CallbackAction action = loopFunction();
+            if (action == I2C::CallbackAction::Exit) {
+                return I2C::CallbackOutcome::Exited;
+            }
+
+        }
+    }
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
+    return I2C::CallbackOutcome::Completed;
+}
+
 I2C::Role I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
     // check if the bus is free (SDA and SCL are high for 128 half-periods)
     // if it is not, another controller (master) has gotten here before us
@@ -760,7 +801,6 @@ I2C::Role I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
             // so we will NACK the first transmission and the ACK the second transmission
             // so we need to wait for two transmissions
             _delay_us((1000000.0 / I2C_FREQUENCY * 18.0 + 25.0) * 2.0);
-            // return `false` to indicate that this device is the target (slave)
             return I2C::Role::Target;
         }
         // half-period delay otherwise too fast
@@ -777,6 +817,36 @@ I2C::Role I2C::handshake(void (*startFunction)(), void (*loopFunction)()) {
             loopFunction();
         }
         // repeat until the write is successful (no NACKs)
+    } while (I2C::getError() != I2C::Error::None);
+    return I2C::Role::Controller;
+}
+
+I2C::Role I2C::handshakeUntil(I2C::CallbackAction (*startFunction)(),
+                              I2C::CallbackAction (*loopFunction)()) {
+    for (uint16_t i = 0; i < I2C_HANDSHAKE_BUSY_CHECKS; i++) {
+        if ((I2C_PIN & (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) !=
+            (_BV(I2C_SDA_BIT) | _BV(I2C_SCL_BIT))) {
+            I2C::setAddress(I2C::targetAddress);
+            _delay_us((1000000.0 / I2C_FREQUENCY * 18.0 + 25.0) * 2.0);
+            return I2C::Role::Target;
+        }
+        _delay_us(1000000.0 / I2C_FREQUENCY / 2.0);
+    }
+    uint8_t zeros = 0b00000000;
+    if (startFunction) {
+        I2C::CallbackAction action = startFunction();
+        if (action == I2C::CallbackAction::Exit) {
+            return I2C::Role::None;
+        }
+    }
+    do {
+        I2C::write(I2C::targetAddress, zeros, I2C::Mode::Sync);
+        if (loopFunction) {
+            I2C::CallbackAction action = loopFunction();
+            if (action == I2C::CallbackAction::Exit) {
+                return I2C::Role::None;
+            }
+        }
     } while (I2C::getError() != I2C::Error::None);
     return I2C::Role::Controller;
 }

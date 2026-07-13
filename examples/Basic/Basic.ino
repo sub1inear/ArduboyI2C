@@ -64,23 +64,40 @@ void setup() {
     I2C::begin();
 
     // check if the cable is flipped and wait for it to be flipped back
-    I2C::checkCableFlipped([]() {
+    I2C::CallbackOutcome outcome = I2C::checkCableFlippedUntil([]() {
         // cable is flipped, draw message
         // F() macro ensures the string is stored in flash memory instead of RAM
         drawMessage(F("Please flip the cable\non this device."));
     });
 
-    // waits for other device and determines if this device is the controller (master) or target (slave)
-    role = I2C::handshake([]() {
-        // waiting for a handshake, display message
-        // F() macro ensures the string is stored in flash memory instead of RAM
-        drawMessage(F("Waiting for other\nplayer..."));
-    });
+    while (true) {
+        drawMessage(F("Press A to start\nhandshake..."));
+        while (!arduboy.pressed(A_BUTTON)) { }
+        arduboy.waitNoButtons();
 
-    // if we're the target (slave), set up the receive and request callbacks
-    if (role == I2C::Role::Target) {
-        I2C::onReceive(onReceive);
-        I2C::onRequest(onRequest);
+        // waits for other device and determines if this device is the controller (master) or target (slave)
+        role = I2C::handshakeUntil([]() {
+            // waiting for a handshake, display message
+            // F() macro ensures the string is stored in flash memory instead of RAM
+            drawMessage(F("Waiting for other\nplayer..."));
+            return I2C::CallbackAction::Continue;
+        }, []() {
+            if (arduboy.pressed(A_BUTTON)) {
+                // exit the handshake loop if A button is pressed
+                arduboy.waitNoButtons();
+                return I2C::CallbackAction::Exit;
+            }
+            return I2C::CallbackAction::Continue;
+        });
+
+        // if we're the target (slave), set up the receive and request callbacks
+        if (role == I2C::Role::Target) {
+            I2C::onReceive(onReceive);
+            I2C::onRequest(onRequest);
+        }
+        if (role != I2C::Role::None) {
+            break;
+        }
     }
 }
 
